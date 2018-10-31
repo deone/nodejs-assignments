@@ -42,7 +42,7 @@ const server = http.createServer((req, res) => {
 })
 
 // Start the server
-server.listen(8080, () =>
+server.listen(port, () =>
   console.log(`Running on ${env} environment on port ${port}`)
 )
 
@@ -56,8 +56,25 @@ const handlers = {}
 
 handlers.notFound = (data, callback) => callback(404, 'Not Found')
 
-handlers.hello = (data, callback) =>
-  callback(200, `Hi there. You said ${data}`)
+handlers.hello = (data, callback) => {
+  http.get('http://fortunecookieapi.herokuapp.com/v1/cookie', (resp) => {
+    let cookie = ''
+  
+    // A chunk of data has been recieved.
+    resp.on('data', (chunk) => {
+      cookie += chunk
+    });
+  
+    // The whole response has been received. Print out the result.
+    resp.on('end', () => {
+      cookie = JSON.parse(cookie)[0].fortune.message
+      callback(200, `Hi there. You said ${data}. Here's a cookie for you - ${cookie}`)
+    });
+  
+  }).on("error", (err) => {
+    console.log("Error: " + err.message)
+  })
+}
 
 const router = {
   hello: handlers.hello
