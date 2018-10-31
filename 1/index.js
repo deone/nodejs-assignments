@@ -60,12 +60,12 @@ handlers.hello = (data, callback) => {
   http.get('http://fortunecookieapi.herokuapp.com/v1/cookie', (resp) => {
     let cookie = ''
   
-    // A chunk of data has been recieved.
+    // A chunk of data has been received.
     resp.on('data', (chunk) => {
       cookie += chunk
     });
   
-    // The whole response has been received. Print out the result.
+    // The whole response has been received. Return response.
     resp.on('end', () => {
       cookie = JSON.parse(cookie)[0].fortune.message
       callback(200, `Hi there. You said ${data}. Here's a cookie for you - ${cookie}`)
