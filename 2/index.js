@@ -4,6 +4,15 @@ const StringDecoder = require('string_decoder').StringDecoder
 const { port, env } = require('./lib/config')
 const handlers = require('./lib/handlers')
 const helpers = require('./lib/helpers')
+const _data = require('./lib/data')
+
+
+// Testing
+// @TODO: Delete this
+// _data.create('test', 'newFile', {'foo': 'bar'})
+// _data.read('test', 'newFile')
+// _data.update('test', 'newFile', 'Aloha')
+
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
