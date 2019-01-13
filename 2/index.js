@@ -9,9 +9,10 @@ const _data = require('./lib/data')
 
 // Testing
 // @TODO: Delete this
-// _data.create('test', 'newFile', {'foo': 'bar'})
+//_data.create('test', 'newFile', {'foo': 'bar'})
 // _data.read('test', 'newFile')
 // _data.update('test', 'newFile', 'Aloha')
+// _data.delete('test', 'newFile')
 
 
 // Configure the server to respond to all requests with a string

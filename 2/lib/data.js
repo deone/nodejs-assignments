@@ -21,7 +21,7 @@ lib.create = (dir, file, data) => {
   openFile(helpers.filePath(lib.baseDir, dir, file), 'wx')
     .then((fileDescriptor) =>
       writeFile(fileDescriptor, dataString))
-    .catch((err) => console.log(err))
+    .catch(console.error)
 }
 
 // Read data from a file
@@ -50,7 +50,13 @@ lib.update = (dir, file, data) => {
 }
 
 // Delete a file
-lib.delete = (dir, file, callback) => {}
+lib.delete = (dir, file) => {
+  const deleteFile = util.promisify(fs.unlink)
+
+  deleteFile(helpers.filePath(lib.baseDir, dir, file))
+    .then(console.log('File deleted'))
+    .catch(console.error)
+}
 
 
 // Export the module
