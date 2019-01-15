@@ -16,7 +16,7 @@ const helpers = require('./lib/helpers')
 // _data.update('test', 'newFile', 'Aloha')
 // _data.delete('test', 'newFile')
 
-const fs = require('fs')
+/* const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 
@@ -29,7 +29,7 @@ openFile(helpers.filePath(baseDir, 'test', 'newFile'), 'wx')
     writeFile(fileDescriptor, JSON.stringify({'foo': 'bar'})))
       .then(console.log('File created'))
       .catch(console.error)
-  .catch(console.error)
+  .catch(console.error) */
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {

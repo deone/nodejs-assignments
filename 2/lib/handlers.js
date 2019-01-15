@@ -1,7 +1,9 @@
 /* Request Handlers */
 
 // Dependencies
+const fs = require('fs')
 const path = require('path')
+const { promisify } = require('util')
 
 const helpers = require('./helpers')
 
@@ -39,7 +41,10 @@ handlers._users.post = (data, callback) => {
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
   if(firstName && lastName && email && streetAddress) {
-    
+    const readFile = promisify(fs.readFile)
+    readFile(helpers.filePath(helpers.baseDir, 'test', 'newFile'), 'utf8')
+      .then(console.log)
+      .catch(console.error)
   } else {
     callback(400, {'Error': 'Missing required fields'})
   }
