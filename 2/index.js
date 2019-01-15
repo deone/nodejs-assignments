@@ -11,13 +11,25 @@ const helpers = require('./lib/helpers')
 // @TODO: Delete this
 // const _data = require('./lib/data')
 
-/* _data.create('test', 'newFile', {'foo': 'bar'}, (err) => {
-  console.log('this was the error', err)
-}) */
-// _data.read('test', 'newFile', () => {})
+// _data.create('test', 'newFile', {'foo': 'bar'})
+// _data.read('test', 'newFile')
 // _data.update('test', 'newFile', 'Aloha')
 // _data.delete('test', 'newFile')
 
+const fs = require('fs')
+const path = require('path')
+const { promisify } = require('util')
+
+const openFile = promisify(fs.open)
+const writeFile = promisify(fs.writeFile)
+const baseDir = path.join(__dirname,'./.data/')
+
+openFile(helpers.filePath(baseDir, 'test', 'newFile'), 'wx')
+  .then((fileDescriptor) =>
+    writeFile(fileDescriptor, JSON.stringify({'foo': 'bar'})))
+      .then(console.log('File created'))
+      .catch(console.error)
+  .catch(console.error)
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
