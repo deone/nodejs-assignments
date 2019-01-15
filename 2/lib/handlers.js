@@ -42,9 +42,29 @@ handlers._users.post = (data, callback) => {
 
   if(firstName && lastName && email && streetAddress) {
     const readFile = promisify(fs.readFile)
-    readFile(helpers.filePath(helpers.baseDir, 'test', 'newFile'), 'utf8')
+    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(console.log)
-      .catch(console.error)
+      .catch((err) => {
+        // Create the user object
+        const userObject = { firstName, lastName, email, streetAddress }
+
+        // Store the user
+        const openFile = promisify(fs.open)
+        const writeFile = promisify(fs.writeFile)
+
+        openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
+          .then((fileDescriptor) =>
+            writeFile(fileDescriptor, JSON.stringify(userObject)))
+              .then(() => callback(200))
+              .catch((err) => {
+                console.log(err)
+                callback(500, {'Error': 'Could not create the new user'})
+              })
+          .catch((err) => {
+            console.log(err)
+            callback(500, {'Error': 'Could not create the new user'})
+          })
+      })
   } else {
     callback(400, {'Error': 'Missing required fields'})
   }
