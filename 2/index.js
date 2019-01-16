@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
     statusCode = typeof statusCode === 'number' ? statusCode : 200
 
     // Use the payload returned from the handler, or set the default payload to an empty object
-    message = typeof message == 'object'? message : {}
+    message = typeof message == 'object' ? message : {}
 
     // Convert the payload to a string
     const messageString = JSON.stringify(message);

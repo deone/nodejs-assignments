@@ -6,6 +6,7 @@ const path = require('path')
 const { promisify } = require('util')
 
 const helpers = require('./helpers')
+const readFile = promisify(fs.readFile)
 
 
 const handlers = {}
@@ -41,7 +42,6 @@ handlers._users.post = (data, callback) => {
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
   if(firstName && lastName && email && streetAddress) {
-    const readFile = promisify(fs.readFile)
     readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(console.log)
       .catch((err) => {
@@ -76,9 +76,14 @@ handlers._users.post = (data, callback) => {
 // @TODO Only let an authenticated user access their object. Dont let them access anyone elses.
 handlers._users.get = (data, callback) => {
   // Validate email - do this properly, maybe with regex
-  const email = helpers.validate(data.queryStringObject.email.trim())
+  const email = helpers.validate(data.queryStringObject.email)
   if(email) {
     // Look up user
+    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+      .then((data) => callback(200, helpers.parseJsonToObject(data)))
+      .catch((err) => callback(404))
+  } else {
+    callback(400, {'Error': 'Missing required field'})
   }
 }
 
