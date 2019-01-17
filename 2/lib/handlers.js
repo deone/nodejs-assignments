@@ -6,7 +6,10 @@ const path = require('path')
 const { promisify } = require('util')
 
 const helpers = require('./helpers')
+
 const readFile = promisify(fs.readFile)
+const writeFile = promisify(fs.writeFile)
+const openFile = promisify(fs.open)
 
 
 const handlers = {}
@@ -29,16 +32,9 @@ handlers._users = {}
 // Option data: none
 handlers._users.post = (data, callback) => {
   // Check that all required fields are filled out
-  // firstName
   const firstName = helpers.validate(data.payload.firstName)
-
-  // lastName
   const lastName = helpers.validate(data.payload.lastName)
-
-  // email
   const email = helpers.validate(data.payload.email)
-
-  // streetAddress
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
   if(firstName && lastName && email && streetAddress) {
@@ -49,9 +45,6 @@ handlers._users.post = (data, callback) => {
         const userObject = { firstName, lastName, email, streetAddress }
 
         // Store the user
-        const openFile = promisify(fs.open)
-        const writeFile = promisify(fs.writeFile)
-
         openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
           .then((fileDescriptor) =>
             writeFile(fileDescriptor, JSON.stringify(userObject)))
@@ -88,7 +81,62 @@ handlers._users.get = (data, callback) => {
 }
 
 // Users - put
-handlers._users.put = (data, callback) => {}
+// Required data: email
+// Optional data: firstName, lastName, streetAddress (at least one must be specified)
+// @TODO Only let an authenticated user up their object. Dont let them access update elses.
+handlers._users.put = (data, callback) => {
+  // Check for required field 
+  const email = helpers.validate(data.payload.email)
+
+  // Check for optional fields
+  const firstName = helpers.validate(data.payload.firstName)
+  const lastName = helpers.validate(data.payload.lastName)
+  const streetAddress = helpers.validate(data.payload.streetAddress)
+
+  if(!email) {
+    callback(400, {'Error': 'Missing required field'})
+  } else {
+    if(firstName || lastName || streetAddress) {
+      readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+        .then((data) => {
+          // Update fields if necessary
+          const userObject = helpers.parseJsonToObject(data)
+
+          if(firstName)
+            userObject.firstName = firstName
+
+          if(lastName)
+            userObject.lastName = lastName
+
+          if(streetAddress)
+            userObject.streetAddress = streetAddress
+
+          // Store updates
+          // This block is same as lines 48 - 59
+          // Exception is file mode and error messages.
+          // Refactor.
+          openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
+            .then((fileDescriptor) =>
+              writeFile(fileDescriptor, JSON.stringify(userObject)))
+                .then(() => callback(200))
+                .catch((err) => {
+                  console.log(err)
+                  callback(500, {'Error': 'Could not update user'})
+                })
+            .catch((err) => {
+              console.log(err)
+              callback(500, {'Error': 'Could not update user'})
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+          callback(400, {'Error': 'User does not exist'})
+        })
+    } else {
+      callback(400, {'Error': 'Missing fields to update'})
+    }
+  }
+}
 
 // Users - delete
 handlers._users.delete = (data, callback) => {}
