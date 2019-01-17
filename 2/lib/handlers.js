@@ -7,9 +7,10 @@ const { promisify } = require('util')
 
 const helpers = require('./helpers')
 
+const openFile = promisify(fs.open)
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
-const openFile = promisify(fs.open)
+const deleteFile = promisify(fs.unlink)
 
 
 const handlers = {}
@@ -85,10 +86,10 @@ handlers._users.get = (data, callback) => {
 // Optional data: firstName, lastName, streetAddress (at least one must be specified)
 // @TODO Only let an authenticated user up their object. Dont let them access update elses.
 handlers._users.put = (data, callback) => {
-  // Check for required field 
+  // Validate required field 
   const email = helpers.validate(data.payload.email)
 
-  // Check for optional fields
+  // Validate optional fields, if provided
   const firstName = helpers.validate(data.payload.firstName)
   const lastName = helpers.validate(data.payload.lastName)
   const streetAddress = helpers.validate(data.payload.streetAddress)
@@ -139,6 +140,29 @@ handlers._users.put = (data, callback) => {
 }
 
 // Users - delete
-handlers._users.delete = (data, callback) => {}
+// Required data: email
+// @TODO Only let an authenticated user delete their object. Dont let them delete update elses.
+// @TODO Cleanup (delete) any other data files associated with the user
+handlers._users.delete = (data, callback) => {
+  // Validate email
+  const email = helpers.validate(data.payload.email)
+  if(email) {
+    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+      .then((data) => {
+        deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
+          .then(() => callback(200))
+          .catch((err) => {
+            console.log(err)
+            callback(500, {'Error': 'Could not delete user'})
+          })
+      })
+      .catch((err) => {
+        console.log(err)
+        callback(400, {'Error': 'Could not find user'})
+      })
+  } else {
+    callback(400, {'Error': 'Missing required field'})
+  }
+}
 
 module.exports = handlers
