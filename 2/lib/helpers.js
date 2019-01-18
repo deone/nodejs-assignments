@@ -1,5 +1,7 @@
 // Dependencies
+const fs = require('fs')
 const path = require('path')
+const { promisify } = require('util')
 
 
 const helpers = {}
@@ -22,5 +24,6 @@ helpers.parseJsonToObject = str => {
   }
 }
 
+helpers.openFile = promisify(fs.open)
 
 module.exports = helpers

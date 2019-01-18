@@ -2,12 +2,10 @@
 
 // Dependencies
 const fs = require('fs')
-const path = require('path')
 const { promisify } = require('util')
 
 const helpers = require('./helpers')
 
-const openFile = promisify(fs.open)
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 const deleteFile = promisify(fs.unlink)
@@ -46,7 +44,7 @@ handlers._users.post = (data, callback) => {
         const userObject = { firstName, lastName, email, streetAddress }
 
         // Store the user
-        openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
+        helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
           .then((fileDescriptor) =>
             writeFile(fileDescriptor, JSON.stringify(userObject)))
               .then(() => callback(200))
@@ -116,7 +114,7 @@ handlers._users.put = (data, callback) => {
           // This block is same as lines 48 - 59
           // Exception is file mode and error messages.
           // Refactor.
-          openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
+          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
             .then((fileDescriptor) =>
               writeFile(fileDescriptor, JSON.stringify(userObject)))
                 .then(() => callback(200))
