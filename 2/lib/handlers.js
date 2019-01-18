@@ -3,6 +3,28 @@
 // Dependencies
 const helpers = require('./helpers')
 
+const fileWriter = (email, userObject, callback, action) => {
+
+  const actionFileOpenMap = {
+    'create': 'wx',
+    'update': 'w'
+  }
+
+  helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email),
+    actionFileOpenMap[action])
+    .then((fileDescriptor) =>
+      helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
+        .then(() => callback(200))
+        .catch((err) => {
+          console.log(err)
+          callback(500, {'Error': `Could not ${action} user`})
+        })
+    .catch((err) => {
+      console.log(err)
+      callback(500, {'Error': `Could not ${action} user`})
+    })
+}
+
 
 const handlers = {}
 
@@ -37,18 +59,7 @@ handlers._users.post = (data, callback) => {
         const userObject = { firstName, lastName, email, streetAddress }
 
         // Store the user
-        helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
-          .then((fileDescriptor) =>
-            helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
-              .then(() => callback(200))
-              .catch((err) => {
-                console.log(err)
-                callback(500, {'Error': 'Could not create the new user'})
-              })
-          .catch((err) => {
-            console.log(err)
-            callback(500, {'Error': 'Could not create the new user'})
-          })
+        fileWriter(email, userObject, callback, 'create')
       })
   } else {
     callback(400, {'Error': 'Missing required fields'})
@@ -104,21 +115,7 @@ handlers._users.put = (data, callback) => {
             userObject.streetAddress = streetAddress
 
           // Store updates
-          // This block is same as lines 48 - 59
-          // Exception is file mode and error messages.
-          // Refactor.
-          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
-            .then((fileDescriptor) =>
-              helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
-                .then(() => callback(200))
-                .catch((err) => {
-                  console.log(err)
-                  callback(500, {'Error': 'Could not update user'})
-                })
-            .catch((err) => {
-              console.log(err)
-              callback(500, {'Error': 'Could not update user'})
-            })
+          fileWriter(email, userObject, callback, 'update')
         })
         .catch((err) => {
           console.log(err)
