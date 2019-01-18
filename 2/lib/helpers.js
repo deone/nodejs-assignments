@@ -25,5 +25,8 @@ helpers.parseJsonToObject = str => {
 }
 
 helpers.openFile = promisify(fs.open)
+helpers.readFile = promisify(fs.readFile)
+helpers.writeFile = promisify(fs.writeFile)
+helpers.deleteFile = promisify(fs.unlink)
 
 module.exports = helpers

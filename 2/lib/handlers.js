@@ -1,14 +1,7 @@
 /* Request Handlers */
 
 // Dependencies
-const fs = require('fs')
-const { promisify } = require('util')
-
 const helpers = require('./helpers')
-
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
-const deleteFile = promisify(fs.unlink)
 
 
 const handlers = {}
@@ -37,7 +30,7 @@ handlers._users.post = (data, callback) => {
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
   if(firstName && lastName && email && streetAddress) {
-    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(console.log)
       .catch((err) => {
         // Create the user object
@@ -46,7 +39,7 @@ handlers._users.post = (data, callback) => {
         // Store the user
         helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
           .then((fileDescriptor) =>
-            writeFile(fileDescriptor, JSON.stringify(userObject)))
+            helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
               .then(() => callback(200))
               .catch((err) => {
                 console.log(err)
@@ -71,7 +64,7 @@ handlers._users.get = (data, callback) => {
   const email = helpers.validate(data.queryStringObject.email)
   if(email) {
     // Look up user
-    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => callback(200, helpers.parseJsonToObject(data)))
       .catch((err) => callback(404))
   } else {
@@ -96,7 +89,7 @@ handlers._users.put = (data, callback) => {
     callback(400, {'Error': 'Missing required field'})
   } else {
     if(firstName || lastName || streetAddress) {
-      readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+      helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
         .then((data) => {
           // Update fields if necessary
           const userObject = helpers.parseJsonToObject(data)
@@ -116,7 +109,7 @@ handlers._users.put = (data, callback) => {
           // Refactor.
           helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
             .then((fileDescriptor) =>
-              writeFile(fileDescriptor, JSON.stringify(userObject)))
+              helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
                 .then(() => callback(200))
                 .catch((err) => {
                   console.log(err)
@@ -145,9 +138,9 @@ handlers._users.delete = (data, callback) => {
   // Validate email
   const email = helpers.validate(data.payload.email)
   if(email) {
-    readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => {
-        deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
+        helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
           .then(() => callback(200))
           .catch((err) => {
             console.log(err)
