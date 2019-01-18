@@ -3,10 +3,14 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 
-
 const helpers = {}
 
 helpers.baseDir = path.join(__dirname,'/../.data/')
+
+helpers.openFile = promisify(fs.open)
+helpers.readFile = promisify(fs.readFile)
+helpers.writeFile = promisify(fs.writeFile)
+helpers.deleteFile = promisify(fs.unlink)
 
 helpers.filePath = (baseDir, dir, file) =>
   path.join(baseDir, dir, file.concat('.','json'))
@@ -24,9 +28,27 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.openFile = promisify(fs.open)
-helpers.readFile = promisify(fs.readFile)
-helpers.writeFile = promisify(fs.writeFile)
-helpers.deleteFile = promisify(fs.unlink)
+helpers.fileWriter = (fileName, userObject, callback, action) => {
+
+  const actionFileOpenMap = {
+    'create': 'wx',
+    'update': 'w'
+  }
+
+  helpers.openFile(helpers.filePath(helpers.baseDir, 'users', fileName),
+    actionFileOpenMap[action])
+    .then((fileDescriptor) =>
+      helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
+        .then(() => callback(200))
+        .catch((err) => {
+          console.log(err)
+          callback(500, {'Error': `Could not ${action} user`})
+        })
+    .catch((err) => {
+      console.log(err)
+      callback(500, {'Error': `Could not ${action} user`})
+    })
+}
+
 
 module.exports = helpers
