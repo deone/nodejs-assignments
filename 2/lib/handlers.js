@@ -8,6 +8,7 @@ const handlers = {}
 
 handlers.notFound = (data, callback) => callback(404, 'Not Found')
 
+// User handlers
 handlers.users = (data, callback) => {
   const acceptableMethods = ['post', 'get', 'put', 'delete']
   if (acceptableMethods.includes(data.method)) {
@@ -17,6 +18,7 @@ handlers.users = (data, callback) => {
   }
 }
 
+// Container for user methods
 handlers._users = {}
 
 // Users - post
@@ -27,14 +29,18 @@ handlers._users.post = (data, callback) => {
   const firstName = helpers.validate(data.payload.firstName)
   const lastName = helpers.validate(data.payload.lastName)
   const email = helpers.validate(data.payload.email)
+  const password = helpers.validate(data.payload.password)
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
-  if(firstName && lastName && email && streetAddress) {
+  if(firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(console.log)
       .catch((err) => {
+        // Hash password
+        var hashedPassword = helpers.hash(password);
+
         // Create the user object
-        const userObject = { firstName, lastName, email, streetAddress }
+        const userObject = { firstName, lastName, email, streetAddress, hashedPassword }
 
         // Store the user
         helpers.fileWriter(email, userObject, callback, 'create')
@@ -130,5 +136,27 @@ handlers._users.delete = (data, callback) => {
     callback(400, {'Error': 'Missing required field'})
   }
 }
+
+// Token handlers
+handlers.tokens = (data, callback) => {
+  const acceptableMethods = ['post', 'get', 'put', 'delete']
+  if (acceptableMethods.includes(data.method)) {
+    handlers._tokens[data.method](data, callback)
+  } else {
+    callback(405)
+  }
+}
+
+// Container for token methods
+handlers._tokens = {}
+
+handlers._tokens.post = {}
+
+handlers._tokens.get = {}
+
+handlers._tokens.put = {}
+
+handlers._tokens.delete = {}
+
 
 module.exports = handlers

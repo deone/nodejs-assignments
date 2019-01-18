@@ -2,6 +2,9 @@
 const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
+const crypto = require('crypto')
+
+const config = require('./config')
 
 const helpers = {}
 
@@ -18,6 +21,14 @@ helpers.filePath = (baseDir, dir, file) =>
 // Validate email properly, maybe with regex
 helpers.validate = data =>
   typeof data === 'string' && data.trim().length > 0 ? data.trim() : false
+
+// Create a SHA256 hash
+helpers.hash = (str) => {
+  if(typeof str == 'string' && str.length > 0)
+    return crypto.createHmac(
+      'sha256', config.hashingSecret).update(str).digest('hex')
+  return false
+}
 
 // Parse a JSON string to an object in all cases, without throwing
 helpers.parseJsonToObject = str => {

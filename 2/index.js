@@ -2,34 +2,9 @@ const http = require('http')
 const StringDecoder = require('string_decoder').StringDecoder
 const url = require('url')
 
-const { port, env } = require('./lib/config')
+const config = require('./lib/config')
 const handlers = require('./lib/handlers')
 const helpers = require('./lib/helpers')
-
-
-// Testing
-// @TODO: Delete this
-// const _data = require('./lib/data')
-
-// _data.create('test', 'newFile', {'foo': 'bar'})
-// _data.read('test', 'newFile')
-// _data.update('test', 'newFile', 'Aloha')
-// _data.delete('test', 'newFile')
-
-/* const fs = require('fs')
-const path = require('path')
-const { promisify } = require('util')
-
-const openFile = promisify(fs.open)
-const writeFile = promisify(fs.writeFile)
-const baseDir = path.join(__dirname,'./.data/')
-
-openFile(helpers.filePath(baseDir, 'test', 'newFile'), 'wx')
-  .then((fileDescriptor) =>
-    writeFile(fileDescriptor, JSON.stringify({'foo': 'bar'})))
-      .then(console.log('File created'))
-      .catch(console.error)
-  .catch(console.error) */
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
@@ -103,10 +78,11 @@ const server = http.createServer((req, res) => {
 })
 
 const router = {
-  users: handlers.users
+  users: handlers.users,
+  tokens: handlers.tokens
 }
 
 // Start the server
-server.listen(port, () =>
-  console.log(`Running on ${env} environment on port ${port}`)
+server.listen(config.port, () =>
+  console.log(`Running on ${config.env} environment on port ${config.port}`)
 )
