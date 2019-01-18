@@ -39,26 +39,50 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.fileWriter = (fileName, userObject, callback, action) => {
+helpers.fileWriter = (fileName, object, action, dir, callback) => {
 
   const actionFileOpenMap = {
     'create': 'wx',
     'update': 'w'
   }
 
-  helpers.openFile(helpers.filePath(helpers.baseDir, 'users', fileName),
+  helpers.openFile(helpers.filePath(helpers.baseDir, dir, fileName),
     actionFileOpenMap[action])
     .then((fileDescriptor) =>
-      helpers.writeFile(fileDescriptor, JSON.stringify(userObject)))
+      helpers.writeFile(fileDescriptor, JSON.stringify(object)))
         .then(() => callback(200))
         .catch((err) => {
           console.log(err)
-          callback(500, {'Error': `Could not ${action} user`})
+          callback(500, {'Error': `Could not ${action} record`})
         })
     .catch((err) => {
       console.log(err)
-      callback(500, {'Error': `Could not ${action} user`})
+      callback(500, {'Error': `Could not ${action} record`})
     })
+}
+
+// Create a string of random alphanumeric characters, of a given length
+helpers.createRandomString = (strLength) => {
+  strLength = typeof strLength === 'number' && strLength > 0 ? strLength : false
+
+  if(strLength) {
+    // Define all the possible characters that could go into a string
+    const possibleCharacters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+    // Start the final string
+    let str = ''
+    for(let i = 1; i <= strLength; i++) {
+      // Get a random character from the possibleCharacters string
+      const randomCharacter = possibleCharacters.charAt(
+        Math.floor(Math.random() * possibleCharacters.length))
+      // Append this character to the string
+      str += randomCharacter
+    }
+    // Return the final string
+    return str
+  } else {
+    return false
+  }
 }
 
 

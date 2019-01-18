@@ -22,8 +22,8 @@ handlers.users = (data, callback) => {
 handlers._users = {}
 
 // Users - post
-// Required data: firstName, lastName, email, streetAddress
-// Option data: none
+// Required data: firstName, lastName, email, streetAddress, password
+// Optional data: none
 handlers._users.post = (data, callback) => {
   // Check that all required fields are filled out
   const firstName = helpers.validate(data.payload.firstName)
@@ -50,7 +50,7 @@ handlers._users.post = (data, callback) => {
           }
 
           // Store the user
-          helpers.fileWriter(email, userObject, callback, 'create')
+          helpers.fileWriter(email, userObject, 'create', 'users', callback)
         }
       })
   } else {
@@ -68,7 +68,11 @@ handlers._users.get = (data, callback) => {
   if(email) {
     // Look up user
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then((data) => callback(200, helpers.parseJsonToObject(data)))
+      .then((data) => {
+        data = helpers.parseJsonToObject(data)
+        delete data.hashedPassword
+        callback(200, data)
+      })
       .catch((err) => callback(404))
   } else {
     callback(400, {'Error': 'Missing required field'})
@@ -77,7 +81,7 @@ handlers._users.get = (data, callback) => {
 
 // Users - put
 // Required data: email
-// Optional data: firstName, lastName, streetAddress (at least one must be specified)
+// Optional data: firstName, lastName, streetAddress, password (at least one must be specified)
 // @TODO Only let an authenticated user up their object. Dont let them access update elses.
 handlers._users.put = (data, callback) => {
   // Validate required field 
@@ -87,11 +91,12 @@ handlers._users.put = (data, callback) => {
   const firstName = helpers.validate(data.payload.firstName)
   const lastName = helpers.validate(data.payload.lastName)
   const streetAddress = helpers.validate(data.payload.streetAddress)
+  const password = helpers.validate(data.payload.password)
 
   if(!email) {
     callback(400, {'Error': 'Missing required field'})
   } else {
-    if(firstName || lastName || streetAddress) {
+    if(firstName || lastName || streetAddress || password) {
       helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
         .then((data) => {
           // Update fields if necessary
@@ -106,8 +111,11 @@ handlers._users.put = (data, callback) => {
           if(streetAddress)
             userObject.streetAddress = streetAddress
 
+          if(password)
+            userObject.hashedPassword = helpers.hash(password)
+
           // Store updates
-          helpers.fileWriter(email, userObject, callback, 'update')
+          helpers.fileWriter(email, userObject, 'update', 'users', callback)
         })
         .catch((err) => {
           console.log(err)
@@ -158,7 +166,38 @@ handlers.tokens = (data, callback) => {
 // Container for token methods
 handlers._tokens = {}
 
-handlers._tokens.post = {}
+handlers._tokens.post = (data, callback) => {
+  const email = helpers.validate(data.payload.email)
+  const password = helpers.validate(data.payload.password)
+
+  if(email && password) {
+    // Lookup user with email
+    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+      .then((data) => {
+        data = helpers.parseJsonToObject(data)
+        // Hash the sent password, and compare it to the password stored in the user object
+        const hashedPassword = helpers.hash(password)
+
+        if(hashedPassword === data.hashedPassword) {
+          // If valid, create a new token with a random name. Set an expiration date 1 hour in the future.
+          const tokenId = helpers.createRandomString(20)
+          const expires = Date.now() + 1000 * 60 * 60
+          const tokenObject = { email, tokenId, expires }
+
+          // Store the token
+          helpers.fileWriter(tokenId, tokenObject, 'create', 'tokens', callback)
+        } else {
+          callback(400, {
+            'Error': "Password did not match the specified user's stored password"
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        callback(400, {'Error': 'User does not exist'})
+      })
+  }
+}
 
 handlers._tokens.get = {}
 
