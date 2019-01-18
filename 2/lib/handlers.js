@@ -37,13 +37,21 @@ handlers._users.post = (data, callback) => {
       .then(console.log)
       .catch((err) => {
         // Hash password
-        var hashedPassword = helpers.hash(password);
+        const hashedPassword = helpers.hash(password)
 
         // Create the user object
-        const userObject = { firstName, lastName, email, streetAddress, hashedPassword }
+        if(hashedPassword) {
+          const userObject = {
+            firstName,
+            lastName,
+            email,
+            streetAddress,
+            hashedPassword
+          }
 
-        // Store the user
-        helpers.fileWriter(email, userObject, callback, 'create')
+          // Store the user
+          helpers.fileWriter(email, userObject, callback, 'create')
+        }
       })
   } else {
     callback(400, {'Error': 'Missing required fields'})
