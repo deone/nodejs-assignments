@@ -50,7 +50,14 @@ helpers.fileWriter = (fileName, object, action, dir, callback) => {
     actionFileOpenMap[action])
     .then((fileDescriptor) =>
       helpers.writeFile(fileDescriptor, JSON.stringify(object)))
-        .then(() => callback(200))
+        .then(() => {
+          // Return token object, if we just created one
+          if (action === 'create' && dir === 'tokens') {
+            callback(200, object)
+          } else {
+            callback(200)
+          }
+        })
         .catch((err) => {
           console.log(err)
           callback(500, {'Error': `Could not ${action} record`})
