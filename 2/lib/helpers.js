@@ -14,9 +14,15 @@ helpers.openFile = promisify(fs.open)
 helpers.readFile = promisify(fs.readFile)
 helpers.writeFile = promisify(fs.writeFile)
 helpers.deleteFile = promisify(fs.unlink)
+helpers.readDir = promisify(fs.readdir)
 
-helpers.filePath = (baseDir, dir, file) =>
-  path.join(baseDir, dir, file.concat('.','json'))
+helpers.filePath = (baseDir, dir, file) => {
+  if (!file) {
+    return path.join(baseDir, dir, '/')
+  } else {
+    return path.join(baseDir, dir, file.concat('.','json'))
+  }
+}
 
 // Validate email properly, maybe with regex
 helpers.validate = data =>
@@ -126,6 +132,36 @@ helpers.createToken = (email, callback) => {
 
 helpers.deleteToken = email =>
   helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', email))
+
+helpers.deleteTokenById = (tokenId, callback) => {
+  helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
+    .then((data) => {
+      data.forEach((fileName) => {
+        helpers.getToken(fileName.slice(0, -5))
+          .then((token) => {
+            const tokenObject = helpers.parseJsonToObject(token)
+            const email = tokenObject.email
+
+            if (tokenObject.tokenId === tokenId) {
+              helpers.deleteToken(email)
+                .then(callback(200, {'Success': 'User logged out'}))
+                .catch((err) => {
+                  console.log(err)
+                  callback(500, {'Error': 'Unable to log user out. Cannot delete token'})
+                })
+            }
+          })
+          .catch((err) => {
+            console.log(err)
+            callback(500, {'Error': 'Unable to log user out. Cannot get token'})
+          })
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+      callback(500, {'Error': 'Unable to log user out. Cannot read directory'})
+    })
+}
 
 
 module.exports = helpers

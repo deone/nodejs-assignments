@@ -152,7 +152,14 @@ handlers.accounts.login = (data, callback) => {
     data, callback, acceptableMethods, handlers.accounts._login)
 }
 
+handlers.accounts.logout = (data, callback) => {
+  const acceptableMethods = ['post']
+  return helpers.requestDispatcher(
+    data, callback, acceptableMethods, handlers.accounts._logout)
+}
+
 handlers.accounts._login = {}
+handlers.accounts._logout = {}
 
 // Login - post
 // Required data: email, password
@@ -208,13 +215,17 @@ handlers.accounts._login.post = (data, callback) => {
   }
 }
 
-handlers.accounts.logout = (data, callback) => {
-  const acceptableMethods = ['post']
-  return helpers.requestDispatcher(
-    data, callback, acceptableMethods, handlers.accounts._logout)
+// Logout - post
+// Required data: tokenId
+// Optional data: none
+handlers.accounts._logout.post = (data, callback) => {
+  const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
+  if (tokenId) {
+    helpers.deleteTokenById(tokenId, callback)
+  } else {
+    callback(400, {'Error' : 'Missing required fields'});
+  }
 }
-
-handlers.accounts._logout = {}
 
 
 module.exports = handlers
