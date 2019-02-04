@@ -23,7 +23,7 @@ helpers.validate = data =>
   typeof data === 'string' && data.trim().length > 0 ? data.trim() : false
 
 // Create a SHA256 hash
-helpers.hash = (str) => {
+helpers.hash = str => {
   if(typeof str == 'string' && str.length > 0)
     return crypto.createHmac(
       'sha256', config.hashingSecret).update(str).digest('hex')
@@ -100,6 +100,23 @@ helpers.requestDispatcher = (data, callback,
     callback(405)
   }
 }
+
+helpers.getToken = email =>
+  helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', email), 'utf8')
+
+helpers.createToken = (email, callback) => {
+  // Create token with a random name.
+  // Set an expiration date 1 hour in the future.
+  const tokenId = helpers.createRandomString(20)
+  const expires = Date.now() + 1000 * 60 * 60
+  const tokenObject = { email, tokenId, expires }
+
+  // Store the token
+  helpers.fileWriter(email, tokenObject, 'create', 'tokens', callback)
+}
+
+helpers.deleteToken = email =>
+  helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', email))
 
 
 module.exports = helpers

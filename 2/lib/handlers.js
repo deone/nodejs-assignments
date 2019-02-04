@@ -177,13 +177,32 @@ handlers.accounts._login.post = (data, callback) => {
         const hashedPassword = helpers.hash(password)
 
         if(hashedPassword === data.hashedPassword) {
-          // If valid, create a new token with a random name. Set an expiration date 1 hour in the future.
-          const tokenId = helpers.createRandomString(20)
-          const expires = Date.now() + 1000 * 60 * 60
-          const tokenObject = { email, tokenId, expires }
-
-          // Store the token
-          helpers.fileWriter(tokenId, tokenObject, 'create', 'tokens', callback)
+          // Check if user has a token
+          helpers.getToken(email)
+            .then((data) => {
+              console.log('got token')
+              // If user has a token
+              // check validity
+              const token = helpers.parseJsonToObject(data)
+              callback(200, token)
+              /* if (token.expires < Date.now()) {
+                // if token is invalid, delete it
+                helpers.deleteToken(email)
+                  .then()
+                  .catch()
+                // and create a new one
+                helpers.createToken(email, callback)
+              } else {
+                // else, return it
+                callback(200, token)
+              } */
+            })
+            .catch((err) => {
+              // Else
+              // - create one
+              console.log('created token')
+              helpers.createToken(email, callback)
+            })
         } else {
           callback(400, {
             'Error': "Password did not match the specified user's stored password"
