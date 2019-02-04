@@ -92,5 +92,14 @@ helpers.createRandomString = (strLength) => {
   }
 }
 
+helpers.requestDispatcher = (data, callback,
+  acceptableMethods, handlersContainer) => {
+  if (acceptableMethods.includes(data.method)) {
+    handlersContainer[data.method](data, callback)
+  } else {
+    callback(405)
+  }
+}
+
 
 module.exports = helpers

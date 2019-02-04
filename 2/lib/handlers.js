@@ -11,11 +11,8 @@ handlers.notFound = (data, callback) => callback(404, 'Not Found')
 // User handlers
 handlers.users = (data, callback) => {
   const acceptableMethods = ['post', 'get', 'put', 'delete']
-  if (acceptableMethods.includes(data.method)) {
-    handlers._users[data.method](data, callback)
-  } else {
-    callback(405)
-  }
+  return helpers.requestDispatcher(
+    data, callback, acceptableMethods, handlers._users)
 }
 
 // Container for user methods
@@ -129,6 +126,7 @@ handlers._users.put = (data, callback) => {
 
 // Users - delete
 // Required data: email
+// Optional data: none
 // @TODO Only let an authenticated user delete their object. Dont let them delete update elses.
 // @TODO Cleanup (delete) any other data files associated with the user
 handlers._users.delete = (data, callback) => {
@@ -153,20 +151,20 @@ handlers._users.delete = (data, callback) => {
   }
 }
 
-// Token handlers
-handlers.tokens = (data, callback) => {
-  const acceptableMethods = ['post', 'get', 'put', 'delete']
-  if (acceptableMethods.includes(data.method)) {
-    handlers._tokens[data.method](data, callback)
-  } else {
-    callback(405)
-  }
+handlers.accounts = {}
+
+handlers.accounts.login = (data, callback) => {
+  const acceptableMethods = ['post']
+  return helpers.requestDispatcher(
+    data, callback, acceptableMethods, handlers.accounts._login)
 }
 
-// Container for token methods
-handlers._tokens = {}
+handlers.accounts._login = {}
 
-handlers._tokens.post = (data, callback) => {
+// Login - post
+// Required data: email, password
+// Optional data: none
+handlers.accounts._login.post = (data, callback) => {
   const email = helpers.validate(data.payload.email)
   const password = helpers.validate(data.payload.password)
 
@@ -199,11 +197,13 @@ handlers._tokens.post = (data, callback) => {
   }
 }
 
-handlers._tokens.get = {}
+handlers.accounts.logout = (data, callback) => {
+  const acceptableMethods = ['post']
+  return helpers.requestDispatcher(
+    data, callback, acceptableMethods, handlers.accounts._logout)
+}
 
-handlers._tokens.put = {}
-
-handlers._tokens.delete = {}
+handlers.accounts._logout = {}
 
 
 module.exports = handlers

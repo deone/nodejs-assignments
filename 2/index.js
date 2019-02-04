@@ -79,7 +79,8 @@ const server = http.createServer((req, res) => {
 
 const router = {
   users: handlers.users,
-  tokens: handlers.tokens
+  login: handlers.accounts.login,
+  logout: handlers.accounts.logout
 }
 
 // Start the server
