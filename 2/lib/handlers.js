@@ -133,19 +133,11 @@ handlers._users.delete = (data, callback) => {
   // Validate email
   const email = helpers.validate(data.payload.email)
   if (email) {
-    // Why did we have to read file before deleting here?
-    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then((data) => {
-        helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
-          .then(() => callback(200))
-          .catch((err) => {
-            console.log(err)
-            callback(500, {'Error': 'Could not delete user'})
-          })
-      })
+    helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
+      .then(() => callback(200))
       .catch((err) => {
         console.log(err)
-        callback(400, {'Error': 'Could not find user'})
+        callback(500, {'Error': 'Could not delete user'})
       })
   } else {
     callback(400, {'Error': 'Missing required field'})
