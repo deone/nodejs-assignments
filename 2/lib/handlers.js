@@ -29,7 +29,7 @@ handlers._users.post = (data, callback) => {
   const password = helpers.validate(data.payload.password)
   const streetAddress = helpers.validate(data.payload.streetAddress)
 
-  if(firstName && lastName && email && streetAddress && password) {
+  if (firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(console.log)
       .catch((err) => {
@@ -62,7 +62,7 @@ handlers._users.post = (data, callback) => {
 handlers._users.get = (data, callback) => {
   // Validate email - do this properly, maybe with regex
   const email = helpers.validate(data.queryStringObject.email)
-  if(email) {
+  if (email) {
     // Look up user
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => {
@@ -132,7 +132,8 @@ handlers._users.put = (data, callback) => {
 handlers._users.delete = (data, callback) => {
   // Validate email
   const email = helpers.validate(data.payload.email)
-  if(email) {
+  if (email) {
+    // Why did we have to read file before deleting here?
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => {
         helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
@@ -168,7 +169,7 @@ handlers.accounts._login.post = (data, callback) => {
   const email = helpers.validate(data.payload.email)
   const password = helpers.validate(data.payload.password)
 
-  if(email && password) {
+  if (email && password) {
     // Lookup user with email
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => {
@@ -176,37 +177,36 @@ handlers.accounts._login.post = (data, callback) => {
         // Hash the sent password, and compare it to the password stored in the user object
         const hashedPassword = helpers.hash(password)
 
-        if(hashedPassword === data.hashedPassword) {
+        if (hashedPassword === data.hashedPassword) {
           // Check if user has a token
           helpers.getToken(email)
             .then((data) => {
-              console.log('got token')
               // If user has a token
-              // check validity
               const token = helpers.parseJsonToObject(data)
-              callback(200, token)
-              /* if (token.expires < Date.now()) {
+              // check validity
+              if (token.expires < Date.now()) {
                 // if token is invalid, delete it
                 helpers.deleteToken(email)
-                  .then()
-                  .catch()
+                  .catch((err) => {
+                    console.log(err)
+                    callback(400, {'Error': 'Unable to delete token'})
+                  })
                 // and create a new one
                 helpers.createToken(email, callback)
               } else {
                 // else, return it
                 callback(200, token)
-              } */
+              }
             })
             .catch((err) => {
               // Else
               // - create one
-              console.log('created token')
               helpers.createToken(email, callback)
             })
         } else {
           callback(400, {
             'Error': "Password did not match the specified user's stored password"
-          });
+          })
         }
       })
       .catch((err) => {

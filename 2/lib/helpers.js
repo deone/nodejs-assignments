@@ -101,6 +101,7 @@ helpers.requestDispatcher = (data, callback,
   }
 }
 
+// Token helpers
 helpers.getToken = email =>
   helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', email), 'utf8')
 
