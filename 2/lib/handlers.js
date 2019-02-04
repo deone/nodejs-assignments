@@ -47,7 +47,7 @@ handlers._users.post = (data, callback) => {
           }
 
           // Store the user
-          helpers.fileWriter(email, userObject, 'create', 'users', callback)
+          helpers.writeObject(email, userObject, 'create', 'users', callback)
         }
       })
   } else {
@@ -94,25 +94,25 @@ handlers._users.put = (data, callback) => {
     callback(400, {'Error': 'Missing required field'})
   } else {
     if(firstName || lastName || streetAddress || password) {
-      helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+      helpers.getUser(email)
         .then((data) => {
           // Update fields if necessary
           const userObject = helpers.parseJsonToObject(data)
 
-          if(firstName)
+          if (firstName)
             userObject.firstName = firstName
 
-          if(lastName)
+          if (lastName)
             userObject.lastName = lastName
 
-          if(streetAddress)
+          if (streetAddress)
             userObject.streetAddress = streetAddress
 
-          if(password)
+          if (password)
             userObject.hashedPassword = helpers.hash(password)
 
           // Store updates
-          helpers.fileWriter(email, userObject, 'update', 'users', callback)
+          helpers.writeObject(email, userObject, 'update', 'users', callback)
         })
         .catch((err) => {
           console.log(err)
@@ -133,8 +133,8 @@ handlers._users.delete = (data, callback) => {
   // Validate email
   const email = helpers.validate(data.payload.email)
   if (email) {
-    helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
-      .then(() => callback(200))
+    helpers.deleteUser(email)
+      .then(() => callback(200, {'Success': 'User successfully deleted'}))
       .catch((err) => {
         console.log(err)
         callback(500, {'Error': 'Could not delete user'})

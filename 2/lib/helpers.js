@@ -39,8 +39,9 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.fileWriter = (fileName, object, action, dir, callback) => {
+helpers.writeObject = (fileName, object, action, dir, callback) => {
 
+  const recordType = dir.slice(0, -1)
   const actionFileOpenMap = {
     'create': 'wx',
     'update': 'w'
@@ -55,30 +56,30 @@ helpers.fileWriter = (fileName, object, action, dir, callback) => {
           if (action === 'create' && dir === 'tokens') {
             callback(200, object)
           } else {
-            callback(200)
+            callback(200, {'Success': `User ${action}d successfully`})
           }
         })
         .catch((err) => {
           console.log(err)
-          callback(500, {'Error': `Could not ${action} record`})
+          callback(500, {'Error': `Could not ${action} ${recordType}`})
         })
     .catch((err) => {
       console.log(err)
-      callback(500, {'Error': `Could not ${action} record`})
+      callback(500, {'Error': `Could not ${action} ${recordType}`})
     })
 }
 
 // Create a string of random alphanumeric characters, of a given length
-helpers.createRandomString = (strLength) => {
+helpers.createRandomString = strLength => {
   strLength = typeof strLength === 'number' && strLength > 0 ? strLength : false
 
-  if(strLength) {
+  if (strLength) {
     // Define all the possible characters that could go into a string
     const possibleCharacters = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
     // Start the final string
     let str = ''
-    for(let i = 1; i <= strLength; i++) {
+    for (let i = 1; i <= strLength; i++) {
       // Get a random character from the possibleCharacters string
       const randomCharacter = possibleCharacters.charAt(
         Math.floor(Math.random() * possibleCharacters.length))
@@ -101,6 +102,13 @@ helpers.requestDispatcher = (data, callback,
   }
 }
 
+// User helpers
+helpers.getUser = email =>
+  helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+
+helpers.deleteUser = email =>
+  helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
+
 // Token helpers
 helpers.getToken = email =>
   helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', email), 'utf8')
@@ -113,7 +121,7 @@ helpers.createToken = (email, callback) => {
   const tokenObject = { email, tokenId, expires }
 
   // Store the token
-  helpers.fileWriter(email, tokenObject, 'create', 'tokens', callback)
+  helpers.writeObject(email, tokenObject, 'create', 'tokens', callback)
 }
 
 helpers.deleteToken = email =>
