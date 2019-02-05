@@ -5,6 +5,7 @@ const url = require('url')
 const config = require('./lib/config')
 const helpers = require('./lib/helpers')
 const handlers = require('./lib/handlers/handlers')
+const userHandler = require('./lib/handlers/users')
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
@@ -78,7 +79,7 @@ const server = http.createServer((req, res) => {
 })
 
 const router = {
-  users: handlers.users,
+  users: userHandler.users,
   login: handlers.login,
   logout: handlers.logout,
   menu: handlers.menu
