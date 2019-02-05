@@ -131,7 +131,7 @@ handlers._users.put = (data, callback) => {
 // @TODO Cleanup (delete) any other data files associated with the user
 handlers._users.delete = (data, callback) => {
   // Validate email
-  const email = helpers.validate(data.payload.email)
+  const email = helpers.validate(data.queryStringObject.email)
   if (email) {
     helpers.deleteUser(email)
       .then(() => callback(200, {'Success': 'User successfully deleted'}))
