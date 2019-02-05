@@ -3,8 +3,8 @@ const StringDecoder = require('string_decoder').StringDecoder
 const url = require('url')
 
 const config = require('./lib/config')
-const handlers = require('./lib/handlers')
 const helpers = require('./lib/helpers')
+const handlers = require('./lib/handlers/handlers')
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {

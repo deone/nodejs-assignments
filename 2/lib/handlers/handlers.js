@@ -1,7 +1,7 @@
 /* Request Handlers */
 
 // Dependencies
-const helpers = require('./helpers')
+const helpers = require('../helpers')
 
 
 const handlers = {}
@@ -127,7 +127,7 @@ handlers._users.put = (data, callback) => {
 // Users - delete
 // Required data: email
 // Optional data: none
-// @TODO Only let an authenticated user delete their object. Dont let them delete update elses.
+// @TODO Only let an authenticated user delete their object. Don't let them delete or update someone elses.
 // @TODO Cleanup (delete) any other data files associated with the user
 handlers._users.delete = (data, callback) => {
   // Validate email
