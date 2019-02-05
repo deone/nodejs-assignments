@@ -134,7 +134,7 @@ handlers._users.delete = (data, callback) => {
   const email = helpers.validate(data.queryStringObject.email)
   if (email) {
     helpers.deleteUser(email)
-      .then(() => callback(200, {'Success': 'User successfully deleted'}))
+      .then(() => callback(200, {'Success': 'User deleted successfully'}))
       .catch((err) => {
         console.log(err)
         callback(500, {'Error': 'Could not delete user'})
@@ -144,27 +144,25 @@ handlers._users.delete = (data, callback) => {
   }
 }
 
-handlers.accounts = {}
-
-handlers.accounts.login = (data, callback) => {
+handlers.login = (data, callback) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, handlers.accounts._login)
+    data, callback, acceptableMethods, handlers._login)
 }
 
-handlers.accounts.logout = (data, callback) => {
+handlers.logout = (data, callback) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, handlers.accounts._logout)
+    data, callback, acceptableMethods, handlers._logout)
 }
 
-handlers.accounts._login = {}
-handlers.accounts._logout = {}
+handlers._login = {}
+handlers._logout = {}
 
 // Login - post
 // Required data: email, password
 // Optional data: none
-handlers.accounts._login.post = (data, callback) => {
+handlers._login.post = (data, callback) => {
   const email = helpers.validate(data.payload.email)
   const password = helpers.validate(data.payload.password)
 
@@ -218,7 +216,7 @@ handlers.accounts._login.post = (data, callback) => {
 // Logout - post
 // Required data: tokenId
 // Optional data: none
-handlers.accounts._logout.post = (data, callback) => {
+handlers._logout.post = (data, callback) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
     helpers.deleteTokenById(tokenId, callback)
