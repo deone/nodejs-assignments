@@ -6,8 +6,6 @@ const helpers = require('../helpers')
 
 const handlers = {}
 
-handlers.notFound = (data, callback) => callback(404, 'Not Found')
-
 handlers.login = (data, callback) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(

@@ -7,6 +7,8 @@ const helpers = require('./lib/helpers')
 const handlers = require('./lib/handlers/handlers')
 const userHandler = require('./lib/handlers/users')
 
+const notFoundHandler = (data, callback) => callback(404, 'Not Found')
+
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
   // To process this request, we need a handler called thus:
@@ -51,7 +53,7 @@ const server = http.createServer((req, res) => {
   const chosenHandler =
     typeof router[trimmedPath] !== 'undefined'
       ? router[trimmedPath]
-      : handlers.notFound
+      : notFoundHandler
 
   // read in data provided by user into variable buffer
   const decoder = new StringDecoder('utf-8')
