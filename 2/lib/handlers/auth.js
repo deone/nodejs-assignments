@@ -1,30 +1,29 @@
-/* Request Handlers */
+/* Auth handlers */
 
 // Dependencies
 const helpers = require('../helpers')
 
+const authHandler = {}
 
-const handlers = {}
-
-handlers.login = (data, callback) => {
+authHandler.login = (data, callback) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, handlers._login)
+    data, callback, acceptableMethods, authHandler._login)
 }
 
-handlers.logout = (data, callback) => {
+authHandler.logout = (data, callback) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, handlers._logout)
+    data, callback, acceptableMethods, authHandler._logout)
 }
 
-handlers._login = {}
-handlers._logout = {}
+authHandler._login = {}
+authHandler._logout = {}
 
 // Login - post
 // Required data: email, password
 // Optional data: none
-handlers._login.post = (data, callback) => {
+authHandler._login.post = (data, callback) => {
   const email = helpers.validate(data.payload.email)
   const password = helpers.validate(data.payload.password)
 
@@ -78,7 +77,7 @@ handlers._login.post = (data, callback) => {
 // Logout - post
 // Required data: tokenId
 // Optional data: none
-handlers._logout.post = (data, callback) => {
+authHandler._logout.post = (data, callback) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
     helpers.deleteTokenById(tokenId, callback)
@@ -88,4 +87,4 @@ handlers._logout.post = (data, callback) => {
 }
 
 
-module.exports = handlers
+module.exports = authHandler

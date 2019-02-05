@@ -4,7 +4,7 @@ const url = require('url')
 
 const config = require('./lib/config')
 const helpers = require('./lib/helpers')
-const handlers = require('./lib/handlers/handlers')
+const authHandler = require('./lib/handlers/auth')
 const userHandler = require('./lib/handlers/users')
 
 const notFoundHandler = (data, callback) => callback(404, 'Not Found')
@@ -82,9 +82,8 @@ const server = http.createServer((req, res) => {
 
 const router = {
   users: userHandler.users,
-  login: handlers.login,
-  logout: handlers.logout,
-  menu: handlers.menu
+  login: authHandler.login,
+  logout: authHandler.logout
 }
 
 // Start the server

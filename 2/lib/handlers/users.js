@@ -5,7 +5,6 @@ const helpers = require('../helpers')
 
 const userHandler = {}
 
-// User handlers
 userHandler.users = (data, callback) => {
   const acceptableMethods = ['post', 'get', 'put', 'delete']
   return helpers.requestDispatcher(
