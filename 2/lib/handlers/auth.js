@@ -37,7 +37,7 @@ authHandler._login.post = (data, callback) => {
 
         if (hashedPassword === userObject.hashedPassword) {
           // Check if user has a token
-          // Read token directory
+          // Read tokens directory
           helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
             .then((fileNames) => {
               if (!fileNames.length) {
@@ -82,7 +82,7 @@ authHandler._login.post = (data, callback) => {
             })
             .catch((err) => {
               console.log(err)
-              callback(500, {'Error': 'Unable to read token directory'})
+              callback(500, {'Error': 'Unable to read tokens directory'})
             })
         } else {
           callback(400, {

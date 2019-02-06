@@ -16,11 +16,11 @@ helpers.writeFile = promisify(fs.writeFile)
 helpers.deleteFile = promisify(fs.unlink)
 helpers.readDir = promisify(fs.readdir)
 
-helpers.filePath = (baseDir, dir, file) => {
-  if (!file) {
+helpers.filePath = (baseDir, dir, fileName) => {
+  if (!fileName) {
     return path.join(baseDir, dir, '/')
   } else {
-    return path.join(baseDir, dir, file.concat('.','json'))
+    return path.join(baseDir, dir, fileName.concat('.','json'))
   }
 }
 
@@ -121,7 +121,7 @@ helpers.getToken = tokenId =>
 
 helpers.createToken = (tokenId, email, callback) => {
   // Set an expiration date 1 hour in the future.
-  const expires = Date.now() + 1000 * 60 * 1
+  const expires = Date.now() + 1000 * 60 * 60
   const tokenObject = { email, tokenId, expires }
 
   // Store the token
