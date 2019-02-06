@@ -116,26 +116,26 @@ helpers.deleteUser = email =>
   helpers.deleteFile(helpers.filePath(helpers.baseDir, 'users', email))
 
 // Token helpers
-helpers.getToken = email =>
-  helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', email), 'utf8')
+helpers.getToken = tokenId =>
+  helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId), 'utf8')
 
-helpers.createToken = (email, callback) => {
-  // Create token with a random name.
+helpers.createToken = (tokenId, email, callback) => {
   // Set an expiration date 1 hour in the future.
-  const tokenId = helpers.createRandomString(20)
-  const expires = Date.now() + 1000 * 60 * 60
+  const expires = Date.now() + 1000 * 60 * 1
   const tokenObject = { email, tokenId, expires }
 
   // Store the token
-  helpers.writeObject(email, tokenObject, 'create', 'tokens', callback)
+  helpers.writeObject(tokenId, tokenObject, 'create', 'tokens', callback)
 }
 
-helpers.deleteToken = email =>
-  helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', email))
+helpers.deleteToken = tokenId =>
+  helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId))
 
 helpers.deleteTokenById = (tokenId, callback) => {
+  // Read files from tokens directory
   helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
     .then((data) => {
+      // Get token from each token file
       data.forEach((fileName) => {
         helpers.getToken(fileName.slice(0, -5))
           .then((token) => {

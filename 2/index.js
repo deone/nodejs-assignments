@@ -4,6 +4,7 @@ const url = require('url')
 
 const config = require('./lib/config')
 const helpers = require('./lib/helpers')
+const menuHandler = require('./lib/handlers/menu')
 const authHandler = require('./lib/handlers/auth')
 const userHandler = require('./lib/handlers/users')
 
@@ -83,7 +84,8 @@ const server = http.createServer((req, res) => {
 const router = {
   users: userHandler.users,
   login: authHandler.login,
-  logout: authHandler.logout
+  logout: authHandler.logout,
+  menu: menuHandler.menu
 }
 
 // Start the server

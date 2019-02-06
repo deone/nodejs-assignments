@@ -31,35 +31,58 @@ authHandler._login.post = (data, callback) => {
     // Lookup user with email
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then((data) => {
-        data = helpers.parseJsonToObject(data)
+        const userObject = helpers.parseJsonToObject(data)
         // Hash the sent password, and compare it to the password stored in the user object
         const hashedPassword = helpers.hash(password)
 
-        if (hashedPassword === data.hashedPassword) {
+        if (hashedPassword === userObject.hashedPassword) {
           // Check if user has a token
-          helpers.getToken(email)
-            .then((data) => {
-              // If user has a token
-              const token = helpers.parseJsonToObject(data)
-              // check validity
-              if (token.expires < Date.now()) {
-                // if token is invalid, delete it
-                helpers.deleteToken(email)
-                  .catch((err) => {
-                    console.log(err)
-                    callback(400, {'Error': 'Unable to delete token'})
-                  })
-                // and create a new one
-                helpers.createToken(email, callback)
+          // Read token directory
+          helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
+            .then((fileNames) => {
+              if (!fileNames.length) {
+                // No token files, create one
+                const tokenId = helpers.createRandomString(20)
+                helpers.createToken(tokenId, email, callback)
               } else {
-                // else, return it
-                callback(200, token)
+                // There are token files
+                // Loop through list of file names
+                fileNames.forEach((fileName) => {
+                  // Get token object from each file
+                  helpers.getToken(fileName.slice(0, -5))
+                    .then((token) => {
+                      const tokenObject = helpers.parseJsonToObject(token)
+                      // Token belongs to user if
+                      // email stored in token matches email provided
+                      if (tokenObject.email === email) {
+                        // If user has a token
+                        // check validity
+                        if (tokenObject.expires < Date.now()) {
+                          // if token is invalid, delete it
+                          helpers.deleteToken(tokenObject.tokenId)
+                            .catch((err) => {
+                              console.log(err)
+                              callback(500, {'Error': 'Unable to delete token'})
+                            })
+                          // and create a new one
+                          const tokenId = helpers.createRandomString(20)
+                          helpers.createToken(tokenId, email, callback)
+                        } else {
+                          // else, return it
+                          callback(200, tokenObject)
+                        }
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err)
+                      callback(500, {'Error': 'Unable to get token'})
+                    })
+                })
               }
             })
             .catch((err) => {
-              // Else
-              // - create one
-              helpers.createToken(email, callback)
+              console.log(err)
+              callback(500, {'Error': 'Unable to read token directory'})
             })
         } else {
           callback(400, {
@@ -80,7 +103,12 @@ authHandler._login.post = (data, callback) => {
 authHandler._logout.post = (data, callback) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
-    helpers.deleteTokenById(tokenId, callback)
+    helpers.deleteToken(tokenId)
+      .then(callback(200, {'Success': 'User logged out'}))
+      .catch((err) => {
+        console.log(err)
+        callback(500, {'Error': 'Unable to log user out. Cannot delete token'})
+      })
   } else {
     callback(400, {'Error' : 'Missing required fields'});
   }
