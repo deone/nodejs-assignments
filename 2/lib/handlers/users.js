@@ -43,7 +43,21 @@ userHandler._users.post = (data, callback) => {
           }
 
           // Store the user
-          helpers.writeObject(email, userObject, 'create', 'users', callback)
+          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
+            .then((fileDescriptor) => {
+              helpers.writeFile(fileDescriptor, JSON.stringify(userObject))
+                .then(() => {
+                  callback(200, {'Message': 'User created successfully.'})
+                })
+                .catch((err) => {
+                  console.log(err)
+                  callback(500, {'Error': 'Unable to write to file.'})
+                })
+            })
+            .catch((err) => {
+              console.log(err)
+              callback(500, {'Error': 'Unable to open file for writing.'})
+            })
         }
       })
   } else {
@@ -108,7 +122,21 @@ userHandler._users.put = (data, callback) => {
             userObject.hashedPassword = helpers.hash(password)
 
           // Store updates
-          helpers.writeObject(email, userObject, 'update', 'users', callback)
+          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
+            .then((fileDescriptor) => {
+              helpers.writeFile(fileDescriptor, JSON.stringify(userObject))
+                .then(() => {
+                  callback(200, {'Message': 'User updated successfully.'})
+                })
+                .catch((err) => {
+                  console.log(err)
+                  callback(500, {'Error': 'Unable to write to file.'})
+                })
+            })
+            .catch((err) => {
+              console.log(err)
+              callback(500, {'Error': 'Unable to open file for writing.'})
+            })
         })
         .catch((err) => {
           console.log(err)
