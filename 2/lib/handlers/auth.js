@@ -41,42 +41,64 @@ authHandler._login.post = (data, callback) => {
           helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
             .then((fileNames) => {
               if (!fileNames.length) {
+                console.log('No token files')
                 // No token files, create one
                 const tokenId = helpers.createRandomString(20)
                 helpers.createToken(tokenId, email, callback)
               } else {
                 // There are token files
                 // Loop through list of file names
+                let promises = []
                 fileNames.forEach((fileName) => {
-                  // Get token object from each file
-                  helpers.getToken(fileName.slice(0, -5))
-                    .then((token) => {
-                      const tokenObject = helpers.parseJsonToObject(token)
-                      // Token belongs to user if
-                      // email stored in token matches email provided
-                      if (tokenObject.email === email) {
-                        // If user has a token
-                        // check validity
-                        if (tokenObject.expires < Date.now()) {
-                          // if token is invalid, delete it
-                          helpers.deleteToken(tokenObject.tokenId)
-                            .catch((err) => {
-                              console.log(err)
-                              callback(500, {'Error': 'Unable to delete token'})
-                            })
+                  const tokenId = fileName.slice(0, -5)
+                  promises.push(
+                    helpers.getToken(tokenId)
+                      .then((token) => {
+                        const tokenObject = helpers.parseJsonToObject(token)
+                        const email = tokenObject.email
+                        let obj = {}
+                        obj[email] = tokenObject
+                        return obj
+                      })
+                      .catch((err) => {
+                        console.log(err)
+                        callback(500, {'Error': 'Unable to get token.'})
+                      })
+                  )
+                })
+                Promise.all(promises).then((listOfTokens) => {
+                  let listOfTokenEmails = []
+                  listOfTokens.map(token => listOfTokenEmails.push(Object.keys(token)[0]))
+
+                  if (!listOfTokenEmails.includes(email)) {
+                    console.log('User does not have token')
+                    const tokenId = helpers.createRandomString(20)
+                    helpers.createToken(tokenId, email, callback)
+                  } else {
+                    console.log('User has token')
+                    // User has token
+                    // Check validity
+                    let tokenObject
+                    listOfTokens.forEach((token) => {
+                      tokenObject = token[email]
+                    })
+                    if (tokenObject.expires < Date.now()) {
+                      // if token is invalid, delete it
+                      helpers.deleteToken(tokenObject.tokenId)
+                        .then(() => {
                           // and create a new one
                           const tokenId = helpers.createRandomString(20)
                           helpers.createToken(tokenId, email, callback)
-                        } else {
-                          // else, return it
-                          callback(200, tokenObject)
-                        }
-                      }
-                    })
-                    .catch((err) => {
-                      console.log(err)
-                      callback(500, {'Error': 'Unable to get token'})
-                    })
+                        })
+                        .catch((err) => {
+                          console.log(err)
+                          callback(500, {'Error': 'Unable to delete token'})
+                        })
+                    } else {
+                      // else, return it
+                      callback(200, tokenObject)
+                    }
+                  }
                 })
               }
             })
