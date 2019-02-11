@@ -45,33 +45,24 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.writeObject = (fileName, object, action, dir, callback) => {
+helpers.writeUser = (email, object, fileOpenMode, callBack) => {
+  const fileOpenActions = {'w': 'update', 'wx': 'create'}
+  const action = fileOpenActions[fileOpenMode]
 
-  const recordType = dir.slice(0, -1)
-  const actionFileOpenMap = {
-    'create': 'wx',
-    'update': 'w'
-  }
-
-  helpers.openFile(helpers.filePath(helpers.baseDir, dir, fileName),
-    actionFileOpenMap[action])
-    .then((fileDescriptor) =>
-      helpers.writeFile(fileDescriptor, JSON.stringify(object)))
+  helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), fileOpenMode)
+    .then((fileDescriptor) => {
+      helpers.writeFile(fileDescriptor, JSON.stringify(object))
         .then(() => {
-          // Return token object, if we just created one
-          if (action === 'create' && dir === 'tokens') {
-            callback(200, object)
-          } else {
-            callback(200, {'Success': `User ${action}d successfully`})
-          }
+          callBack(200, {'Message': `User ${action}d successfully.`})
         })
         .catch((err) => {
           console.log(err)
-          callback(500, {'Error': `Could not ${action} ${recordType}`})
+          callBack(500, {'Error': 'Unable to write to file.'})
         })
+    })
     .catch((err) => {
       console.log(err)
-      callback(500, {'Error': `Could not ${action} ${recordType}`})
+      callBack(500, {'Error': 'Unable to open file for writing.'})
     })
 }
 

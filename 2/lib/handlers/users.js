@@ -27,7 +27,10 @@ userHandler._users.post = (data, callback) => {
 
   if (firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then(console.log)
+      .then((user) => {
+        console.log(user)
+        callback(400, {'Message': 'User already exists.'})
+      })
       .catch((err) => {
         // Hash password
         const hashedPassword = helpers.hash(password)
@@ -43,21 +46,7 @@ userHandler._users.post = (data, callback) => {
           }
 
           // Store the user
-          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'wx')
-            .then((fileDescriptor) => {
-              helpers.writeFile(fileDescriptor, JSON.stringify(userObject))
-                .then(() => {
-                  callback(200, {'Message': 'User created successfully.'})
-                })
-                .catch((err) => {
-                  console.log(err)
-                  callback(500, {'Error': 'Unable to write to file.'})
-                })
-            })
-            .catch((err) => {
-              console.log(err)
-              callback(500, {'Error': 'Unable to open file for writing.'})
-            })
+          helpers.writeUser(email, userObject, 'wx', callback)
         }
       })
   } else {
@@ -122,21 +111,7 @@ userHandler._users.put = (data, callback) => {
             userObject.hashedPassword = helpers.hash(password)
 
           // Store updates
-          helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), 'w')
-            .then((fileDescriptor) => {
-              helpers.writeFile(fileDescriptor, JSON.stringify(userObject))
-                .then(() => {
-                  callback(200, {'Message': 'User updated successfully.'})
-                })
-                .catch((err) => {
-                  console.log(err)
-                  callback(500, {'Error': 'Unable to write to file.'})
-                })
-            })
-            .catch((err) => {
-              console.log(err)
-              callback(500, {'Error': 'Unable to open file for writing.'})
-            })
+          helpers.writeUser(email, userObject, 'w', callback)
         })
         .catch((err) => {
           console.log(err)
