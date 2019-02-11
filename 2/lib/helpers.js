@@ -125,7 +125,21 @@ helpers.createToken = (tokenId, email, callback) => {
   const tokenObject = { email, tokenId, expires }
 
   // Store the token
-  helpers.writeObject(tokenId, tokenObject, 'create', 'tokens', callback)
+  helpers.openFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId), 'wx')
+    .then((fileDescriptor) => {
+      helpers.writeFile(fileDescriptor, JSON.stringify(tokenObject))
+        .then(() => {
+          callback(200, tokenObject)
+        })
+        .catch((err) => {
+          console.log(err)
+          callback(500, {'Error': 'Unable to write to file.'})
+        })
+    })
+    .catch((err) => {
+      console.log(err)
+      callback(500, {'Error': 'Unable to open file for writing.'})
+    })
 }
 
 helpers.deleteToken = tokenId =>
