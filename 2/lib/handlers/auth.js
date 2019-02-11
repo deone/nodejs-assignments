@@ -126,7 +126,7 @@ authHandler._logout.post = (data, callback) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
     helpers.deleteToken(tokenId)
-      .then(callback(200, {'Success': 'User logged out'}))
+      .then(callback(200, {'Message': 'User logged out'}))
       .catch((err) => {
         console.log(err)
         callback(500, {'Error': 'Unable to log user out. Cannot delete token'})

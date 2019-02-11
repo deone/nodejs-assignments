@@ -1,11 +1,12 @@
+const url = require('url')
 const http = require('http')
 const StringDecoder = require('string_decoder').StringDecoder
-const url = require('url')
 
 const config = require('./lib/config')
 const helpers = require('./lib/helpers')
-const menuHandler = require('./lib/handlers/menu')
 const authHandler = require('./lib/handlers/auth')
+const menuHandler = require('./lib/handlers/menu')
+const cartHandler = require('./lib/handlers/cart')
 const userHandler = require('./lib/handlers/users')
 
 const notFoundHandler = (data, callback) => callback(404, 'Not Found')
@@ -85,7 +86,8 @@ const router = {
   users: userHandler.users,
   login: authHandler.login,
   logout: authHandler.logout,
-  menu: menuHandler.menu
+  menu: menuHandler.menu,
+  cart: cartHandler.cart
 }
 
 // Start the server

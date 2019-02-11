@@ -21,6 +21,7 @@ menuHandler._menu.get = (data, callback) => {
     helpers.getToken(tokenId)
       .then((token) => {
         const tokenObject = helpers.parseJsonToObject(token)
+        // Check whether token is valid
         if (tokenObject.expires > Date.now()) {
           // Token is valid
           // Read menuitems directory
@@ -57,7 +58,10 @@ menuHandler._menu.get = (data, callback) => {
           callback(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch()
+      .catch((err) => {
+        console.log(err)
+        callback(500, {'Error': 'Unable to get token'})
+      })
   } else {
     callback(401, {'Error': 'Authentication token not provided'})
   }
