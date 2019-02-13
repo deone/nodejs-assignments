@@ -53,14 +53,8 @@ authHandler._login.post = (data, callback) => {
                   const tokenId = fileName.slice(0, -5)
                   promises.push(
                     helpers.getToken(tokenId)
-                      .then((token) => {
-                        const tokenObject = helpers.parseJsonToObject(token)
-                        const email = tokenObject.email
-                        let obj = {}
-                        obj[email] = tokenObject
-                        return obj
-                      })
-                      .catch((err) => {
+                      .then(token => helpers.parseJsonToObject(token))
+                      .catch(err => {
                         console.log(err)
                         callback(500, {'Error': 'Unable to get token.'})
                       })
@@ -68,7 +62,7 @@ authHandler._login.post = (data, callback) => {
                 })
                 Promise.all(promises).then((listOfTokens) => {
                   let listOfTokenEmails = []
-                  listOfTokens.map(token => listOfTokenEmails.push(Object.keys(token)[0]))
+                  listOfTokens.map(token => listOfTokenEmails.push(token.email))
 
                   if (!listOfTokenEmails.includes(email)) {
                     console.log('User does not have token')
@@ -78,10 +72,7 @@ authHandler._login.post = (data, callback) => {
                     console.log('User has token')
                     // User has token
                     // Check validity
-                    let tokenObject
-                    listOfTokens.forEach((token) => {
-                      tokenObject = token[email]
-                    })
+                    const tokenObject = listOfTokens.find(token => token.email === email)
                     if (tokenObject.expires < Date.now()) {
                       // if token is invalid, delete it
                       helpers.deleteToken(tokenObject.tokenId)
@@ -90,7 +81,7 @@ authHandler._login.post = (data, callback) => {
                           const tokenId = helpers.createRandomString(20)
                           helpers.createToken(tokenId, email, callback)
                         })
-                        .catch((err) => {
+                        .catch(err => {
                           console.log(err)
                           callback(500, {'Error': 'Unable to delete token'})
                         })
@@ -102,7 +93,7 @@ authHandler._login.post = (data, callback) => {
                 })
               }
             })
-            .catch((err) => {
+            .catch(err => {
               console.log(err)
               callback(500, {'Error': 'Unable to read tokens directory'})
             })
@@ -112,7 +103,7 @@ authHandler._login.post = (data, callback) => {
           })
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err)
         callback(400, {'Error': 'User does not exist'})
       })
@@ -127,7 +118,7 @@ authHandler._logout.post = (data, callback) => {
   if (tokenId) {
     helpers.deleteToken(tokenId)
       .then(callback(200, {'Message': 'User logged out'}))
-      .catch((err) => {
+      .catch(err => {
         console.log(err)
         callback(500, {'Error': 'Unable to log user out. Cannot delete token'})
       })
