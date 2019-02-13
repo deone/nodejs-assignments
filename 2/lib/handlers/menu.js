@@ -19,38 +19,38 @@ menuHandler._menu.get = (data, callback) => {
   if (tokenId) {
     // Get token
     helpers.getToken(tokenId)
-      .then((token) => {
+      .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
         // Check whether token is valid
         if (tokenObject.expires > Date.now()) {
           // Token is valid
           // Read menuitems directory
           helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
-            .then((fileNames) => {
+            .then(fileNames => {
               if (!fileNames.length) {
                 // There are no menu items
                 callback(200, {'Message': 'There are no items on the menu'})
               } else {
                 // There are menu items
                 let menuItems = []
-                fileNames.forEach((fileName) => {
+                fileNames.forEach(fileName => {
                   // Get menu item from each file
                   helpers.readFile(
                     helpers.filePath(helpers.baseDir, 'menuitems', fileName.slice(0, -5)), 'utf8')
-                    .then((menuItem) => {
+                    .then(menuItem => {
                       menuItems.push(helpers.parseJsonToObject(menuItem))
                       if (menuItems.length === fileNames.length) {
                         callback(200, menuItems)
                       }
                     })
-                    .catch((err) => {
+                    .catch(err => {
                       console.log(err)
                       callback(500, {'Error': 'Unable to read menu item'})
                     })
                 })
               }
             })
-            .catch((err) => {
+            .catch(err => {
               console.log(err)
               callback(500, {'Error': 'Unable to read menuitems directory'})
             })
@@ -58,7 +58,7 @@ menuHandler._menu.get = (data, callback) => {
           callback(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err)
         callback(500, {'Error': 'Unable to get token'})
       })

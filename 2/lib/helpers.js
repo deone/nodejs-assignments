@@ -50,17 +50,17 @@ helpers.writeUser = (email, object, fileOpenMode, callBack) => {
   const action = fileOpenActions[fileOpenMode]
 
   helpers.openFile(helpers.filePath(helpers.baseDir, 'users', email), fileOpenMode)
-    .then((fileDescriptor) => {
+    .then(fileDescriptor => {
       helpers.writeFile(fileDescriptor, JSON.stringify(object))
         .then(() => {
           callBack(200, {'Message': `User ${action}d successfully.`})
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
           callBack(500, {'Error': 'Unable to write to file.'})
         })
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err)
       callBack(500, {'Error': 'Unable to open file for writing.'})
     })
@@ -90,12 +90,12 @@ helpers.createRandomString = strLength => {
   }
 }
 
-helpers.requestDispatcher = (data, callback,
+helpers.requestDispatcher = (data, callBack,
   acceptableMethods, handlersContainer) => {
   if (acceptableMethods.includes(data.method)) {
-    handlersContainer[data.method](data, callback)
+    handlersContainer[data.method](data, callBack)
   } else {
-    callback(405)
+    callBack(405)
   }
 }
 
@@ -110,63 +110,31 @@ helpers.deleteUser = email =>
 helpers.getToken = tokenId =>
   helpers.readFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId), 'utf8')
 
-helpers.createToken = (tokenId, email, callback) => {
+helpers.createToken = (tokenId, email, callBack) => {
   // Set an expiration date 1 hour in the future.
   const expires = Date.now() + 1000 * 60 * 60
   const tokenObject = { email, tokenId, expires }
 
   // Store the token
   helpers.openFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId), 'wx')
-    .then((fileDescriptor) => {
+    .then(fileDescriptor => {
       helpers.writeFile(fileDescriptor, JSON.stringify(tokenObject))
         .then(() => {
-          callback(200, tokenObject)
+          callBack(200, tokenObject)
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
-          callback(500, {'Error': 'Unable to write to file.'})
+          callBack(500, {'Error': 'Unable to write to file.'})
         })
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err)
-      callback(500, {'Error': 'Unable to open file for writing.'})
+      callBack(500, {'Error': 'Unable to open file for writing.'})
     })
 }
 
 helpers.deleteToken = tokenId =>
   helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId))
-
-helpers.deleteTokenById = (tokenId, callback) => {
-  // Read files from tokens directory
-  helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
-    .then((data) => {
-      // Get token from each token file
-      data.forEach((fileName) => {
-        helpers.getToken(fileName.slice(0, -5))
-          .then((token) => {
-            const tokenObject = helpers.parseJsonToObject(token)
-            const email = tokenObject.email
-
-            if (tokenObject.tokenId === tokenId) {
-              helpers.deleteToken(email)
-                .then(callback(200, {'Success': 'User logged out'}))
-                .catch((err) => {
-                  console.log(err)
-                  callback(500, {'Error': 'Unable to log user out. Cannot delete token'})
-                })
-            }
-          })
-          .catch((err) => {
-            console.log(err)
-            callback(500, {'Error': 'Unable to log user out. Cannot get token'})
-          })
-      })
-    })
-    .catch((err) => {
-      console.log(err)
-      callback(500, {'Error': 'Unable to log user out. Cannot read directory'})
-    })
-}
 
 
 module.exports = helpers

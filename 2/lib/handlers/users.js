@@ -27,11 +27,11 @@ userHandler._users.post = (data, callback) => {
 
   if (firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then((user) => {
+      .then(user => {
         console.log(user)
         callback(400, {'Message': 'User already exists.'})
       })
-      .catch((err) => {
+      .catch(err => {
         // Hash password
         const hashedPassword = helpers.hash(password)
 
@@ -64,12 +64,12 @@ userHandler._users.get = (data, callback) => {
   if (email) {
     // Look up user
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then((data) => {
-        data = helpers.parseJsonToObject(data)
-        delete data.hashedPassword
-        callback(200, data)
+      .then(data => {
+        const userObject = helpers.parseJsonToObject(data)
+        delete userObject.hashedPassword
+        callback(200, userObject)
       })
-      .catch((err) => callback(404))
+      .catch(err => callback(404))
   } else {
     callback(400, {'Error': 'Missing required field'})
   }
@@ -94,7 +94,7 @@ userHandler._users.put = (data, callback) => {
   } else {
     if(firstName || lastName || streetAddress || password) {
       helpers.getUser(email)
-        .then((data) => {
+        .then(data => {
           // Update fields if necessary
           const userObject = helpers.parseJsonToObject(data)
 
@@ -113,7 +113,7 @@ userHandler._users.put = (data, callback) => {
           // Store updates
           helpers.writeUser(email, userObject, 'w', callback)
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
           callback(400, {'Error': 'User does not exist'})
         })
@@ -134,7 +134,7 @@ userHandler._users.delete = (data, callback) => {
   if (email) {
     helpers.deleteUser(email)
       .then(() => callback(200, {'Success': 'User deleted successfully'}))
-      .catch((err) => {
+      .catch(err => {
         console.log(err)
         callback(500, {'Error': 'Could not delete user'})
       })

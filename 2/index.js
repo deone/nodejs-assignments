@@ -9,7 +9,7 @@ const menuHandler = require('./lib/handlers/menu')
 const cartHandler = require('./lib/handlers/cart')
 const userHandler = require('./lib/handlers/users')
 
-const notFoundHandler = (data, callback) => callback(404, 'Not Found')
+const notFoundHandler = (data, callBack) => callBack(404, 'Not Found')
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
