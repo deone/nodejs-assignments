@@ -5,16 +5,16 @@ const helpers = require('../helpers')
 
 const authHandler = {}
 
-authHandler.login = (data, callback) => {
+authHandler.login = (data, callBack) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, authHandler._login)
+    data, callBack, acceptableMethods, authHandler._login)
 }
 
-authHandler.logout = (data, callback) => {
+authHandler.logout = (data, callBack) => {
   const acceptableMethods = ['post']
   return helpers.requestDispatcher(
-    data, callback, acceptableMethods, authHandler._logout)
+    data, callBack, acceptableMethods, authHandler._logout)
 }
 
 authHandler._login = {}
@@ -23,14 +23,14 @@ authHandler._logout = {}
 // Login - post
 // Required data: email, password
 // Optional data: none
-authHandler._login.post = (data, callback) => {
+authHandler._login.post = (data, callBack) => {
   const email = helpers.validate(data.payload.email)
   const password = helpers.validate(data.payload.password)
 
   if (email && password) {
     // Lookup user with email
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then((data) => {
+      .then(data => {
         const userObject = helpers.parseJsonToObject(data)
         // Hash the sent password, and compare it to the password stored in the user object
         const hashedPassword = helpers.hash(password)
@@ -39,35 +39,34 @@ authHandler._login.post = (data, callback) => {
           // Check if user has a token
           // Read tokens directory
           helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
-            .then((fileNames) => {
+            .then(fileNames => {
               if (!fileNames.length) {
                 console.log('No token files')
                 // No token files, create one
                 const tokenId = helpers.createRandomString(20)
-                helpers.createToken(tokenId, email, callback)
+                helpers.createToken(tokenId, email, callBack)
               } else {
                 // There are token files
                 // Loop through list of file names
                 let promises = []
-                fileNames.forEach((fileName) => {
+                fileNames.forEach(fileName => {
                   const tokenId = fileName.slice(0, -5)
                   promises.push(
                     helpers.getToken(tokenId)
                       .then(token => helpers.parseJsonToObject(token))
                       .catch(err => {
                         console.log(err)
-                        callback(500, {'Error': 'Unable to get token.'})
+                        callBack(500, {'Error': 'Unable to get token.'})
                       })
                   )
                 })
-                Promise.all(promises).then((listOfTokens) => {
-                  let listOfTokenEmails = []
-                  listOfTokens.map(token => listOfTokenEmails.push(token.email))
+                Promise.all(promises).then(listOfTokens => {
+                  const listOfTokenEmails = listOfTokens.map(token => token.email)
 
                   if (!listOfTokenEmails.includes(email)) {
                     console.log('User does not have token')
                     const tokenId = helpers.createRandomString(20)
-                    helpers.createToken(tokenId, email, callback)
+                    helpers.createToken(tokenId, email, callBack)
                   } else {
                     console.log('User has token')
                     // User has token
@@ -79,15 +78,15 @@ authHandler._login.post = (data, callback) => {
                         .then(() => {
                           // and create a new one
                           const tokenId = helpers.createRandomString(20)
-                          helpers.createToken(tokenId, email, callback)
+                          helpers.createToken(tokenId, email, callBack)
                         })
                         .catch(err => {
                           console.log(err)
-                          callback(500, {'Error': 'Unable to delete token'})
+                          callBack(500, {'Error': 'Unable to delete token'})
                         })
                     } else {
                       // else, return it
-                      callback(200, tokenObject)
+                      callBack(200, tokenObject)
                     }
                   }
                 })
@@ -95,17 +94,17 @@ authHandler._login.post = (data, callback) => {
             })
             .catch(err => {
               console.log(err)
-              callback(500, {'Error': 'Unable to read tokens directory'})
+              callBack(500, {'Error': 'Unable to read tokens directory'})
             })
         } else {
-          callback(400, {
+          callBack(400, {
             'Error': "Password did not match the specified user's stored password"
           })
         }
       })
       .catch(err => {
         console.log(err)
-        callback(400, {'Error': 'User does not exist'})
+        callBack(400, {'Error': 'User does not exist'})
       })
   }
 }
@@ -113,17 +112,17 @@ authHandler._login.post = (data, callback) => {
 // Logout - post
 // Required data: tokenId
 // Optional data: none
-authHandler._logout.post = (data, callback) => {
+authHandler._logout.post = (data, callBack) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
     helpers.deleteToken(tokenId)
-      .then(callback(200, {'Message': 'User logged out'}))
+      .then(callBack(200, {'Message': 'User logged out'}))
       .catch(err => {
         console.log(err)
-        callback(500, {'Error': 'Unable to log user out. Cannot delete token'})
+        callBack(500, {'Error': 'Unable to log user out. Cannot delete token'})
       })
   } else {
-    callback(400, {'Error' : 'Missing required fields'});
+    callBack(400, {'Error' : 'Missing required fields'});
   }
 }
 

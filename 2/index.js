@@ -33,7 +33,7 @@ const server = http.createServer((req, res) => {
   const headers = req.headers;
 
   // -- Callback
-  const callback = (statusCode, message) => {
+  const callBack = (statusCode, message) => {
     // set a default status code
     statusCode = typeof statusCode === 'number' ? statusCode : 200
 
@@ -78,7 +78,7 @@ const server = http.createServer((req, res) => {
     };
 
     // handle request
-    chosenHandler(data, callback)
+    chosenHandler(data, callBack)
   })
 })
 
