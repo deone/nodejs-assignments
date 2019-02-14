@@ -8,6 +8,7 @@ const authHandler = require('./lib/handlers/auth')
 const menuHandler = require('./lib/handlers/menu')
 const cartHandler = require('./lib/handlers/cart')
 const userHandler = require('./lib/handlers/users')
+const orderHandler = require('./lib/handlers/order')
 
 const notFoundHandler = (data, callBack) => callBack(404, 'Not Found')
 
@@ -87,7 +88,8 @@ const router = {
   login: authHandler.login,
   logout: authHandler.logout,
   menu: menuHandler.menu,
-  cart: cartHandler.cart
+  cart: cartHandler.cart,
+  order: orderHandler.order
 }
 
 // Start the server

@@ -61,7 +61,7 @@ helpers.writeUser = (email, object, fileOpenMode, caller = 'users', callBack) =>
         })
         .catch(err => {
           console.log(err)
-          callBack(500, {'Error': 'Unable to write to file.'})
+          callBack(500, {'Error': `Unable to ${action} user.`})
         })
     })
     .catch(err => {

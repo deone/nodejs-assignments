@@ -185,11 +185,11 @@ cartHandler._cart.delete = (data, callBack) => {
                       .then(user => {
                         const userObject = helpers.parseJsonToObject(user)
                         if (!userObject.hasOwnProperty('cart')) {
-                          callBack(400, {'Message': 'User has no shopping cart.'})
+                          callBack(400, {'Error': 'User has no shopping cart.'})
                         } else {
                           const cart = userObject.cart
                           if (!cart.length) {
-                            callBack(400, {'Message': 'Shopping cart is empty.'})
+                            callBack(400, {'Error': 'Shopping cart is empty.'})
                           } else {
                             const itemIndex = cart.indexOf(menuItem)
                             userObject.cart.splice(itemIndex, 1)

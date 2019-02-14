@@ -29,7 +29,7 @@ userHandler._users.post = (data, callback) => {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
       .then(user => {
         console.log(user)
-        callback(400, {'Message': 'User already exists.'})
+        callback(400, {'Error': 'User already exists.'})
       })
       .catch(err => {
         // Hash password

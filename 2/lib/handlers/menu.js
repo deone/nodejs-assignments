@@ -29,7 +29,7 @@ menuHandler._menu.get = (data, callback) => {
             .then(fileNames => {
               if (!fileNames.length) {
                 // There are no menu items
-                callback(200, {'Message': 'There are no items on the menu'})
+                callback(400, {'Error': 'There are no items on the menu'})
               } else {
                 // There are menu items
                 let menuItems = []
