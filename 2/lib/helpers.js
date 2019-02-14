@@ -45,7 +45,7 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.writeUser = (email, object, fileOpenMode, callBack) => {
+helpers.writeUser = (email, object, fileOpenMode, caller = 'users', callBack) => {
   const fileOpenActions = {'w': 'update', 'wx': 'create'}
   const action = fileOpenActions[fileOpenMode]
 
@@ -53,7 +53,11 @@ helpers.writeUser = (email, object, fileOpenMode, callBack) => {
     .then(fileDescriptor => {
       helpers.writeFile(fileDescriptor, JSON.stringify(object))
         .then(() => {
-          callBack(200, {'Message': `User ${action}d successfully.`})
+          if (caller === 'cart') {
+            callBack(200, object.cart)
+          } else {
+            callBack(200, {'Message': `User ${action}d successfully.`})
+          }
         })
         .catch(err => {
           console.log(err)
