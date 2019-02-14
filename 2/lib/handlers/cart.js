@@ -100,6 +100,60 @@ cartHandler._cart.put = (data, callBack) => {
                 const menu = fileNames.map(fileName => fileName.slice(0, -5))
                 if (!menu.includes(item)) {
                   callBack(400, {'Error': 'Item provided is not on menu.'})
+                } else {
+                  helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
+                    .then(fileNames => {
+                      fileNames.forEach(fileName => {
+                        if (item === fileName.slice(0, -5)) {
+                          helpers.readFile(helpers.filePath(helpers.baseDir, 'menuitems', item), 'utf8')
+                            .then(menuItem => {
+                              const menuItemObject = helpers.parseJsonToObject(menuItem)
+                              // Get cart
+                              helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+                                .then(fileNames => {
+                                  if (!fileNames.length) {
+                                    // No file in users directory
+                                    callBack(400, {'Error': 'User not found.'})
+                                  } else {
+                                    fileNames.forEach(fileName => {
+                                      const email = fileName.slice(0, -5)
+                                      if (email === tokenObject.email) {
+                                        // Update cart
+                                        helpers.getUser(email)
+                                          .then(user => {
+                                            const userObject = helpers.parseJsonToObject(user)
+                                            if (!userObject.hasOwnProperty('cart')) {
+                                              userObject.cart = []
+                                            }
+                                            delete menuItemObject.id
+                                            userObject.cart.push(menuItemObject)
+                                            // Store updates
+                                            helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                                          })
+                                          .catch(err => {
+                                            console.log(err)
+                                            callBack(500, {'Error': 'Unable to get cart.'})
+                                          })
+                                      }
+                                    })
+                                  }
+                                })
+                                .catch(err => {
+                                  console.log(err)
+                                  callBack(500, {'Error': 'Unable to read user directory.'})
+                                })
+                            })
+                            .catch(err => {
+                              console.log(err)
+                              callBack(500, {'Error': 'Unable to read menu entry.'})
+                            })
+                        }
+                      })
+                    })
+                    .catch(err => {
+                      console.log(err)
+                      callBack(500, {'Error': 'Unable to read menu directory.'})
+                    })
                 }
               })
               .catch(err => {
@@ -109,52 +163,7 @@ cartHandler._cart.put = (data, callBack) => {
 
             // Get user object
             // Read users directory
-            helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
-              .then(fileNames => {
-                if (!fileNames.length) {
-                  // No file in users directory
-                  callBack(400, {'Error': 'User not found.'})
-                } else {
-                  fileNames.forEach(fileName => {
-                    const email = fileName.slice(0, -5)
-                    if (email === tokenObject.email) {
-                      // Update cart
-                      helpers.getUser(email)
-                        .then(user => {
-                          const userObject = helpers.parseJsonToObject(user)
-                          if (!userObject.hasOwnProperty('cart')) {
-                            userObject.cart = []
-                          }
-                          helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
-                            .then(fileNames => {
-                              fileNames.forEach(fileName => {
-                                if (item === fileName.slice(0, -5)) {
-                                  helpers.readFile(helpers.filePath(helpers.baseDir, 'menuitems', item), 'utf8')
-                                    .then(menuItem => {
-                                      const menuItemObject = helpers.parseJsonToObject(menuItem)
-                                      delete menuItemObject.id
-                                      userObject.cart.push(menuItemObject)
-                                      // Update user
-                                      helpers.writeUser(email, userObject, 'w', 'cart', callBack)
-                                    })
-                                    .catch(console.error)
-                                }
-                              })
-                            })
-                            .catch(console.error)
-                        })
-                        .catch(err => {
-                          console.log(err)
-                          callBack(500, {'Error': 'Unable to get cart.'})
-                        })
-                    }
-                  })
-                }
-              })
-              .catch(err => {
-                console.log(err)
-                callBack(500, {'Error': 'Unable to get user.'})
-              })
+            
           }
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
@@ -209,8 +218,7 @@ cartHandler._cart.delete = (data, callBack) => {
                           if (!cart.length) {
                             callBack(400, {'Error': 'Shopping cart is empty.'})
                           } else {
-                            const itemIndex = cart.indexOf(menuItem)
-                            userObject.cart.splice(itemIndex, 1)
+                            userObject.cart = cart.filter(item => item.name !== menuItem)
                             // Store updates
                             helpers.writeUser(email, userObject, 'w', 'cart', callBack)
                           }

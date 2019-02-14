@@ -115,7 +115,7 @@ authHandler._login.post = (data, callBack) => {
 // Required data: tokenId
 // Optional data: none
 authHandler._logout.post = (data, callBack) => {
-  const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
+  const tokenId = helpers.validate(data.headers.token)
   if (tokenId) {
     helpers.deleteToken(tokenId)
       .then(callBack(200, {'Success': 'User logged out.'}))
