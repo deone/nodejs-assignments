@@ -81,7 +81,9 @@ cartHandler._cart.get = (data, callBack) => {
 cartHandler._cart.put = (data, callBack) => {
   // Get tokenID from header  
   const tokenId = helpers.validate(data.headers.token)
-  if (tokenId) {
+  const item = helpers.validate(data.payload.item)
+
+  if (tokenId && item) {
     // Get token
     helpers.getToken(tokenId)
       .then(token => {
@@ -90,14 +92,13 @@ cartHandler._cart.put = (data, callBack) => {
         if (tokenObject.expires > Date.now()) {
           // Token is valid
           // Get menu item and validate
-          const menuItem = helpers.validate(data.payload.item)
 
-          if (menuItem) {
+          if (item) {
             // Check whether menu item is on menu
             helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
               .then(fileNames => {
                 const menu = fileNames.map(fileName => fileName.slice(0, -5))
-                if (!menu.includes(menuItem)) {
+                if (!menu.includes(item)) {
                   callBack(400, {'Error': 'Item provided is not on menu.'})
                 }
               })
@@ -112,7 +113,7 @@ cartHandler._cart.put = (data, callBack) => {
               .then(fileNames => {
                 if (!fileNames.length) {
                   // No file in users directory
-                  callBack(400, {'Error': 'User not found'})
+                  callBack(400, {'Error': 'User not found.'})
                 } else {
                   fileNames.forEach(fileName => {
                     const email = fileName.slice(0, -5)
@@ -124,13 +125,13 @@ cartHandler._cart.put = (data, callBack) => {
                           if (!userObject.hasOwnProperty('cart')) {
                             userObject.cart = []
                           }
-                          userObject.cart.push(menuItem)
+                          userObject.cart.push(item)
                           // Store updates
                           helpers.writeUser(email, userObject, 'w', 'cart', callBack)
                         })
                         .catch(err => {
                           console.log(err)
-                          callBack(500, {'Error': 'Unable to get cart'})
+                          callBack(500, {'Error': 'Unable to get cart.'})
                         })
                     }
                   })
@@ -147,10 +148,10 @@ cartHandler._cart.put = (data, callBack) => {
       })
       .catch(err => {
         console.log(err)
-        callBack(500, {'Error': 'Unable to get token'})
+        callBack(500, {'Error': 'Unable to get token.'})
       })
   } else {
-    callBack(401, {'Error': 'Authentication token not provided'})
+    callBack(401, {'Error': 'Authentication token not provided. Missing required field.'})
   }
 }
 
