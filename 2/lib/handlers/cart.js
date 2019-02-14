@@ -125,9 +125,23 @@ cartHandler._cart.put = (data, callBack) => {
                           if (!userObject.hasOwnProperty('cart')) {
                             userObject.cart = []
                           }
-                          userObject.cart.push(item)
-                          // Store updates
-                          helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                          helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
+                            .then(fileNames => {
+                              fileNames.forEach(fileName => {
+                                if (item === fileName.slice(0, -5)) {
+                                  helpers.readFile(helpers.filePath(helpers.baseDir, 'menuitems', item), 'utf8')
+                                    .then(menuItem => {
+                                      const menuItemObject = helpers.parseJsonToObject(menuItem)
+                                      delete menuItemObject.id
+                                      userObject.cart.push(menuItemObject)
+                                      // Update user
+                                      helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                                    })
+                                    .catch(console.error)
+                                }
+                              })
+                            })
+                            .catch(console.error)
                         })
                         .catch(err => {
                           console.log(err)
