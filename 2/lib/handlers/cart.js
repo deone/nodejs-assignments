@@ -218,6 +218,8 @@ cartHandler._cart.delete = (data, callBack) => {
                           if (!cart.length) {
                             callBack(400, {'Error': 'Shopping cart is empty.'})
                           } else {
+                            // Beware! Filter matches each item with condition and filters,
+                            // Doesn't just delete the first item that matches.
                             userObject.cart = cart.filter(item => item.name !== menuItem)
                             // Store updates
                             helpers.writeUser(email, userObject, 'w', 'cart', callBack)

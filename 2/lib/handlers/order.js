@@ -50,19 +50,50 @@ orderHandler._order.post = (data, callBack) => {
                             callBack(400, {'Error': "User's shopping cart is empty."})
                           } else {
                             // Place order
-                            // - Create order object
                             // - Set ID to random string
+                            const id = helpers.createRandomString(20)
                             // - Set user property to email
+                            const user = email
                             // - Set paid and mailSent properties on order object to false
+                            const paid = false
+                            const mailSent = false
         
                             // - Get price for each item in cart and create order item objects
+                            const items = userObject.cart
                             // - Set items property on order object to list of order item objects
+                            const totalPrice = items.reduce((a, b) => a.price + b.price)
                             // - Set totalPrice property on order object to total price of items
-                            // - Empty cart on user object
+                            // - Create order object
+                            const order = {id, user, paid, mailSent, totalPrice, items}
                             // - Write order object to file with file name as order ID
+                            helpers.openFile(helpers.filePath(helpers.baseDir, 'orders', id), 'wx')
+                              .then(fileDescriptor => {
+                                helpers.writeFile(fileDescriptor, JSON.stringify(order))
+                                  // .then(() => {
+                                  // })
+                                  .catch(err => {
+                                    console.log(err)
+                                    callBack(500, {'Error': 'Unable to create order.'})
+                                  })
+                              })
+                              .catch(err => {
+                                console.log(err)
+                                callBack(500, {'Error': 'Unable to open file for writing.'})
+                              })
+
+                            // - Empty cart on user object
+                            userObject.cart = []
 
                             // - Set orders property on user object to list of order IDs
+                            // - First time user is placing an order
+                            if (!userObject.hasOwnProperty('orders')) {
+                              // Set property to empty list
+                              userObject.orders = []
+                            }
+                            userObject.orders.push(id)
+
                             // - Update user object on file
+                            helpers.writeUser(email, userObject, 'w', 'order', callBack)
                           }
                         }
                       })
@@ -84,10 +115,10 @@ orderHandler._order.post = (data, callBack) => {
       })
       .catch(err => {
         console.log(err)
-        callBack(500, {'Error': 'Unable to get token'})
+        callBack(500, {'Error': 'Unable to get token.'})
       })
   } else {
-    callBack(401, {'Error': 'Authentication token not provided'})
+    callBack(401, {'Error': 'Authentication token not provided.'})
   }
 }
 
