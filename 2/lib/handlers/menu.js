@@ -13,6 +13,9 @@ menuHandler.menu = (data, callback) => {
 
 menuHandler._menu = {}
 
+// Menu - get
+// Required data: token ID
+// Optional data: none
 menuHandler._menu.get = (data, callback) => {
   // Get tokenId from header
   const tokenId = helpers.validate(data.headers.token)

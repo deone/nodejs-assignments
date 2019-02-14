@@ -82,7 +82,7 @@ authHandler._login.post = (data, callBack) => {
                         })
                         .catch(err => {
                           console.log(err)
-                          callBack(500, {'Error': 'Unable to delete token'})
+                          callBack(500, {'Error': 'Unable to delete token.'})
                         })
                     } else {
                       // else, return it
@@ -94,18 +94,20 @@ authHandler._login.post = (data, callBack) => {
             })
             .catch(err => {
               console.log(err)
-              callBack(500, {'Error': 'Unable to read tokens directory'})
+              callBack(500, {'Error': 'Unable to read tokens directory.'})
             })
         } else {
           callBack(400, {
-            'Error': "Password did not match the specified user's stored password"
+            'Error': "Password did not match the specified user's stored password."
           })
         }
       })
       .catch(err => {
         console.log(err)
-        callBack(400, {'Error': 'User does not exist'})
+        callBack(400, {'Error': 'User does not exist.'})
       })
+  } else {
+    callBack(400, {'Error': 'Missing required fields.'})
   }
 }
 
@@ -116,13 +118,13 @@ authHandler._logout.post = (data, callBack) => {
   const tokenId = typeof data.headers.token == 'string' ? data.headers.token : false
   if (tokenId) {
     helpers.deleteToken(tokenId)
-      .then(callBack(200, {'Message': 'User logged out'}))
+      .then(callBack(200, {'Success': 'User logged out.'}))
       .catch(err => {
         console.log(err)
-        callBack(500, {'Error': 'Unable to log user out. Cannot delete token'})
+        callBack(500, {'Error': 'Unable to log user out. Cannot delete token.'})
       })
   } else {
-    callBack(400, {'Error' : 'Missing required fields'});
+    callBack(401, {'Error' : 'Authentication token not provided.'});
   }
 }
 

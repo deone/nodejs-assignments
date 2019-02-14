@@ -50,7 +50,7 @@ userHandler._users.post = (data, callback) => {
         }
       })
   } else {
-    callback(400, {'Error': 'Missing required fields'})
+    callback(400, {'Error': 'Missing required fields.'})
   }
 }
 
@@ -71,7 +71,7 @@ userHandler._users.get = (data, callback) => {
       })
       .catch(err => callback(404))
   } else {
-    callback(400, {'Error': 'Missing required field'})
+    callback(400, {'Error': 'Missing required field.'})
   }
 }
 
@@ -90,7 +90,7 @@ userHandler._users.put = (data, callback) => {
   const password = helpers.validate(data.payload.password)
 
   if(!email) {
-    callback(400, {'Error': 'Missing required field'})
+    callback(400, {'Error': 'Missing required field.'})
   } else {
     if(firstName || lastName || streetAddress || password) {
       helpers.getUser(email)
@@ -133,13 +133,13 @@ userHandler._users.delete = (data, callback) => {
   const email = helpers.validate(data.queryStringObject.email)
   if (email) {
     helpers.deleteUser(email)
-      .then(() => callback(200, {'Success': 'User deleted successfully'}))
+      .then(() => callback(200, {'Success': 'User deleted successfully.'}))
       .catch(err => {
         console.log(err)
-        callback(500, {'Error': 'Could not delete user'})
+        callback(500, {'Error': 'Could not delete user.'})
       })
   } else {
-    callback(400, {'Error': 'Missing required field'})
+    callback(400, {'Error': 'Missing required field.'})
   }
 }
 
