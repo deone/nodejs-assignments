@@ -69,17 +69,9 @@ orderHandler._order.post = (data, callBack) => {
                             helpers.openFile(helpers.filePath(helpers.baseDir, 'orders', id), 'wx')
                               .then(fileDescriptor => {
                                 helpers.writeFile(fileDescriptor, JSON.stringify(order))
-                                  // .then(() => {
-                                  // })
-                                  .catch(err => {
-                                    console.log(err)
-                                    callBack(500, {'Error': 'Unable to create order.'})
-                                  })
+                                  .catch(err => callBack(500, {'Error': err.toString()}))
                               })
-                              .catch(err => {
-                                console.log(err)
-                                callBack(500, {'Error': 'Unable to open file for writing.'})
-                              })
+                              .catch(err => callBack(500, {'Error': err.toString()}))
 
                             // - Empty cart on user object
                             userObject.cart = []
@@ -98,38 +90,31 @@ orderHandler._order.post = (data, callBack) => {
                           }
                         }
                       })
-                      .catch(err => {
-                        console.log(err)
-                        callBack(500, {'Error': 'Unable to get cart'})
-                      })
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   }
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callBack(500, {'Error': 'Unable to get user.'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to get token.'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
     callBack(401, {'Error': 'Authentication token not provided.'})
   }
 }
 
 // Order - get
-// Required data: token ID
+// Required data: token ID, order ID in querystring
 // Optional data: none
 orderHandler._order.get = (data, callBack) => {
   // Get tokenId from header
   const tokenId = helpers.validate(data.headers.token)
-  if (tokenId) {
+  const orderId = helpers.validate(data.queryStringObject.id)
+
+  if (tokenId && orderId) {
     // Get token
     helpers.getToken(tokenId)
       .then(token => {
@@ -149,37 +134,38 @@ orderHandler._order.get = (data, callBack) => {
                   const email = fileName.slice(0, -5)
                   if (email === tokenObject.email) {
                     // Get order
-                    helpers.getUser(email)
-                      .then(user => {
-                        const userObject = helpers.parseJsonToObject(user)
-                        if (!userObject.hasOwnProperty('orders')) {
-                          callBack(400, {'Error': 'User has no orders.'})
+                    helpers.readDir(helpers.filePath(helpers.baseDir, 'orders'))
+                      .then(orderFileNames => {
+                        if (!orderFileNames.length) {
+                          // No file in orders directory
+                          callBack(400, {'Error': 'Order not found.'})
                         } else {
-                          callBack(200, userObject.orders)
+                          orderFileNames.forEach(orderFileName => {
+                            if (orderId === orderFileName.slice(0, -5)) {
+                              helpers.readFile(helpers.filePath(helpers.baseDir,
+                                'orders', orderId), 'utf8')
+                                .then(order => {
+                                  const orderObject = helpers.parseJsonToObject(order)
+                                  callBack(200, orderObject)
+                                })
+                                .catch(err => callBack(500, {'Error': err.toString()}))
+                            }
+                          })
                         }
                       })
-                      .catch(err => {
-                        console.log(err)
-                        callBack(500, {'Error': 'Unable to get order.'})
-                      })
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   }
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callBack(500, {'Error': 'Unable to get user.'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to get token'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
-    callBack(401, {'Error': 'Authentication token not provided'})
+    callBack(400, {'Error': 'Authentication token not provided. Missing required field.'})
   }  
 }
 
