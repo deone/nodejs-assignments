@@ -45,7 +45,7 @@ cartHandler._cart.get = (data, callBack) => {
                         if (!userObject.hasOwnProperty('cart')) {
                           userObject.cart = []
                           // Store updates
-                          helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                          helpers.writeUser(email, userObject, 'w', callBack, 'cart')
                         } else {
                           callBack(200, userObject.cart) 
                         }
@@ -128,7 +128,7 @@ cartHandler._cart.put = (data, callBack) => {
                                             delete menuItemObject.id
                                             userObject.cart.push(menuItemObject)
                                             // Store updates
-                                            helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                                            helpers.writeUser(email, userObject, 'w', callBack, 'cart')
                                           })
                                           .catch(err => {
                                             console.log(err)
@@ -222,7 +222,7 @@ cartHandler._cart.delete = (data, callBack) => {
                             // Doesn't just delete the first item that matches.
                             userObject.cart = cart.filter(item => item.name !== menuItem)
                             // Store updates
-                            helpers.writeUser(email, userObject, 'w', 'cart', callBack)
+                            helpers.writeUser(email, userObject, 'w', callBack, 'cart')
                           }
                         }
                       })

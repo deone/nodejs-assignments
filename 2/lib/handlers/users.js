@@ -46,7 +46,7 @@ userHandler._users.post = (data, callback) => {
           }
 
           // Store the user
-          helpers.writeUser(email, userObject, 'wx', 'users', callback)
+          helpers.writeUser(email, userObject, 'wx', callback)
         }
       })
   } else {
@@ -111,7 +111,7 @@ userHandler._users.put = (data, callback) => {
             userObject.hashedPassword = helpers.hash(password)
 
           // Store updates
-          helpers.writeUser(email, userObject, 'w', 'users', callback)
+          helpers.writeUser(email, userObject, 'w', callback)
         })
         .catch(err => {
           console.log(err)

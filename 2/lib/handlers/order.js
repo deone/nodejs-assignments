@@ -93,7 +93,7 @@ orderHandler._order.post = (data, callBack) => {
                             userObject.orders.push(id)
 
                             // - Update user object on file
-                            helpers.writeUser(email, userObject, 'w', 'order', callBack)
+                            helpers.writeUser(email, userObject, 'w', callBack, 'order')
                           }
                         }
                       })

@@ -45,7 +45,7 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.writeUser = (email, object, fileOpenMode, caller, callBack) => {
+helpers.writeUser = (email, object, fileOpenMode, callBack, caller = 'users') => {
   const fileOpenActions = {'w': 'update', 'wx': 'create'}
   const action = fileOpenActions[fileOpenMode]
 
