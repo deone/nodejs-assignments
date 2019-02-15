@@ -63,15 +63,9 @@ helpers.writeUser = (email, object, fileOpenMode, callBack, caller = 'users') =>
             }
           }
         })
-        .catch(err => {
-          console.log(err)
-          callBack(500, {'Error': `Unable to ${action} user.`})
-        })
+        .catch(err => callBack(500, {'Error': err.toString()}))
     })
-    .catch(err => {
-      console.log(err)
-      callBack(500, {'Error': 'Unable to open file for writing.'})
-    })
+    .catch(err => callBack(500, {'Error': err.toString()}))
 }
 
 // Create a string of random alphanumeric characters, of a given length
@@ -130,15 +124,9 @@ helpers.createToken = (tokenId, email, callBack) => {
         .then(() => {
           callBack(200, tokenObject)
         })
-        .catch(err => {
-          console.log(err)
-          callBack(500, {'Error': 'Unable to write to file.'})
-        })
+        .catch(err => callBack(500, {'Error': err.toString()}))
     })
-    .catch(err => {
-      console.log(err)
-      callBack(500, {'Error': 'Unable to open file for writing.'})
-    })
+    .catch(err => callBack(500, {'Error': err.toString()}))
 }
 
 helpers.deleteToken = tokenId =>

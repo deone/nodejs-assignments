@@ -54,10 +54,7 @@ authHandler._login.post = (data, callBack) => {
                   promises.push(
                     helpers.getToken(tokenId)
                       .then(token => helpers.parseJsonToObject(token))
-                      .catch(err => {
-                        console.log(err)
-                        callBack(500, {'Error': 'Unable to get token.'})
-                      })
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   )
                 })
                 Promise.all(promises).then(listOfTokens => {
@@ -80,10 +77,7 @@ authHandler._login.post = (data, callBack) => {
                           const tokenId = helpers.createRandomString(20)
                           helpers.createToken(tokenId, email, callBack)
                         })
-                        .catch(err => {
-                          console.log(err)
-                          callBack(500, {'Error': 'Unable to delete token.'})
-                        })
+                        .catch(err => callBack(500, {'Error': err.toString()}))
                     } else {
                       // else, return it
                       callBack(200, tokenObject)
@@ -92,10 +86,7 @@ authHandler._login.post = (data, callBack) => {
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callBack(500, {'Error': 'Unable to read tokens directory.'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
           callBack(400, {
             'Error': "Password did not match the specified user's stored password."
@@ -119,10 +110,7 @@ authHandler._logout.post = (data, callBack) => {
   if (tokenId) {
     helpers.deleteToken(tokenId)
       .then(callBack(200, {'Success': 'User logged out.'}))
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to log user out. Cannot delete token.'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
     callBack(401, {'Error' : 'Authentication token not provided.'});
   }

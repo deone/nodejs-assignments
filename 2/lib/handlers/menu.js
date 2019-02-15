@@ -16,7 +16,7 @@ menuHandler._menu = {}
 // Menu - get
 // Required data: token ID
 // Optional data: none
-menuHandler._menu.get = (data, callback) => {
+menuHandler._menu.get = (data, callBack) => {
   // Get tokenId from header
   const tokenId = helpers.validate(data.headers.token)
   if (tokenId) {
@@ -32,7 +32,7 @@ menuHandler._menu.get = (data, callback) => {
             .then(fileNames => {
               if (!fileNames.length) {
                 // There are no menu items
-                callback(400, {'Error': 'There are no items on the menu'})
+                callBack(400, {'Error': 'There are no items on the menu'})
               } else {
                 // There are menu items
                 let menuItems = []
@@ -43,30 +43,21 @@ menuHandler._menu.get = (data, callback) => {
                     .then(menuItem => {
                       menuItems.push(helpers.parseJsonToObject(menuItem))
                       if (menuItems.length === fileNames.length) {
-                        callback(200, menuItems)
+                        callBack(200, menuItems)
                       }
                     })
-                    .catch(err => {
-                      console.log(err)
-                      callback(500, {'Error': 'Unable to read menu item'})
-                    })
+                    .catch(err => callBack(500, {'Error': err.toString()}))
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callback(500, {'Error': 'Unable to read menuitems directory'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
-          callback(401, {'Error': 'Invalid token. Please login again.'})
+          callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callback(500, {'Error': 'Unable to get token'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
-    callback(401, {'Error': 'Authentication token not provided'})
+    callBack(401, {'Error': 'Authentication token not provided'})
   }
 }
 

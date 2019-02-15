@@ -50,26 +50,17 @@ cartHandler._cart.get = (data, callBack) => {
                           callBack(200, userObject.cart) 
                         }
                       })
-                      .catch(err => {
-                        console.log(err)
-                        callBack(500, {'Error': 'Unable to get cart'})
-                      })
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   }
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callBack(500, {'Error': 'Unable to get user.'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to get token'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
     callBack(401, {'Error': 'Authentication token not provided'})
   }
@@ -132,49 +123,27 @@ cartHandler._cart.put = (data, callBack) => {
                                             // Store updates
                                             helpers.writeUser(email, userObject, 'w', callBack, 'cart')
                                           })
-                                          .catch(err => {
-                                            console.log(err)
-                                            callBack(500, {'Error': 'Unable to get cart.'})
-                                          })
+                                          .catch(err => callBack(500, {'Error': err.toString()}))
                                       }
                                     })
                                   }
                                 })
-                                .catch(err => {
-                                  console.log(err)
-                                  callBack(500, {'Error': 'Unable to read user directory.'})
-                                })
+                                .catch(err => callBack(500, {'Error': err.toString()}))
                             })
-                            .catch(err => {
-                              console.log(err)
-                              callBack(500, {'Error': 'Unable to read menu entry.'})
-                            })
+                            .catch(err => callBack(500, {'Error': err.toString()}))
                         }
                       })
                     })
-                    .catch(err => {
-                      console.log(err)
-                      callBack(500, {'Error': 'Unable to read menu directory.'})
-                    })
+                    .catch(err => callBack(500, {'Error': err.toString()}))
                 }
               })
-              .catch(err => {
-                console.log(err)
-                callBack(500, {'Error': 'Unable to fetch menu.'})
-              })
-
-            // Get user object
-            // Read users directory
-            
+              .catch(err => callBack(500, {'Error': err.toString()}))
           }
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to get token.'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
     callBack(401, {'Error': 'Authentication token not provided. Missing required field.'})
   }
@@ -228,26 +197,17 @@ cartHandler._cart.delete = (data, callBack) => {
                           }
                         }
                       })
-                      .catch(err => {
-                        console.log(err)
-                        callBack(500, {'Error': 'Unable to get cart.'})
-                      })
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   }
                 })
               }
             })
-            .catch(err => {
-              console.log(err)
-              callBack(500, {'Error': 'Unable to get user.'})
-            })
+            .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
           callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
-      .catch(err => {
-        console.log(err)
-        callBack(500, {'Error': 'Unable to get token.'})
-      })
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
     callBack(400, {'Error': 'Authentication token not provided. Missing required fields.'})
   }  

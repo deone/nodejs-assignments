@@ -27,10 +27,7 @@ userHandler._users.post = (data, callback) => {
 
   if (firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then(user => {
-        console.log(user)
-        callback(400, {'Error': 'User already exists.'})
-      })
+      .then(user => callback(400, {'Error': 'User already exists.'}))
       .catch(err => {
         // Hash password
         const hashedPassword = helpers.hash(password)
@@ -58,7 +55,7 @@ userHandler._users.post = (data, callback) => {
 // Required data: email
 // Optional data: none
 // @TODO Only let an authenticated user access their object. Dont let them access anyone elses.
-userHandler._users.get = (data, callback) => {
+userHandler._users.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
   const email = helpers.validate(data.queryStringObject.email)
   if (email) {
@@ -67,11 +64,11 @@ userHandler._users.get = (data, callback) => {
       .then(data => {
         const userObject = helpers.parseJsonToObject(data)
         delete userObject.hashedPassword
-        callback(200, userObject)
+        callBack(200, userObject)
       })
-      .catch(err => callback(404))
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
-    callback(400, {'Error': 'Missing required field.'})
+    callBack(400, {'Error': 'Missing required field.'})
   }
 }
 
@@ -128,19 +125,17 @@ userHandler._users.put = (data, callback) => {
 // Optional data: none
 // @TODO Only let an authenticated user delete their object. Don't let them delete or update someone elses.
 // @TODO Cleanup (delete) any other data files associated with the user
-userHandler._users.delete = (data, callback) => {
+userHandler._users.delete = (data, callBack) => {
   // Validate email
   const email = helpers.validate(data.queryStringObject.email)
   if (email) {
     helpers.deleteUser(email)
-      .then(() => callback(200, {'Success': 'User deleted successfully.'}))
-      .catch(err => {
-        console.log(err)
-        callback(500, {'Error': 'Could not delete user.'})
-      })
+      .then(() => callBack(200, {'Success': 'User deleted successfully.'}))
+      .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
-    callback(400, {'Error': 'Missing required field.'})
+    callBack(400, {'Error': 'Missing required field.'})
   }
 }
+
 
 module.exports = userHandler
