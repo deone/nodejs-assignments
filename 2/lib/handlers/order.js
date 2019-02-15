@@ -90,7 +90,8 @@ orderHandler._order.post = (data, callBack) => {
                               // Set property to empty list
                               userObject.orders = []
                             }
-                            userObject.orders.push(id)
+                            const userOrder = {'id': id, 'value': totalPrice}
+                            userObject.orders.push(userOrder)
 
                             // - Update user object on file
                             helpers.writeUser(email, userObject, 'w', callBack, 'order')
