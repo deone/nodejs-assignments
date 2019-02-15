@@ -149,6 +149,19 @@ orderHandler._order.get = (data, callBack) => {
                   const email = fileName.slice(0, -5)
                   if (email === tokenObject.email) {
                     // Get order
+                    helpers.getUser(email)
+                      .then(user => {
+                        const userObject = helpers.parseJsonToObject(user)
+                        if (!userObject.hasOwnProperty('orders')) {
+                          callBack(400, {'Error': 'User has no orders.'})
+                        } else {
+                          callBack(200, userObject.orders)
+                        }
+                      })
+                      .catch(err => {
+                        console.log(err)
+                        callBack(500, {'Error': 'Unable to get order.'})
+                      })
                   }
                 })
               }

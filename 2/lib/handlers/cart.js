@@ -99,8 +99,10 @@ cartHandler._cart.put = (data, callBack) => {
               .then(fileNames => {
                 const menu = fileNames.map(fileName => fileName.slice(0, -5))
                 if (!menu.includes(item)) {
+                  // Item is not on menu
                   callBack(400, {'Error': 'Item provided is not on menu.'})
                 } else {
+                  // Item is on menu, get item
                   helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
                     .then(fileNames => {
                       fileNames.forEach(fileName => {
@@ -108,7 +110,7 @@ cartHandler._cart.put = (data, callBack) => {
                           helpers.readFile(helpers.filePath(helpers.baseDir, 'menuitems', item), 'utf8')
                             .then(menuItem => {
                               const menuItemObject = helpers.parseJsonToObject(menuItem)
-                              // Get cart
+                              // Get cart, so we can update it with menu item
                               helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
                                 .then(fileNames => {
                                   if (!fileNames.length) {
