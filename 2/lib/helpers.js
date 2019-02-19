@@ -1,6 +1,7 @@
 // Dependencies
 const fs = require('fs')
 const path = require('path')
+const https = require('https')
 const { promisify } = require('util')
 const crypto = require('crypto')
 
@@ -131,6 +132,40 @@ helpers.createToken = (tokenId, email, callBack) => {
 
 helpers.deleteToken = tokenId =>
   helpers.deleteFile(helpers.filePath(helpers.baseDir, 'tokens', tokenId))
+
+helpers.sendRequest = (payload, hostName, path, auth, callBack) => {
+  const options = {
+    hostname: hostName,
+    port: 443,
+    path: path,
+    method: 'POST',
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(payload)
+    }
+  }
+
+  const req = https.request(options, res => {
+    console.log(`Status code: ${res.statusCode}`)
+  
+    res.on('data', d => {
+      console.log(`${d}`)
+      if (res.statusCode === 200) {
+        callBack(false)
+      } else {
+        callBack(true)
+      }
+    })
+  })
+  
+  req.on('error', error => {
+    console.error(error)
+  })
+  
+  req.write(payload)
+  req.end()
+}
 
 
 module.exports = helpers

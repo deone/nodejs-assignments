@@ -1,7 +1,6 @@
 /* Checkout handler */
 
 // Dependencies
-const https = require('https')
 const queryString = require('querystring')
 
 const helpers = require('../helpers')
@@ -54,58 +53,34 @@ checkoutHandler._checkout.post = (data, callBack) => {
                       'orders', orderId), 'utf8')
                       .then(order => {
                         const orderObject = helpers.parseJsonToObject(order)
-                        console.log(orderObject)
-                        const stripeRequestObject = {
+
+                        const stripePayload = queryString.stringify({
                           amount: Math.round(orderObject.totalPrice * 100),
                           currency: 'usd',
                           description: `${email}_${tokenId}_${Date.now()}`,
                           source: stripeToken
-                        }
-                        const requestString = queryString.stringify(stripeRequestObject)
+                        })
 
-                        const options = {
-                          hostname: 'api.stripe.com',
-                          port: 443,
-                          path: '/v1/charges',
-                          method: 'POST',
-                          headers: {
-                            'Authorization': `Bearer ${config.stripeKey}`,
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Content-Length': Buffer.byteLength(requestString)
+                        helpers.sendRequest(stripePayload, 'api.stripe.com', '/v1/charges',
+                          `Bearer ${config.stripeKey}`, (err, data) => {
+                          if (!err) {
+                            orderObject.paid = true
                           }
-                        }
+                        })
 
-                        const req = https.request(options, res => {
-                          console.log(`Stripe payment status code: ${res.statusCode}`)
-                        
-                          res.on('data', d => {
-                            console.log(`${d}`)
-                            // Update order object
-                            if (res.statusCode === 200) {
-                              orderObject.paid = true
-                              helpers.openFile(helpers.filePath(helpers.baseDir,
-                                'orders', orderId), 'w')
-                                .then(fileDescriptor => {
-                                  helpers.writeFile(fileDescriptor, JSON.stringify(orderObject))
-                                    .catch(err => callBack(500, {'Error': err.toString()}))
-                                  callBack(200, {'Success': 'Payment processed successfully.'})
-                                })
-                                .catch(err => callBack(500, {'Error': err.toString()}))
-                            }
+                        helpers.openFile(helpers.filePath(helpers.baseDir,
+                          'orders', orderId), 'w')
+                          .then(fileDescriptor => {
+                            helpers.writeFile(fileDescriptor, JSON.stringify(orderObject))
+                              .catch(err => callBack(500, {'Error': err.toString()}))
+                            callBack(200, {'Success': 'Payment processed and user notified successfully.'})
                           })
-                        })
-                        
-                        req.on('error', error => {
-                          console.error(error)
-                        })
-                        
-                        req.write(requestString)
-                        req.end()
+                          .catch(err => callBack(500, {'Error': err.toString()}))
                       })
                       .catch(err => callBack(500, {'Error': err.toString()}))
                   }
                 })
-              }  
+              }
             })
         } else {
           callBack(400, {'Error': 'Invalid token. Please login again.'})
