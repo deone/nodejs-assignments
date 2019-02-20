@@ -54,6 +54,7 @@ checkoutHandler._checkout.post = (data, callBack) => {
                       .then(order => {
                         const orderObject = helpers.parseJsonToObject(order)
 
+                        // Make payment
                         const stripePayload = queryString.stringify({
                           amount: Math.round(orderObject.totalPrice * 100),
                           currency: 'usd',
@@ -65,17 +66,36 @@ checkoutHandler._checkout.post = (data, callBack) => {
                           `Bearer ${config.stripeKey}`, (err, data) => {
                           if (!err) {
                             orderObject.paid = true
+                            // Send mail
+                            const mailgunPayload = queryString.stringify({
+                              'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
+                              'to': 'alwaysdeone@gmail.com',
+                              'subject': `Order No. ${orderObject.id}`,
+                              'text': `Dear ${email}, an order with a total amount of ${orderObject.totalPrice} was made by you.`
+                            })
+
+                            helpers.sendRequest(mailgunPayload, 'api.mailgun.net',
+                              `/v3/${config.mailgunDomain}/messages`,
+                              ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')), (err, data) => {
+                              if (!err) {
+                                orderObject.mailSent = true
+                                // Update order
+                                helpers.openFile(helpers.filePath(helpers.baseDir,
+                                  'orders', orderId), 'w')
+                                  .then(fileDescriptor => {
+                                    helpers.writeFile(fileDescriptor, JSON.stringify(orderObject))
+                                      .catch(err => callBack(500, {'Error': err.toString()}))
+                                    callBack(200, {'Success': 'Payment processed and user notified successfully.'})
+                                  })
+                                  .catch(err => callBack(500, {'Error': err.toString()}))
+                              } else {
+                                callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
+                              }
+                            })
+                          } else {
+                            callBack(500, {'Error': 'Unable to process payment.'})
                           }
                         })
-
-                        helpers.openFile(helpers.filePath(helpers.baseDir,
-                          'orders', orderId), 'w')
-                          .then(fileDescriptor => {
-                            helpers.writeFile(fileDescriptor, JSON.stringify(orderObject))
-                              .catch(err => callBack(500, {'Error': err.toString()}))
-                            callBack(200, {'Success': 'Payment processed and user notified successfully.'})
-                          })
-                          .catch(err => callBack(500, {'Error': err.toString()}))
                       })
                       .catch(err => callBack(500, {'Error': err.toString()}))
                   }
