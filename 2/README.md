@@ -1,87 +1,57 @@
-# Project Title
+# The Node.js Master Class - Homework Assignment #2
 
-One Paragraph of project description goes here
+This is the repo for the second assignment of The Node.js Master Class.
 
-## Getting Started
+## API Documentation
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This is the API documentation for a pizza-delivery company.
 
-### Prerequisites
+**Show User**
+----
+  Returns json data about a single user.
 
-What things you need to install the software and how to install them
+* **URL**
 
-```
-Give examples
-```
+  /users/:id
 
-### Installing
+* **Method:**
 
-A step by step series of examples that tell you how to get a development env running
+  `GET`
+  
+*  **URL Params**
 
-Say what the step will be
+   **Required:**
+ 
+   `id=[integer]`
 
-```
-Give the example
-```
+* **Data Params**
 
-And repeat
+  None
 
-```
-until finished
-```
+* **Success Response:**
 
-End with an example of getting some data out of the system or using it for a little demo
+  * **Code:** 200 <br />
+    **Content:** `{ id : 12, name : "Michael Bloom" }`
+ 
+* **Error Response:**
 
-## Running the tests
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error : "User doesn't exist" }`
 
-Explain how to run the automated tests for this system
+  OR
 
-### Break down into end to end tests
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** `{ error : "You are unauthorized to make this request." }`
 
-Explain what these tests test and why
+* **Sample Call:**
 
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+  ```javascript
+    $.ajax({
+      url: "/users/1",
+      dataType: "json",
+      type : "GET",
+      success : function(r) {
+        console.log(r);
+      }
+    });
+  ```
