@@ -38,7 +38,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br />
+  * **Code:** 200 <br/>
     **Content:** `{ "Success": "User created successfully." }`
  
 * **Error Response:**
@@ -57,17 +57,17 @@ This is the API documentation for a pizza-delivery company.
 
 * **URL**
 
-  /users/:id
+  /users?email=alex@o.com
 
 * **Method:**
 
   `GET`
-  
+
 *  **URL Params**
 
    **Required:**
  
-   `id=[integer]`
+   `email=[string]`
 
 * **Data Params**
 
@@ -75,31 +75,27 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br />
-    **Content:** `{ id : 12, name : "Michael Bloom" }`
+  * **Code:** 200 <br/>
+    **Content:**
+    ```json
+    {
+        "firstName": "Alex",
+        "lastName": "Dale",
+        "streetAddress": "20, Ocean Ave. Florida",
+        "email": "alex@o.com"
+    }
+    ```
  
 * **Error Response:**
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "User doesn't exist" }`
+  * **Code:** 404 Not Found <br/>
+    **Content:** `{ "Error" : "User does not exist." }`
 
   OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "You are unauthorized to make this request." }`
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error" : "Missing required field." }`
 
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/users/1",
-      dataType: "json",
-      type : "GET",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 **Update User**
 ----
   Returns json data about a single user.
