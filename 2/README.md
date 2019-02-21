@@ -21,6 +21,7 @@ This is the API documentation for a pizza-delivery company.
   **Required:** `email`, `firstName`, `lastName`, `password`, `streetAddress`.
 
 * **Sample Request:**
+
   ```json
   {
       "firstName": "Alex",
@@ -34,17 +35,35 @@ This is the API documentation for a pizza-delivery company.
 * **Success Response:**
 
   * **Code:** 200 <br/>
-    **Content:** `{ "Success": "User created successfully." }`
+    **Content:**
+    
+    ```json
+    {
+        "Success": "User created successfully."
+    }
+    ```
  
 * **Error Response:**
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "Missing required fields." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required fields."
+    }
+    ```
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "User already exists." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User already exists."
+    }
+    ```
 
 **Show User**
 ----
@@ -77,12 +96,24 @@ This is the API documentation for a pizza-delivery company.
 * **Error Response:**
 
   * **Code:** 404 Not Found <br/>
-    **Content:** `{ "Error": "User does not exist." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User does not exist."
+    }
+    ```
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "Missing required field." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required field."
+    }
+    ```
 
 **Update User**
 ----
@@ -98,9 +129,10 @@ This is the API documentation for a pizza-delivery company.
 
   **Required:** `email`
 
-  **Optional:** `streetAddress`, `firstName`, `lastName`, `streetAddress`
+  **Optional:** `streetAddress`, `firstName`, `lastName`, `streetAddress`.
 
-  **Sample Request:** 
+  **Sample Request:**
+  
   ```json
   {
       "streetAddress": "20, Ocean Ave. Florida",
@@ -111,22 +143,46 @@ This is the API documentation for a pizza-delivery company.
 * **Success Response:**
 
   * **Code:** 200 <br/>
-    **Content:** `{ "Success": "User updated successfully." }`
+    **Content:**
+    
+    ```json
+    {
+        "Success": "User updated successfully."
+    }
+    ```
  
 * **Error Response:**
 
   * **Code:** 404 Not Found <br/>
-    **Content:** `{ "Error": "User does not exist" }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User does not exist"
+    }
+    ```
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "Missing required field." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required field."
+    }
+    ```
   
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "Missing fields to update." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing fields to update."
+    }
+    ```
 
 **Delete User**
 ----
@@ -145,14 +201,103 @@ This is the API documentation for a pizza-delivery company.
 * **Success Response:**
 
   * **Code:** 200 <br/>
-    **Content:** `{ "Error": "User deleted successfully." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User deleted successfully."
+    }
+    ```
  
 * **Error Response:**
 
   * **Code:** 404 Not Found <br/>
-    **Content:** `{ "Error": "User does not exist." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User does not exist."
+    }
+    ```
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error": "Missing required field." }`
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required field."
+    }
+    ```
+
+----
+
+**Log In**
+----
+  Logs user in.
+
+* **URL:** `/login`
+
+* **Method:** `POST`
+  
+*  **URL Params:** None
+
+* **Data Params**
+
+  **Required:** `email`, `password`.
+
+* **Sample Request:**
+
+  ```json
+  {
+      "email": "alex@o.com",
+      "password": 123456
+  }
+  ```
+
+* **Success Response:**
+
+  * **Code:** 200 <br/>
+    **Content:**
+    
+    ```json
+    {
+        "email": "alex@o.com",
+        "tokenId": "2ph7dlfmwsn92r5djson",
+        "expires": 1550784359160
+    }
+    ```
+ 
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required fields."
+    }
+    ```
+
+  OR
+
+  * **Code:** 404 Not Found <br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User does not exist."
+    }
+    ```
+  
+  OR
+
+  * **Code:** 400 Bad Request <br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Password did not match the specified user's stored password."
+    }
+    ```
