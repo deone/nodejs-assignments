@@ -252,7 +252,7 @@ This is the API documentation for a pizza-delivery company.
   ```json
   {
       "email": "alex@o.com",
-      "password": 123456
+      "password": "123456"
   }
   ```
 
