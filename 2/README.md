@@ -158,7 +158,7 @@ This is the API documentation for a pizza-delivery company.
     
     ```json
     {
-        "Error": "User does not exist"
+        "Error": "User does not exist."
     }
     ```
 
@@ -299,5 +299,43 @@ This is the API documentation for a pizza-delivery company.
     ```json
     {
         "Error": "Password did not match the specified user's stored password."
+    }
+    ```
+
+**Log Out**
+----
+  Logs user out.
+
+* **URL:** `/logout`
+
+* **Method:** `POST`
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
+  
+*  **URL Params:** None
+
+* **Data Params:** None
+
+* **Sample Request:** None
+
+* **Success Response:**
+
+  * **Code:** 200 <br/>
+    **Content:**
+    
+    ```json
+    {
+        "Success": "User logged out."
+    }
+    ```
+ 
+* **Error Response:**
+
+  * **Code:** 401 Not Authorized <br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided."
     }
     ```
