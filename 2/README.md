@@ -10,7 +10,7 @@ This is the API documentation for a pizza-delivery company.
 ----
   Create a user.
 
-* **URL:** /users
+* **URL:** `/users`
 
 * **Method:** `POST`
   
@@ -18,7 +18,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Data Params**
 
-  **Required:** `email`, `firstName`, `lastName`, `password`, `streetAddress`
+  **Required:** `email`, `firstName`, `lastName`, `password`, `streetAddress`.
 
 * **Sample Request:**
   ```json
@@ -44,7 +44,7 @@ This is the API documentation for a pizza-delivery company.
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error" : "User already exists." }`
+    **Content:** `{ "Error": "User already exists." }`
 
 **Show User**
 ----
@@ -77,18 +77,18 @@ This is the API documentation for a pizza-delivery company.
 * **Error Response:**
 
   * **Code:** 404 Not Found <br/>
-    **Content:** `{ "Error" : "User does not exist." }`
+    **Content:** `{ "Error": "User does not exist." }`
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error" : "Missing required field." }`
+    **Content:** `{ "Error": "Missing required field." }`
 
 **Update User**
 ----
   Updates user.
 
-* **URL:** /users
+* **URL:** `/users`
 
 * **Method:** `PUT`
   
@@ -111,69 +111,48 @@ This is the API documentation for a pizza-delivery company.
 * **Success Response:**
 
   * **Code:** 200 <br/>
-    **Content:** `{ "Success" : "User updated successfully." }`
+    **Content:** `{ "Success": "User updated successfully." }`
  
 * **Error Response:**
 
   * **Code:** 404 Not Found <br/>
-    **Content:** `{ "Error" : "User does not exist" }`
+    **Content:** `{ "Error": "User does not exist" }`
 
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error" : "Missing required field." }`
+    **Content:** `{ "Error": "Missing required field." }`
   
   OR
 
   * **Code:** 400 Bad Request <br/>
-    **Content:** `{ "Error" : "Missing fields to update." }`
+    **Content:** `{ "Error": "Missing fields to update." }`
 
 **Delete User**
 ----
-  Returns json data about a single user.
+  Deletes user.
 
-* **URL**
+* **URL:** `/users?email=alex@o.com`
 
-  /users/:id
-
-* **Method:**
-
-  `GET`
+* **Method:** `DELETE`
   
 *  **URL Params**
 
-   **Required:**
- 
-   `id=[integer]`
+   **Required:** `email=[string]`
 
-* **Data Params**
-
-  None
+* **Data Params:** None
 
 * **Success Response:**
 
-  * **Code:** 200 <br />
-    **Content:** `{ id : 12, name : "Michael Bloom" }`
+  * **Code:** 200 <br/>
+    **Content:** `{ "Error": "User deleted successfully." }`
  
 * **Error Response:**
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "User doesn't exist" }`
+  * **Code:** 404 Not Found <br/>
+    **Content:** `{ "Error": "User does not exist." }`
 
   OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "You are unauthorized to make this request." }`
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/users/1",
-      dataType: "json",
-      type : "GET",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error": "Missing required field." }`
