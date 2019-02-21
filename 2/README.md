@@ -26,15 +26,15 @@ This is the API documentation for a pizza-delivery company.
 
   **Required:**
  
-```json
-{
-    "firstName": "Alex",
-    "lastName": "Dale",
-    "password": 123456,
-    "streetAddress": "20, Ocean Ave. Florida",
-    "email": "alex@o.com"
-}
-```
+  ```json
+  {
+      "firstName": "Alex",
+      "lastName": "Dale",
+      "password": 123456,
+      "streetAddress": "20, Ocean Ave. Florida",
+      "email": "alex@o.com"
+  }
+  ```
 
 * **Success Response:**
 
