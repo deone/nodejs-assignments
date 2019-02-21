@@ -339,3 +339,80 @@ This is the API documentation for a pizza-delivery company.
         "Error": "Authentication token not provided."
     }
     ```
+
+----
+
+**Menu**
+----
+  Displays a list of menu items.
+
+* **URL:** `/menu`
+
+* **Method:** `GET`
+  
+*  **URL Params:** None
+
+* **Data Params:** None
+
+* **Success Response:**
+
+  * **Code:** 200 <br/>
+    **Content:**
+    
+    ```json
+    [
+        {
+            "id": 2,
+            "name": "barbeque",
+            "price": 13.99
+        },
+        {
+            "id": 4,
+            "name": "pepperoni",
+            "price": 20.99
+        },
+        {
+            "id": 5,
+            "name": "marinara",
+            "price": 17.99
+        },
+        {
+            "id": 6,
+            "name": "margherita",
+            "price": 18.79
+        }
+    ]
+    ```
+
+  OR
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Message": "There are no items on the menu."
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided."
+    }
+    ```
+
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
