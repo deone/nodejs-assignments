@@ -6,32 +6,32 @@ This is the repo for the second assignment of The Node.js Master Class.
 
 This is the API documentation for a pizza-delivery company.
 
-**Show User**
+**Create User**
 ----
-  Returns json data about a single user.
+  Create a user.
 
 * **URL**
 
-  /users/:id
+  /users
 
 * **Method:**
 
-  `GET`
+  `POST`
   
 *  **URL Params**
 
-   **Required:**
- 
-   `id=[integer]`
+  None
 
 * **Data Params**
 
-  None
+  **Required:**
+ 
+   `{ "firstName": "Alex", "lastName": "Dale", "password": 123456, "streetAddress": "20, Ocean Ave. Florida", "email": "alex@o.com" }`
 
 * **Success Response:**
 
   * **Code:** 200 <br />
-    **Content:** `{ id : 12, name : "Michael Bloom" }`
+    **Content:** `{ "Success": "User created successfully." }`
  
 * **Error Response:**
 
@@ -104,7 +104,7 @@ This is the API documentation for a pizza-delivery company.
       }
     });
   ```
-**Show User**
+**Update User**
 ----
   Returns json data about a single user.
 
@@ -153,7 +153,7 @@ This is the API documentation for a pizza-delivery company.
       }
     });
   ```
-**Show User**
+**Delete User**
 ----
   Returns json data about a single user.
 
