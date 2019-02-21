@@ -119,10 +119,10 @@ userHandler._users.put = (data, callback) => {
         })
         .catch(err => {
           console.log(err)
-          callback(400, {'Error': 'User does not exist'})
+          callback(404, {'Error': 'User does not exist.'})
         })
     } else {
-      callback(400, {'Error': 'Missing fields to update'})
+      callback(400, {'Error': 'Missing fields to update.'})
     }
   }
 }
@@ -138,7 +138,14 @@ userHandler._users.delete = (data, callBack) => {
   if (email) {
     helpers.deleteUser(email)
       .then(() => callBack(200, {'Success': 'User deleted successfully.'}))
-      .catch(err => callBack(500, {'Error': err.toString()}))
+      .catch(err => {
+        const errorString = err.toString()
+        if (errorString.includes('no such file or directory')) {
+          callBack(404, {'Error': 'User does not exist.'})
+        } else {
+          callBack(500, {'Error': err.toString()})
+        }
+      })
   } else {
     callBack(400, {'Error': 'Missing required field.'})
   }
