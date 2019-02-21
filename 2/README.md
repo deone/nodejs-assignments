@@ -43,26 +43,14 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "User doesn't exist" }`
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error": "Missing required fields." }`
 
   OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "You are unauthorized to make this request." }`
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error" : "User already exists." }`
 
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/users/1",
-      dataType: "json",
-      type : "GET",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 **Show User**
 ----
   Returns json data about a single user.
