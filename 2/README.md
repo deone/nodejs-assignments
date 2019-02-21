@@ -10,22 +10,17 @@ This is the API documentation for a pizza-delivery company.
 ----
   Create a user.
 
-* **URL**
+* **URL:** /users
 
-  /users
-
-* **Method:**
-
-  `POST`
+* **Method:** `POST`
   
-*  **URL Params**
-
-   None
+*  **URL Params:** None
 
 * **Data Params**
 
-  **Required:**
- 
+  **Required:** `email`, `firstName`, `lastName`, `password`, `streetAddress`
+
+* **Sample Request:**
   ```json
   {
       "firstName": "Alex",
@@ -57,7 +52,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **URL**
 
-  /users?email=alex@o.com
+  `/users?email=alex@o.com`
 
 * **Method:**
 
@@ -102,21 +97,29 @@ This is the API documentation for a pizza-delivery company.
 
 * **URL**
 
-  /users/:id
+  /users
 
 * **Method:**
 
-  `GET`
+  `PUT`
   
 *  **URL Params**
-
-   **Required:**
  
-   `id=[integer]`
+   None
 
 * **Data Params**
 
-  None
+  **Required:**
+  `email`
+
+  **Optional:**
+ 
+  ```json
+  {
+      "streetAddress": "20, Ocean Ave. Florida",
+      "email": "alex@o.com"
+  }
+  ```
 
 * **Success Response:**
 
