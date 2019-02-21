@@ -342,9 +342,9 @@ This is the API documentation for a pizza-delivery company.
 
 ----
 
-**Menu**
+**Show Menu**
 ----
-  Displays a list of menu items.
+  Returns json data about available menu items.
 
 * **URL:** `/menu`
 
@@ -406,6 +406,59 @@ This is the API documentation for a pizza-delivery company.
     }
     ```
 
+----
+
+**Update Cart**
+----
+  Add menu item to cart.
+
+* **URL:** `/cart`
+
+* **Method:** `PUT`
+  
+*  **URL Params:** None
+
+* **Data Params:** `item`. - menu item
+
+* **Sample Request:**
+
+  ```json
+  {
+      "item": "barbeque"
+  }
+  ```
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    
+    ```
+
+  OR
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    {
+        
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "."
+    }
+    ```
+
   OR
 
   * **Code:** 401 Not Authorized<br/>
@@ -413,6 +466,6 @@ This is the API documentation for a pizza-delivery company.
     
     ```json
     {
-        "Error": "Invalid token. Please log in again."
+        "Error": "."
     }
     ```
