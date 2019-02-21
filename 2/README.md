@@ -50,28 +50,21 @@ This is the API documentation for a pizza-delivery company.
 ----
   Returns json data about a single user.
 
-* **URL**
+* **URL:** `/users?email=alex@o.com`
 
-  `/users?email=alex@o.com`
-
-* **Method:**
-
-  `GET`
+* **Method:** `GET`
 
 *  **URL Params**
 
-   **Required:**
- 
-   `email=[string]`
+   **Required:** `email=[string]`
 
-* **Data Params**
-
-  None
+* **Data Params:** None
 
 * **Success Response:**
 
   * **Code:** 200 <br/>
     **Content:**
+    
     ```json
     {
         "firstName": "Alex",
@@ -93,27 +86,21 @@ This is the API documentation for a pizza-delivery company.
 
 **Update User**
 ----
-  Returns json data about a single user.
+  Updates user.
 
-* **URL**
+* **URL:** /users
 
-  /users
-
-* **Method:**
-
-  `PUT`
+* **Method:** `PUT`
   
-*  **URL Params**
- 
-   None
+*  **URL Params:** None
 
 * **Data Params**
 
-  **Required:**
-  `email`
+  **Required:** `email`
 
-  **Optional:**
- 
+  **Optional:** `streetAddress`, `firstName`, `lastName`, `streetAddress`
+
+  **Sample Request:** 
   ```json
   {
       "streetAddress": "20, Ocean Ave. Florida",
@@ -123,31 +110,24 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br />
-    **Content:** `{ id : 12, name : "Michael Bloom" }`
+  * **Code:** 200 <br/>
+    **Content:** `{ "Success" : "User updated successfully." }`
  
 * **Error Response:**
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "User doesn't exist" }`
+  * **Code:** 404 Not Found <br/>
+    **Content:** `{ "Error" : "User does not exist" }`
 
   OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "You are unauthorized to make this request." }`
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error" : "Missing required field." }`
+  
+  OR
 
-* **Sample Call:**
+  * **Code:** 400 Bad Request <br/>
+    **Content:** `{ "Error" : "Missing fields to update." }`
 
-  ```javascript
-    $.ajax({
-      url: "/users/1",
-      dataType: "json",
-      type : "GET",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 **Delete User**
 ----
   Returns json data about a single user.
