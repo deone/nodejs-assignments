@@ -26,7 +26,7 @@ This is the API documentation for a pizza-delivery company.
   {
       "firstName": "Alex",
       "lastName": "Dale",
-      "password": 123456,
+      "password": "123456",
       "streetAddress": "20, Ocean Ave. Florida",
       "email": "alex@o.com"
   }
@@ -34,7 +34,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -45,7 +45,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -56,7 +56,7 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -81,7 +81,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -95,7 +95,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 404 Not Found <br/>
+  * **Code:** 404 Not Found<br/>
     **Content:**
     
     ```json
@@ -106,7 +106,7 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -142,7 +142,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -153,7 +153,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 404 Not Found <br/>
+  * **Code:** 404 Not Found<br/>
     **Content:**
     
     ```json
@@ -164,7 +164,7 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -175,7 +175,7 @@ This is the API documentation for a pizza-delivery company.
   
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -200,7 +200,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -211,7 +211,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 404 Not Found <br/>
+  * **Code:** 404 Not Found<br/>
     **Content:**
     
     ```json
@@ -222,7 +222,7 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -258,7 +258,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -271,7 +271,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -282,7 +282,7 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
-  * **Code:** 404 Not Found <br/>
+  * **Code:** 404 Not Found<br/>
     **Content:**
     
     ```json
@@ -293,7 +293,7 @@ This is the API documentation for a pizza-delivery company.
   
   OR
 
-  * **Code:** 400 Bad Request <br/>
+  * **Code:** 400 Bad Request<br/>
     **Content:**
     
     ```json
@@ -320,7 +320,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
@@ -331,7 +331,7 @@ This is the API documentation for a pizza-delivery company.
  
 * **Error Response:**
 
-  * **Code:** 401 Not Authorized <br/>
+  * **Code:** 401 Not Authorized<br/>
     **Content:**
     
     ```json
@@ -356,7 +356,7 @@ This is the API documentation for a pizza-delivery company.
 
 * **Success Response:**
 
-  * **Code:** 200 <br/>
+  * **Code:** 200<br/>
     **Content:**
     
     ```json
