@@ -66,7 +66,14 @@ userHandler._users.get = (data, callBack) => {
         delete userObject.hashedPassword
         callBack(200, userObject)
       })
-      .catch(err => callBack(500, {'Error': err.toString()}))
+      .catch(err => {
+        const errorString = err.toString()
+        if (errorString.includes('no such file or directory')) {
+          callBack(404, {'Error': 'User does not exist.'})
+        } else {
+          callBack(500, {'Error': err.toString()})
+        }
+      })
   } else {
     callBack(400, {'Error': 'Missing required field.'})
   }

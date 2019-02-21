@@ -60,7 +60,7 @@ helpers.writeUser = (email, object, fileOpenMode, callBack, caller = 'users') =>
             if (caller === 'order') {
               callBack(200, object.orders)
             } else {
-              callBack(200, {'Message': `User ${action}d successfully.`})
+              callBack(200, {'Success': `User ${action}d successfully.`})
             }
           }
         })
