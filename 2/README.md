@@ -455,6 +455,16 @@ This is the API documentation for a pizza-delivery company.
 
   OR
 
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required field."
+    }
+    ```
+  OR
+
   * **Code:** 401 Not Authorized<br/>
     **Content:**
     
