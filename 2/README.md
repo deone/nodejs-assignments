@@ -679,6 +679,17 @@ This is the API documentation for a pizza-delivery company.
   
   OR
 
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Order not found."
+    }
+    ```
+  
+  OR
+
   * **Code:** 401 Not Authorized<br/>
     **Content:**
     
@@ -687,7 +698,71 @@ This is the API documentation for a pizza-delivery company.
         "Error": "Invalid token. Please log in again."
     }
     ```
+
+**Checkout**
+----
+  Send order details to Stripe, notify user via Mailgun, and return json response.
+
+* **URL:** `/checkout`
+
+* **Method:** `POST`
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Success": "Payment processed and user notified successfully."
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** 500 Internal Server Error<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Unable to process payment."
+    }
+    ```
+
+  OR
   
+  * **Code:** 500 Internal Server Error<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Payment successful, but unable to notify user."
+    }
+    ```
+
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided."
+    }
+    ```
+
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please login again."
+    }
+    ```
   OR
 
   * **Code:** 400 Bad Request<br/>
@@ -695,6 +770,6 @@ This is the API documentation for a pizza-delivery company.
     
     ```json
     {
-        "Error": "Order not found."
+        "Error": "Required fields missing."
     }
     ```
