@@ -95,7 +95,7 @@ authHandler._login.post = (data, callBack) => {
       })
       .catch(err => {
         console.log(err)
-        callBack(400, {'Error': 'User does not exist.'})
+        callBack(404, {'Error': 'User does not exist.'})
       })
   } else {
     callBack(400, {'Error': 'Missing required fields.'})

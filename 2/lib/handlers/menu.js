@@ -32,7 +32,7 @@ menuHandler._menu.get = (data, callBack) => {
             .then(fileNames => {
               if (!fileNames.length) {
                 // There are no menu items
-                callBack(400, {'Error': 'There are no items on the menu'})
+                callBack(200, {'Message': 'There are no items on the menu.'})
               } else {
                 // There are menu items
                 let menuItems = []
@@ -52,12 +52,12 @@ menuHandler._menu.get = (data, callBack) => {
             })
             .catch(err => callBack(500, {'Error': err.toString()}))
         } else {
-          callBack(401, {'Error': 'Invalid token. Please login again.'})
+          callBack(401, {'Error': 'Invalid token. Please log in again.'})
         }
       })
       .catch(err => callBack(500, {'Error': err.toString()}))
   } else {
-    callBack(401, {'Error': 'Authentication token not provided'})
+    callBack(401, {'Error': 'Authentication token not provided.'})
   }
 }
 

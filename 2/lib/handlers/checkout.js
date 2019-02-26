@@ -103,7 +103,7 @@ checkoutHandler._checkout.post = (data, callBack) => {
               }
             })
         } else {
-          callBack(400, {'Error': 'Invalid token. Please login again.'})
+          callBack(401, {'Error': 'Invalid token. Please login again.'})
         }
       })
       .catch()
