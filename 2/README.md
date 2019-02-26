@@ -627,3 +627,74 @@ This is the API documentation for a pizza-delivery company.
         "Error": "Invalid token. Please log in again."
     }
     ```
+
+**Show Order**
+----
+  Returns json data about available menu items.
+
+* **URL:** `/menu?id=1ukwlzopiyou1lrmki2v`
+
+* **Method:** `GET`
+
+* **URL Params**
+
+  **Required:** `id=[string]`
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    {
+        "id": "aa33pb27zt0ve33ehkcm",
+        "user": "alex@gmail.com",
+        "paid": false,
+        "mailSent": false,
+        "totalPrice": {
+            "name": "marinara",
+            "price": 17.99
+        },
+        "items": [
+            {
+                "name": "marinara",
+                "price": 17.99
+            }
+        ]
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided. Missing required field"
+    }
+    ```
+  
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
+  
+  OR
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Order not found."
+    }
+    ```
