@@ -13,8 +13,6 @@ This is the API documentation for a pizza-delivery company.
 * **URL:** `/users`
 
 * **Method:** `POST`
-  
-*  **URL Params:** None
 
 * **Data Params**
 
@@ -73,11 +71,9 @@ This is the API documentation for a pizza-delivery company.
 
 * **Method:** `GET`
 
-*  **URL Params**
+* **URL Params**
 
-   **Required:** `email=[string]`
-
-* **Data Params:** None
+  **Required:** `email=[string]`
 
 * **Success Response:**
 
@@ -122,8 +118,6 @@ This is the API documentation for a pizza-delivery company.
 * **URL:** `/users`
 
 * **Method:** `PUT`
-  
-*  **URL Params:** None
 
 * **Data Params**
 
@@ -192,11 +186,9 @@ This is the API documentation for a pizza-delivery company.
 
 * **Method:** `DELETE`
   
-*  **URL Params**
+* **URL Params**
 
-   **Required:** `email=[string]`
-
-* **Data Params:** None
+  **Required:** `email=[string]`
 
 * **Success Response:**
 
@@ -240,8 +232,6 @@ This is the API documentation for a pizza-delivery company.
 * **URL:** `/login`
 
 * **Method:** `POST`
-  
-*  **URL Params:** None
 
 * **Data Params**
 
@@ -311,12 +301,6 @@ This is the API documentation for a pizza-delivery company.
 * **Method:** `POST`
 
 * **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
-  
-*  **URL Params:** None
-
-* **Data Params:** None
-
-* **Sample Request:** None
 
 * **Success Response:**
 
@@ -339,6 +323,17 @@ This is the API documentation for a pizza-delivery company.
         "Error": "Authentication token not provided."
     }
     ```
+    
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
 
 ----
 
@@ -349,10 +344,8 @@ This is the API documentation for a pizza-delivery company.
 * **URL:** `/menu`
 
 * **Method:** `GET`
-  
-*  **URL Params:** None
 
-* **Data Params:** None
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
 
 * **Success Response:**
 
@@ -405,6 +398,16 @@ This is the API documentation for a pizza-delivery company.
         "Error": "Authentication token not provided."
     }
     ```
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
 
 ----
 
@@ -415,8 +418,8 @@ This is the API documentation for a pizza-delivery company.
 * **URL:** `/cart`
 
 * **Method:** `PUT`
-  
-*  **URL Params:** None
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
 
 * **Data Params:** `item`.
 
@@ -427,6 +430,76 @@ This is the API documentation for a pizza-delivery company.
       "item": "barbeque"
   }
   ```
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    [
+        {
+            "name": "barbeque",
+            "price": 17.99
+        }
+    ]
+    ```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Item provided is not on menu."
+    }
+    ```
+
+  OR
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Missing required field."
+    }
+    ```
+  
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided."
+    }
+    ```
+  
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
+
+----
+
+**Show Cart**
+----
+  Returns json data about items in cart.
+
+* **URL:** `/cart`
+
+* **Method:** `GET`
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
 
 * **Success Response:**
 
@@ -471,5 +544,15 @@ This is the API documentation for a pizza-delivery company.
     ```json
     {
         "Error": "Authentication token not provided."
+    }
+    ```
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
     }
     ```
