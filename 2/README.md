@@ -8,7 +8,7 @@ This is the API documentation for a pizza-delivery company.
 
 **Create User**
 ----
-  Create a user.
+  Create a user and return json data.
 
 * **URL:** `/users`
 
@@ -534,6 +534,77 @@ This is the API documentation for a pizza-delivery company.
     ```json
     {
         "Error": "Missing required field."
+    }
+    ```
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Authentication token not provided."
+    }
+    ```
+  OR
+
+  * **Code:** 401 Not Authorized<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "Invalid token. Please log in again."
+    }
+    ```
+
+----
+
+**Create Order**
+----
+  Create order and return json data.
+
+* **URL:** `/order`
+
+* **Method:** `POST`
+
+* **Authentication:** Requires token in header. E.g. `token: 2ph7dlfmwsn92r5djson`
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:**
+    
+    ```json
+    [
+        {
+            "id": "aa33pb27zt0ve33ehkcm",
+            "value": {
+                "name": "marinara",
+                "price": 17.99
+            }
+        }
+    ]
+    ```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User has no shopping cart."
+    }
+    ```
+
+  OR
+
+  * **Code:** 400 Bad Request<br/>
+    **Content:**
+    
+    ```json
+    {
+        "Error": "User's shopping cart is empty."
     }
     ```
   OR
