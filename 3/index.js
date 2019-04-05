@@ -1,9 +1,11 @@
 const url = require('url')
 const http = require('http')
-const StringDecoder = require('string_decoder').StringDecoder
+const { StringDecoder } = require('string_decoder')
 
 const config = require('./lib/config')
 const helpers = require('./lib/helpers')
+
+// Handlers
 const authHandler = require('./lib/handlers/auth')
 const menuHandler = require('./lib/handlers/menu')
 const cartHandler = require('./lib/handlers/cart')
@@ -12,6 +14,9 @@ const orderHandler = require('./lib/handlers/order')
 const checkoutHandler = require('./lib/handlers/checkout')
 
 const notFoundHandler = (data, callBack) => callBack(404, 'Not Found')
+
+// HTML handler
+const frontEnd = require('./lib/handlers/frontend')
 
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
@@ -35,18 +40,52 @@ const server = http.createServer((req, res) => {
   const headers = req.headers;
 
   // -- Callback
-  const callBack = (statusCode, message) => {
+  const callBack = (statusCode, message, contentType) => {
+    // Determine the type of response (fallback to JSON)
+    contentType = typeof contentType === 'string' ? contentType : 'json'
+
     // set a default status code
     statusCode = typeof statusCode === 'number' ? statusCode : 200
 
-    // Use the payload returned from the handler, or set the default payload to an empty object
-    message = typeof message == 'object' ? message : {}
+    // Return the response parts that are content-type specific
+    let messageString = '';
+    if (contentType === 'json') {
+      res.setHeader('Content-Type', 'application/json');
+      message = typeof message === 'object' ? message : {}
+      messageString = JSON.stringify(message)
+    }
 
-    // Convert the payload to a string
-    const messageString = JSON.stringify(message);
+    if (contentType === 'html') {
+      res.setHeader('Content-Type', 'text/html')
+      messageString = typeof message === 'string' ? message : ''
+    }
 
-    // Return the response
-    res.setHeader('Content-Type', 'application/json')
+    if (contentType === 'favicon') {
+      res.setHeader('Content-Type', 'image/x-icon')
+      messageString = typeof message !== 'undefined' ? message : ''
+    }
+
+    if (contentType === 'plain') {
+      res.setHeader('Content-Type', 'text/plain')
+      messageString = typeof message !== 'undefined' ? message : ''
+    }
+
+    if (contentType === 'css') {
+      res.setHeader('Content-Type', 'text/css');
+      messageString = typeof message !== 'undefined' ? message : ''
+    }
+
+    if (contentType === 'png') {
+      res.setHeader('Content-Type', 'image/png');
+      messageString = typeof message !== 'undefined' ? message : ''
+    }
+
+    if (contentType === 'jpg') {
+      res.setHeader('Content-Type', 'image/jpeg');
+      messageString = typeof message !== 'undefined' ? message : ''
+    }
+
+    // Return the response-parts common to all content-types
     res.writeHead(statusCode)
     res.end(messageString)
     console.log(trimmedPath, statusCode)
@@ -85,13 +124,14 @@ const server = http.createServer((req, res) => {
 })
 
 const router = {
-  users: userHandler.users,
-  login: authHandler.login,
-  logout: authHandler.logout,
-  menu: menuHandler.menu,
-  cart: cartHandler.cart,
-  order: orderHandler.order,
-  checkout: checkoutHandler.checkout
+  '': frontEnd.index,
+  'api/users': userHandler.users,
+  'api/login': authHandler.login,
+  'api/logout': authHandler.logout,
+  'api/menu': menuHandler.menu,
+  'api/cart': cartHandler.cart,
+  'api/order': orderHandler.order,
+  'api/checkout': checkoutHandler.checkout
 }
 
 // Start the server
