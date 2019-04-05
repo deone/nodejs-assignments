@@ -9,7 +9,8 @@ const config = require('./config')
 
 const helpers = {}
 
-helpers.baseDir = path.join(__dirname,'/../.data/')
+helpers.baseDir = path.join(__dirname, '/../.data/')
+helpers.templateDir = path.join(__dirname, '/../templates/')
 
 helpers.openFile = promisify(fs.open)
 helpers.readFile = promisify(fs.readFile)
@@ -21,7 +22,7 @@ helpers.filePath = (baseDir, dir, fileName) => {
   if (!fileName) {
     return path.join(baseDir, dir, '/')
   } else {
-    return path.join(baseDir, dir, fileName.concat('.','json'))
+    return path.join(baseDir, dir, fileName.concat('.', 'json'))
   }
 }
 
@@ -166,6 +167,38 @@ helpers.sendRequest = (payload, hostName, path, auth, callBack) => {
   req.write(payload)
   req.end()
 }
+
+helpers.getTemplate = (templateName, data, callBack) => {
+  templateName = typeof templateName === 'string' && templateName.length > 0
+    ? templateName : false
+  data = typeof data === 'object' && data !== null
+    ? data : {}
+
+  if (templateName) {
+    return helpers.readFile(path.join(helpers.templateDir, `${templateName}.html`), 'utf8')
+  } else {
+    callBack('A valid template name was not specified.');
+  }
+}
+
+/* helpers.getTemplate = function(templateName,data,callback){
+  templateName = typeof(templateName) == 'string' && templateName.length > 0 ? templateName : false;
+  data = typeof(data) == 'object' && data !== null ? data : {};
+  if(templateName){
+    var templatesDir = path.join(__dirname,'/../templates/');
+    fs.readFile(templatesDir+templateName+'.html', 'utf8', function(err,str){
+      if(!err && str && str.length > 0){
+        // Do interpolation on the string
+        var finalString = helpers.interpolate(str,data);
+        callback(false,finalString);
+      } else {
+        callback('No template could be found');
+      }
+    });
+  } else {
+    callback('A valid template name was not specified');
+  }
+}; */
 
 
 module.exports = helpers
