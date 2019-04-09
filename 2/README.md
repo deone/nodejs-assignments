@@ -632,7 +632,7 @@ This is the API documentation for a pizza-delivery company.
 ----
   Returns json data about available menu items.
 
-* **URL:** `/menu?id=1ukwlzopiyou1lrmki2v`
+* **URL:** `/order?id=1ukwlzopiyou1lrmki2v`
 
 * **Method:** `GET`
 
