@@ -80,31 +80,21 @@ helpers.writeUser = (
     .catch(err => callBack(500, {'Error': err.toString()}))
 }
 
-const createString = strLength => {
-  // Define all the possible characters that could go into a string
-  const possibleCharacters = 'abcdefghijklmnopqrstuvwxyz0123456789'
-
-  // Start the final string
-  let str = ''
-  for (let i = 1; i <= strLength; i++) {
-    // Get a random character from the possibleCharacters string
-    const randomCharacter = possibleCharacters.charAt(
-      Math.floor(Math.random() * possibleCharacters.length))
-    // Append this character to the string
-    str += randomCharacter
-  }
-
-  // Return the final string
-  return str
-}
+const createString = (strLength, chars) =>
+  Array(strLength).fill().map(i =>
+    chars.charAt(
+      Math.floor(Math.random() * chars.length)
+    )
+  ).join('')
 
 // Create a string of random alphanumeric characters, of a given length
 helpers.createRandomString = strLength => {
   strLength = typeof strLength === 'number' && strLength > 0
     ? strLength : false
+  const possibleChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
   return strLength
-    ? createString(strLength)
+    ? createString(strLength, possibleChars)
     : false
 }
 
