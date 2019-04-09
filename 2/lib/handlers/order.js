@@ -61,7 +61,7 @@ orderHandler._order.post = (data, callBack) => {
                             // - Get price for each item in cart and create order item objects
                             const items = userObject.cart
                             // - Set items property on order object to list of order item objects
-                            const totalPrice = items.reduce((a, b) => a.price + b.price)
+                            const totalPrice = items.reduce((a, b) => a + b.price, 0)
                             // - Set totalPrice property on order object to total price of items
                             // - Create order object
                             const order = {id, user, paid, mailSent, totalPrice, items}
