@@ -24,20 +24,20 @@ const server = http.createServer((req, res) => {
   // handler(data, callback)
 
   // Parse the url
-  var parsedUrl = url.parse(req.url, true);
+  var parsedUrl = url.parse(req.url, true)
 
   // Get the path
-  const path = parsedUrl.pathname;
-  const trimmedPath = path.replace(/^\/+|\/+$/g, '');
+  const path = parsedUrl.pathname
+  const trimmedPath = path.replace(/^\/+|\/+$/g, '')
 
   // Get the query string as an object
-  const queryStringObject = parsedUrl.query;
+  const queryStringObject = parsedUrl.query
 
   // Get the HTTP method
-  const method = req.method.toLowerCase();
+  const method = req.method.toLowerCase()
 
   //Get the headers as an object
-  const headers = req.headers;
+  const headers = req.headers
 
   // -- Callback
   const callBack = (statusCode, message, contentType) => {
@@ -47,45 +47,49 @@ const server = http.createServer((req, res) => {
     // set a default status code
     statusCode = typeof statusCode === 'number' ? statusCode : 200
 
+    const headers = {
+      'favicon': 'image/x-icon',
+      'plain': 'text/plain',
+      'css': 'text/css',
+      'png': 'image/png',
+      'jpg': 'image/jpeg',
+      'json': 'application/json',
+      'html': 'text/html'
+    }
+
     // Return the response parts that are content-type specific
     let messageString = '';
     if (contentType === 'json') {
-      res.setHeader('Content-Type', 'application/json');
       message = typeof message === 'object' ? message : {}
       messageString = JSON.stringify(message)
     }
 
     if (contentType === 'html') {
-      res.setHeader('Content-Type', 'text/html')
       messageString = typeof message === 'string' ? message : ''
     }
 
     if (contentType === 'favicon') {
-      res.setHeader('Content-Type', 'image/x-icon')
       messageString = typeof message !== 'undefined' ? message : ''
     }
 
     if (contentType === 'plain') {
-      res.setHeader('Content-Type', 'text/plain')
       messageString = typeof message !== 'undefined' ? message : ''
     }
 
     if (contentType === 'css') {
-      res.setHeader('Content-Type', 'text/css');
       messageString = typeof message !== 'undefined' ? message : ''
     }
 
     if (contentType === 'png') {
-      res.setHeader('Content-Type', 'image/png');
       messageString = typeof message !== 'undefined' ? message : ''
     }
 
     if (contentType === 'jpg') {
-      res.setHeader('Content-Type', 'image/jpeg');
       messageString = typeof message !== 'undefined' ? message : ''
     }
 
     // Return the response-parts common to all content-types
+    res.setHeader('Content-Type', headers[contentType])
     res.writeHead(statusCode)
     res.end(messageString)
     console.log(trimmedPath, statusCode)
