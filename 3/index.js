@@ -18,6 +18,23 @@ const notFoundHandler = (data, callBack) => callBack(404, 'Not Found')
 // HTML handler
 const frontEnd = require('./lib/handlers/frontend')
 
+const getMsgString = (message, contentType) => {
+  const mediaContentTypes = [
+    'favicon', 'plain', 'css', 'png', 'jpg'
+  ]
+
+  const msgStrings = {
+    'json': () => JSON.stringify(
+              typeof message === 'object' ? message : {}
+            ),
+    'html': () => typeof message === 'string' ? message : ''
+  }
+
+  return mediaContentTypes.includes(contentType)
+    ? typeof message !== 'undefined' ? message : ''
+    : msgStrings[contentType]()
+}
+
 // Configure the server to respond to all requests with a string
 const server = http.createServer((req, res) => {
   // To process this request, we need a handler called thus:
@@ -57,38 +74,8 @@ const server = http.createServer((req, res) => {
       'html': 'text/html'
     }
 
-    // Return the response parts that are content-type specific
-    let messageString = '';
-    if (contentType === 'json') {
-      message = typeof message === 'object' ? message : {}
-      messageString = JSON.stringify(message)
-    }
+    const messageString = getMsgString(message, contentType)
 
-    if (contentType === 'html') {
-      messageString = typeof message === 'string' ? message : ''
-    }
-
-    if (contentType === 'favicon') {
-      messageString = typeof message !== 'undefined' ? message : ''
-    }
-
-    if (contentType === 'plain') {
-      messageString = typeof message !== 'undefined' ? message : ''
-    }
-
-    if (contentType === 'css') {
-      messageString = typeof message !== 'undefined' ? message : ''
-    }
-
-    if (contentType === 'png') {
-      messageString = typeof message !== 'undefined' ? message : ''
-    }
-
-    if (contentType === 'jpg') {
-      messageString = typeof message !== 'undefined' ? message : ''
-    }
-
-    // Return the response-parts common to all content-types
     res.setHeader('Content-Type', headers[contentType])
     res.writeHead(statusCode)
     res.end(messageString)
