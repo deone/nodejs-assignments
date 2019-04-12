@@ -13,7 +13,8 @@ const userHandler = require('./lib/handlers/users')
 const orderHandler = require('./lib/handlers/order')
 const checkoutHandler = require('./lib/handlers/checkout')
 
-const notFoundHandler = (data, callBack) => callBack(404, 'Not Found')
+const notFoundHandler = (data, callBack) =>
+  callBack(404, 'Not Found')
 
 // HTML handler
 const frontEnd = require('./lib/handlers/frontend')
@@ -84,8 +85,7 @@ const server = http.createServer((req, res) => {
 
   // -- Handler
   // Use notFound handler if we can't find a handler
-  const chosenHandler =
-    typeof router[trimmedPath] !== 'undefined'
+  const chosenHandler = typeof router[trimmedPath] !== 'undefined'
       ? router[trimmedPath]
       : notFoundHandler
 
@@ -127,5 +127,7 @@ const router = {
 
 // Start the server
 server.listen(config.port, () =>
-  console.log(`Running on ${config.env} environment on port ${config.port}`)
+  console.log(
+    `Running on ${config.env} environment on port ${config.port}`
+  )
 )
