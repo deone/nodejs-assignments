@@ -54,7 +54,7 @@ userHandler._users.post = (data, callBack) => {
       const hashedPassword = helpers.hash(password)
 
       // Create the user object
-      if(hashedPassword) {
+      if (hashedPassword) {
         const userObject = {
           firstName,
           lastName,
