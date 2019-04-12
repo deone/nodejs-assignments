@@ -51,23 +51,22 @@ authHandler._login.post = (data, callBack) => {
               } else {
                 // There are token files
                 // Loop through list of file names
-                let promises = []
-                fileNames.forEach(fileName => {
+                const promises = fileNames.map(fileName => {
                   const tokenId = fileName.slice(0, -5)
-                  promises.push(
-                    helpers.getToken(tokenId)
-                      .then(token => helpers.parseJsonToObject(token))
-                      .catch(err => callBack(500, {
-                        'Error': err.toString()
-                      }))
-                  )
+                  return helpers.getToken(tokenId)
+                          .then(token =>
+                            helpers.parseJsonToObject(token))
+                          .catch(err => callBack(500, {
+                            'Error': err.toString()
+                          }))
                 })
-                Promise.all(promises).then(listOfTokens => {
-                  const listOfTokenEmails = listOfTokens.map(
+
+                Promise.all(promises).then(tokens => {
+                  const emails = tokens.map(
                     token => token.email
                   )
 
-                  if (!listOfTokenEmails.includes(email)) {
+                  if (!emails.includes(email)) {
                     console.log('User does not have token')
                     const tokenId = helpers.createRandomString(20)
                     helpers.createToken(tokenId, email, callBack)
@@ -75,7 +74,9 @@ authHandler._login.post = (data, callBack) => {
                     console.log('User has token')
                     // User has token
                     // Check validity
-                    const tokenObject = listOfTokens.find(token => token.email === email)
+                    const tokenObject = tokens.find(
+                      token => token.email === email
+                    )
                     tokenObject.expires < Date.now()
                       // if token is invalid, delete it
                       ? helpers.deleteToken(tokenObject.tokenId)
