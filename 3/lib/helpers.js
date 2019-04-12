@@ -58,14 +58,12 @@ helpers.writeUser = (
   callBack,
   caller = 'users'
 ) => {
-  const fileOpenActions = {
-    'w': 'update',
-    'wx': 'create'
-  }
-  const action = fileOpenActions[fileOpenMode]
-
   helpers.openFile(
-    helpers.filePath(helpers.baseDir, 'users', email),
+    helpers.filePath(
+      helpers.baseDir,
+      'users',
+      email
+    ),
     fileOpenMode
   )
     .then(fileDescriptor => {
@@ -77,12 +75,20 @@ helpers.writeUser = (
               ? callBack(200, object.orders)
               : callBack(
                   200,
-                  {'Success': `User ${action}d successfully.`}
+                  {
+                    'Success': `User ${{
+                    'w': 'update', 'wx': 'create'
+                    }[fileOpenMode]}d successfully.`
+                  }
                 )
         })
-        .catch(err => callBack(500, {'Error': err.toString()}))
+        .catch(err => callBack(500, {
+          'Error': err.toString()
+        }))
     })
-    .catch(err => callBack(500, {'Error': err.toString()}))
+    .catch(err => callBack(500, {
+      'Error': err.toString()
+    }))
 }
 
 const createString = (strLength, chars) =>
@@ -93,16 +99,11 @@ const createString = (strLength, chars) =>
   ).join('')
 
 // Create a string of random alphanumeric characters, of a given length
-helpers.createRandomString = strLength => {
-  const possibleChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-  strLength = typeof strLength === 'number' && strLength > 0
-    ? strLength
-    : false
-
-  return strLength
-    ? createString(strLength, possibleChars)
-    : false
-}
+helpers.createRandomString = strLength =>
+  createString(
+    strLength,
+    'abcdefghijklmnopqrstuvwxyz0123456789'
+  )
 
 helpers.requestDispatcher = (
   data,
