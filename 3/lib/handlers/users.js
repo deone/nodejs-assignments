@@ -5,19 +5,21 @@ const helpers = require('../helpers')
 
 const userHandler = {}
 
-userHandler.users = (data, callback) => {
-  const acceptableMethods = ['post', 'get', 'put', 'delete']
-  return helpers.requestDispatcher(
-    data, callback, acceptableMethods, userHandler._users)
-}
+userHandler.users = (data, callback) =>
+  helpers.requestDispatcher(
+    data, callback,
+    ['post', 'get', 'put', 'delete'],
+    userHandler._users
+  )
 
 // Container for user methods
 userHandler._users = {}
 
 // Users - post
-// Required data: firstName, lastName, email, streetAddress, password
+// Required data: firstName, lastName,
+// email, streetAddress, password
 // Optional data: none
-userHandler._users.post = (data, callback) => {
+userHandler._users.post = (data, callBack) => {
   // Check that all required fields are filled out
   const [
     firstName,
@@ -25,66 +27,83 @@ userHandler._users.post = (data, callback) => {
     email,
     password,
     streetAddress
-    ] = helpers.validate(
-      data.payload.firstName,
-      data.payload.lastName,
-      data.payload.email,
-      data.payload.password,
-      data.payload.streetAddress
-    )
+  ] = helpers.validate(
+    data.payload.firstName,
+    data.payload.lastName,
+    data.payload.email,
+    data.payload.password,
+    data.payload.streetAddress
+  )
 
-  if (firstName && lastName && email && streetAddress && password) {
-    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then(user => callback(400, {'Error': 'User already exists.'}))
-      .catch(err => {
-        // Hash password
-        const hashedPassword = helpers.hash(password)
-
-        // Create the user object
-        if(hashedPassword) {
-          const userObject = {
-            firstName,
-            lastName,
-            email,
-            streetAddress,
-            hashedPassword
-          }
-
-          // Store the user
-          helpers.writeUser(email, userObject, 'wx', callback)
-        }
-      })
-  } else {
-    callback(400, {'Error': 'Missing required fields.'})
+  if (!(firstName && lastName &&  email &&  streetAddress &&  password)) {
+    callBack(400, {'Error': 'Missing required fields.'})
+    return
   }
+
+  helpers.readFile(
+    helpers.filePath(
+      helpers.baseDir, 'users', email
+    ),
+    'utf8'
+  )
+    .then(user => callBack(400, {
+      'Error': 'User already exists.'
+    }))
+    .catch(err => {
+      // Hash password
+      const hashedPassword = helpers.hash(password)
+
+      // Create the user object
+      if(hashedPassword) {
+        const userObject = {
+          firstName,
+          lastName,
+          email,
+          streetAddress,
+          hashedPassword
+        }
+
+        // Store the user
+        helpers.writeUser(email, userObject, 'wx', callBack)
+      }
+    })
 }
 
 // Users - get
 // Required data: email
 // Optional data: none
-// @TODO Only let an authenticated user access their object. Dont let them access anyone elses.
+// @TODO Only let an authenticated user access
+// their object. Dont let them access anyone elses.
 userHandler._users.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
   const [email] = helpers.validate(data.queryStringObject.email)
-  if (email) {
-    // Look up user
-    helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
-      .then(data => {
-        const userObject = helpers.parseJsonToObject(data)
-        delete userObject.hashedPassword
-        callBack(200, userObject)
-      })
-      .catch(err => {
-        const errorString = err.toString()
-        if (errorString.includes('no such file or directory')) {
-          callBack(404, {'Error': 'User does not exist.'})
-        } else {
-          callBack(500, {'Error': err.toString()})
-        }
-      })
-  } else {
+  if (!email) {
     callBack(400, {'Error': 'Missing required field.'})
+    return
   }
+
+  // Look up user
+  helpers.readFile(
+    helpers.filePath(
+      helpers.baseDir, 'users', email
+    ),
+    'utf8'
+  )
+    .then(data => {
+      const userObject = helpers.parseJsonToObject(data)
+      delete userObject.hashedPassword
+      callBack(200, userObject)
+    })
+    .catch(err => {
+      const errorString = err.toString()
+      errorString.includes('no such file or directory')
+        ? callBack(404, {
+          'Error': 'User does not exist.'
+        })
+        : callBack(500, {
+          'Error': err.toString()
+        })
+    })
 }
 
 // Users - put
@@ -103,45 +122,48 @@ userHandler._users.put = (data, callback) => {
     lastName,
     password,
     streetAddress
-    ] = helpers.validate(
-      data.payload.firstName,
-      data.payload.lastName,
-      data.payload.password,
-      data.payload.streetAddress
-    )
+  ] = helpers.validate(
+    data.payload.firstName,
+    data.payload.lastName,
+    data.payload.password,
+    data.payload.streetAddress
+  )
 
   if(!email) {
     callback(400, {'Error': 'Missing required field.'})
-  } else {
-    if(firstName || lastName || streetAddress || password) {
-      helpers.getUser(email)
-        .then(data => {
-          // Update fields if necessary
-          const userObject = helpers.parseJsonToObject(data)
-
-          if (firstName)
-            userObject.firstName = firstName
-
-          if (lastName)
-            userObject.lastName = lastName
-
-          if (streetAddress)
-            userObject.streetAddress = streetAddress
-
-          if (password)
-            userObject.hashedPassword = helpers.hash(password)
-
-          // Store updates
-          helpers.writeUser(email, userObject, 'w', callback)
-        })
-        .catch(err => {
-          console.log(err)
-          callback(404, {'Error': 'User does not exist.'})
-        })
-    } else {
-      callback(400, {'Error': 'Missing fields to update.'})
-    }
+    return
   }
+
+  if (!(firstName || lastName || streetAddress || password)) {
+    callback(400, {'Error': 'Missing fields to update.'})
+    return
+  }
+
+  helpers.getUser(email)
+    .then(data => {
+      const input = { firstName, lastName, streetAddress, password }
+
+      // Filter fields that
+      // don't have values and
+      // shouldn't be updated
+      const filteredInput = Object.entries(input)
+        .filter(item => item[1] !== false)
+        .reduce((acc, item) => {
+          acc[item[0]] = item[1]
+          return acc
+        }, {})
+
+      // Update fields if necessary
+      const userObject = helpers.parseJsonToObject(data)
+      Object.assign(userObject, filteredInput)
+
+      // Store updates
+      helpers.writeUser(email, userObject, 'w', callback)
+    })
+    .catch(err => {
+      console.log(err)
+      callback(404, {'Error': 'User does not exist.'})
+    })
 }
 
 // Users - delete
@@ -153,20 +175,20 @@ userHandler._users.put = (data, callback) => {
 userHandler._users.delete = (data, callBack) => {
   // Validate email
   const [email] = helpers.validate(data.queryStringObject.email)
-  if (email) {
-    helpers.deleteUser(email)
-      .then(() => callBack(200, {'Success': 'User deleted successfully.'}))
-      .catch(err => {
-        const errorString = err.toString()
-        if (errorString.includes('no such file or directory')) {
-          callBack(404, {'Error': 'User does not exist.'})
-        } else {
-          callBack(500, {'Error': err.toString()})
-        }
-      })
-  } else {
+  if (!email) {
     callBack(400, {'Error': 'Missing required field.'})
+    return
   }
+  helpers.deleteUser(email)
+    .then(() => callBack(200, {
+      'Success': 'User deleted successfully.'
+    }))
+    .catch(err => {
+      const errorString = err.toString()
+      errorString.includes('no such file or directory')
+        ? callBack(404, {'Error': 'User does not exist.'})
+        : callBack(500, {'Error': err.toString()})
+    })
 }
 
 
