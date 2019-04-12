@@ -21,12 +21,17 @@ helpers.readDir = promisify(fs.readdir)
 helpers.filePath = (baseDir, dir, fileName) =>
   !fileName
     ? path.join(baseDir, dir, '/')
-    : path.join(baseDir, dir, fileName.concat('.', 'json'))
+    : path.join(
+        baseDir, dir, fileName.concat('.', 'json')
+      )
 
 // Validate email properly, maybe with regex
-helpers.validate = data =>
-  typeof data === 'string' && data.trim().length > 0
-    ? data.trim() : false
+helpers.validate = (...data) =>
+  data.map(item =>
+    typeof item === 'string' && item.trim().length > 0
+      ? item.trim()
+      : false
+  )
 
 // Create a SHA256 hash
 helpers.hash = str =>
@@ -89,9 +94,10 @@ const createString = (strLength, chars) =>
 
 // Create a string of random alphanumeric characters, of a given length
 helpers.createRandomString = strLength => {
-  strLength = typeof strLength === 'number' && strLength > 0
-    ? strLength : false
   const possibleChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  strLength = typeof strLength === 'number' && strLength > 0
+    ? strLength
+    : false
 
   return strLength
     ? createString(strLength, possibleChars)
@@ -195,12 +201,17 @@ helpers.sendRequest = (
 
 helpers.getTemplate = (templateName, data, callBack) => {
   templateName = typeof templateName === 'string' && templateName.length > 0
-    ? templateName : false
+    ? templateName
+    : false
+
   data = typeof data === 'object' && data !== null
-    ? data : {}
+    ? data
+    : {}
 
   return templateName
-    ? helpers.readFile(path.join(helpers.templateDir, `${templateName}.html`), 'utf8')
+    ? helpers.readFile(path.join(
+        helpers.templateDir, `${templateName}.html`
+      ), 'utf8')
     : callBack('A valid template name was not specified.');
 }
 

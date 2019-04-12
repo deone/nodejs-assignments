@@ -19,11 +19,19 @@ userHandler._users = {}
 // Optional data: none
 userHandler._users.post = (data, callback) => {
   // Check that all required fields are filled out
-  const firstName = helpers.validate(data.payload.firstName)
-  const lastName = helpers.validate(data.payload.lastName)
-  const email = helpers.validate(data.payload.email)
-  const password = helpers.validate(data.payload.password)
-  const streetAddress = helpers.validate(data.payload.streetAddress)
+  const [
+    firstName,
+    lastName,
+    email,
+    password,
+    streetAddress
+    ] = helpers.validate(
+      data.payload.firstName,
+      data.payload.lastName,
+      data.payload.email,
+      data.payload.password,
+      data.payload.streetAddress
+    )
 
   if (firstName && lastName && email && streetAddress && password) {
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
@@ -57,7 +65,7 @@ userHandler._users.post = (data, callback) => {
 // @TODO Only let an authenticated user access their object. Dont let them access anyone elses.
 userHandler._users.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
-  const email = helpers.validate(data.queryStringObject.email)
+  const [email] = helpers.validate(data.queryStringObject.email)
   if (email) {
     // Look up user
     helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
@@ -81,17 +89,26 @@ userHandler._users.get = (data, callBack) => {
 
 // Users - put
 // Required data: email
-// Optional data: firstName, lastName, streetAddress, password (at least one must be specified)
-// @TODO Only let an authenticated user up their object. Dont let them access update elses.
+// Optional data: firstName, lastName, streetAddress,
+// password (at least one must be specified)
+// @TODO Only let an authenticated user up their object.
+// Dont let them access update elses.
 userHandler._users.put = (data, callback) => {
   // Validate required field 
-  const email = helpers.validate(data.payload.email)
+  const [email] = helpers.validate(data.payload.email)
 
   // Validate optional fields, if provided
-  const firstName = helpers.validate(data.payload.firstName)
-  const lastName = helpers.validate(data.payload.lastName)
-  const streetAddress = helpers.validate(data.payload.streetAddress)
-  const password = helpers.validate(data.payload.password)
+  const [
+    firstName,
+    lastName,
+    password,
+    streetAddress
+    ] = helpers.validate(
+      data.payload.firstName,
+      data.payload.lastName,
+      data.payload.password,
+      data.payload.streetAddress
+    )
 
   if(!email) {
     callback(400, {'Error': 'Missing required field.'})
@@ -130,11 +147,12 @@ userHandler._users.put = (data, callback) => {
 // Users - delete
 // Required data: email
 // Optional data: none
-// @TODO Only let an authenticated user delete their object. Don't let them delete or update someone elses.
+// @TODO Only let an authenticated user delete their object.
+// Don't let them delete or update someone elses.
 // @TODO Cleanup (delete) any other data files associated with the user
 userHandler._users.delete = (data, callBack) => {
   // Validate email
-  const email = helpers.validate(data.queryStringObject.email)
+  const [email] = helpers.validate(data.queryStringObject.email)
   if (email) {
     helpers.deleteUser(email)
       .then(() => callBack(200, {'Success': 'User deleted successfully.'}))

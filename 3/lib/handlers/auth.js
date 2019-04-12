@@ -22,15 +22,20 @@ authHandler._logout = {}
 // Required data: email, password
 // Optional data: none
 authHandler._login.post = (data, callBack) => {
-  const email = helpers.validate(data.payload.email)
-  const password = helpers.validate(data.payload.password)
+  const [email, password] = helpers.validate(
+    data.payload.email,
+    data.payload.password
+  )
 
   email && password
     // Lookup user with email
-    ? helpers.readFile(helpers.filePath(helpers.baseDir, 'users', email), 'utf8')
+    ? helpers.readFile(helpers.filePath(
+        helpers.baseDir, 'users', email), 'utf8'
+      )
       .then(data => {
         const userObject = helpers.parseJsonToObject(data)
-        // Hash the sent password, and compare it to the password stored in the user object
+        // Hash the sent password, and compare it to
+        // the password stored in the user object
         const hashedPassword = helpers.hash(password)
 
         hashedPassword === userObject.hashedPassword
@@ -52,11 +57,15 @@ authHandler._login.post = (data, callBack) => {
                   promises.push(
                     helpers.getToken(tokenId)
                       .then(token => helpers.parseJsonToObject(token))
-                      .catch(err => callBack(500, {'Error': err.toString()}))
+                      .catch(err => callBack(500, {
+                        'Error': err.toString()
+                      }))
                   )
                 })
                 Promise.all(promises).then(listOfTokens => {
-                  const listOfTokenEmails = listOfTokens.map(token => token.email)
+                  const listOfTokenEmails = listOfTokens.map(
+                    token => token.email
+                  )
 
                   if (!listOfTokenEmails.includes(email)) {
                     console.log('User does not have token')

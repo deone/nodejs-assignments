@@ -18,7 +18,7 @@ orderHandler._order = {}
 // Optional data: none
 orderHandler._order.post = (data, callBack) => {
   // Get tokenId from header
-  const tokenId = helpers.validate(data.headers.token)
+  const [tokenId] = helpers.validate(data.headers.token)
   if (tokenId) {
     // Get token
     helpers.getToken(tokenId)
@@ -110,9 +110,10 @@ orderHandler._order.post = (data, callBack) => {
 // Required data: token ID, order ID in querystring
 // Optional data: none
 orderHandler._order.get = (data, callBack) => {
-  // Get tokenId from header
-  const tokenId = helpers.validate(data.headers.token)
-  const orderId = helpers.validate(data.queryStringObject.id)
+  const [tokenId, orderId] = helpers.validate(
+    data.headers.token,
+    data.queryStringObject.id
+  )
 
   if (tokenId && orderId) {
     // Get token
