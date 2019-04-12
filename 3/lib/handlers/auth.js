@@ -115,18 +115,22 @@ authHandler._login.post = (data, callBack) => {
 // Required data: tokenId
 // Optional data: none
 authHandler._logout.post = (data, callBack) => {
-  const tokenId = helpers.validate(data.headers.token)
-  tokenId
-    ? helpers.deleteToken(tokenId)
-      .then(callBack(
-        200, {'Success': 'User logged out.'}
-      ))
-      .catch(err => callBack(
-        500, {'Error': err.toString()}
-      ))
-    : callBack(
-        401, {'Error' : 'Authentication token not provided.'}
-      )
+  const [tokenId] = helpers.validate(data.headers.token)
+
+  if (!tokenId) {
+    callBack(401, {
+      'Error' : 'Authentication token not provided.'
+    })
+    return
+  }
+
+  helpers.deleteToken(tokenId)
+    .then(callBack(
+      200, {'Success': 'User logged out.'}
+    ))
+    .catch(err => callBack(500, {
+      'Error': err.toString()
+    }))
 }
 
 
