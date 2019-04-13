@@ -19,10 +19,8 @@ cartHandler._cart.get = (data, callBack) => {
   // Get tokenId from header
   const [tokenId] = helpers.validate(data.headers.token)
 
-  if (!tokenId) {
-    callBack(401, {
-      'Error': 'Authentication token not provided'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
     return
   }
 
@@ -31,11 +29,9 @@ cartHandler._cart.get = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      // Check whether token is valid
-      if (!tokenObject.expires > Date.now()) {
-        callBack(401, {
-          'Error': 'Invalid token. Please login again.'
-        })
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
@@ -44,14 +40,6 @@ cartHandler._cart.get = (data, callBack) => {
       // Read users directory
       helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
         .then(fileNames => {
-          if (!fileNames.length) {
-            // No file in users directory
-            callBack(400, {
-                'Error': 'User not found.'
-            })
-            return
-          }
-            
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
 
@@ -96,10 +84,13 @@ cartHandler._cart.put = (data, callBack) => {
     data.payload.item
   )
 
-  if (!(tokenId && item)) {
-    callBack(401, {
-      'Error': 'Authentication token not provided. Missing required field.'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
+    return
+  }
+
+  if (!helpers.isRequiredFieldProvided(
+    item, callBack)) {
     return
   }
 
@@ -108,11 +99,9 @@ cartHandler._cart.put = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      // Check whether token is valid
-      if (Date.now() > tokenObject.expires) {
-        callBack(401, {
-          'Error': 'Invalid token. Please login again.'
-        })
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
@@ -130,7 +119,7 @@ cartHandler._cart.put = (data, callBack) => {
           if (!menu.includes(item)) {
             // Item is not on menu
             callBack(400, {
-              'Error': 'Item provided is not on menu.'
+              'Error': 'Item requested is not on menu.'
             })
             return
           }
@@ -161,14 +150,6 @@ cartHandler._cart.put = (data, callBack) => {
                         )
                       )
                         .then(fileNames => {
-                          if (!fileNames.length) {
-                            // No file in users directory
-                            callBack(400, {
-                              'Error': 'User not found.'
-                            })
-                            return
-                          }
-
                           fileNames.forEach(fileName => {
                             const email = fileName.slice(0, -5)
                             // This is same as
@@ -230,10 +211,13 @@ cartHandler._cart.delete = (data, callBack) => {
     data.payload.item
   )
 
-  if (!(tokenId && menuItem)) {
-    callBack(400, {
-      'Error': 'Authentication token not provided. Missing required fields.'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
+    return
+  }
+
+  if (!helpers.isRequiredFieldProvided(
+    menuItem, callBack)) {
     return
   }
 
@@ -241,11 +225,10 @@ cartHandler._cart.delete = (data, callBack) => {
   helpers.getToken(tokenId)
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
-      // Check whether token is valid
-      if (!tokenObject.expires > Date.now()) {
-        callBack(401, {
-          'Error': 'Invalid token. Please login again.'
-        })
+
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
@@ -256,12 +239,6 @@ cartHandler._cart.delete = (data, callBack) => {
       // Read users directory
       helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
         .then(fileNames => {
-          if (!fileNames.length) {
-            // No file in users directory
-            callBack(400, {'Error': 'User not found'})
-            return
-          }
-
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
             email === tokenObject.email &&

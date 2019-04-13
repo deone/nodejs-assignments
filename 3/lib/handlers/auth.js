@@ -44,7 +44,7 @@ authHandler._login.post = (data, callBack) => {
 
       if (!(hashedPassword === userObject.hashedPassword)) {
         callBack(400, {
-          'Error': "Password did not match the specified user's stored password."
+          'Error': "Password did not match the user's stored password."
         })
         return
       }
@@ -96,14 +96,19 @@ authHandler._login.post = (data, callBack) => {
                       const tokenId = helpers.createRandomString(20)
                       helpers.createToken(tokenId, email, callBack)
                     })
-                    .catch(err => callBack(500, {'Error': err.toString()}))
+                    .catch(err => callBack(500, {
+                      'Error': err.toString()
+                    }))
+
                   // else, return it
                   : callBack(200, tokenObject)
               }
             })
           }
         })
-        .catch(err => callBack(500, {'Error': err.toString()}))
+        .catch(err => callBack(500, {
+          'Error': err.toString()
+        }))
     })
     .catch(err => {
       console.log(err)
@@ -117,10 +122,8 @@ authHandler._login.post = (data, callBack) => {
 authHandler._logout.post = (data, callBack) => {
   const [tokenId] = helpers.validate(data.headers.token)
 
-  if (!tokenId) {
-    callBack(401, {
-      'Error' : 'Authentication token not provided.'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
     return
   }
 

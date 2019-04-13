@@ -32,12 +32,12 @@ checkoutHandler._checkout.post = (data, callBack) => {
     data.payload.stripeToken
   )
 
-  if (!tokenId) {
-    callBack(401, {'Error': 'Authentication token not provided.'})
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
     return
   }
 
-  if (!orderId || !stripeToken) {
+  if (!(orderId && stripeToken)) {
     callBack(400, {'Error': 'Required fields missing.'})
     return
   }
@@ -46,20 +46,15 @@ checkoutHandler._checkout.post = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      if (!tokenObject.expires > Date.now()) {
-        callBack(401, {'Error': 'Invalid token. Please login again.'})
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
       // Get user email
       helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
         .then(fileNames => {
-          // No file in users directory
-          if (!fileNames.length) {
-            callBack(400, {'Error': 'User not found.'})
-            return
-          }
-
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
             // This is same as
@@ -105,6 +100,7 @@ checkoutHandler._checkout.post = (data, callBack) => {
                         'text': `Dear ${email}, an order with a total amount of ${orderObject.totalPrice} was made by you.`
                       })
 
+                      // Send email if payment is successful
                       helpers.sendRequest(
                         mailgunPayload,
                         'api.mailgun.net',

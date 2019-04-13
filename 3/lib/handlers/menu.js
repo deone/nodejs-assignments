@@ -18,8 +18,8 @@ menuHandler._menu.get = (data, callBack) => {
   // Get tokenId from header
   const [tokenId] = helpers.validate(data.headers.token)
 
-  if (!tokenId) {
-    callBack(401, {'Error': 'Authentication token not provided.'})
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
     return
   }
 
@@ -28,19 +28,23 @@ menuHandler._menu.get = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      // Check whether token is valid
-      if (!tokenObject.expires > Date.now()) {
-        callBack(401, {'Error': 'Invalid token. Please login again.'})
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
       // Token is valid
       // Read menuitems directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'menuitems'))
+      helpers.readDir(
+        helpers.filePath(helpers.baseDir, 'menuitems')
+      )
         .then(fileNames => {
           if (!fileNames.length) {
             // There are no menu items
-            callBack(200, {'Message': 'There are no items on the menu.'})
+            callBack(200, {
+              'Message': 'There are no items on the menu.'
+            })
             return
           }
 
@@ -67,9 +71,13 @@ menuHandler._menu.get = (data, callBack) => {
           })
 
         })
-        .catch(err => callBack(500, {'Error': err.toString()}))
+        .catch(err => callBack(500, {
+          'Error': err.toString()
+        }))
     })
-    .catch(err => callBack(500, {'Error': err.toString()}))
+    .catch(err => callBack(500, {
+      'Error': err.toString()
+    }))
 }
 
 

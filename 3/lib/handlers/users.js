@@ -77,8 +77,9 @@ userHandler._users.post = (data, callBack) => {
 userHandler._users.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
   const [email] = helpers.validate(data.queryStringObject.email)
-  if (!email) {
-    callBack(400, {'Error': 'Missing required field.'})
+
+  if (!helpers.isRequiredFieldProvided(
+    email, callBack)) {
     return
   }
 
@@ -98,8 +99,8 @@ userHandler._users.get = (data, callBack) => {
       const errorString = err.toString()
       errorString.includes('no such file or directory')
         ? callBack(404, {
-          'Error': 'User does not exist.'
-        })
+            'Error': 'User does not exist.'
+          })
         : callBack(500, {
           'Error': err.toString()
         })
@@ -112,7 +113,7 @@ userHandler._users.get = (data, callBack) => {
 // password (at least one must be specified)
 // @TODO Only let an authenticated user up their object.
 // Dont let them access update elses.
-userHandler._users.put = (data, callback) => {
+userHandler._users.put = (data, callBack) => {
   // Validate required field 
   const [email] = helpers.validate(data.payload.email)
 
@@ -129,13 +130,13 @@ userHandler._users.put = (data, callback) => {
     data.payload.streetAddress
   )
 
-  if(!email) {
-    callback(400, {'Error': 'Missing required field.'})
+  if (!helpers.isRequiredFieldProvided(
+    email, callBack)) {
     return
   }
 
   if (!(firstName || lastName || streetAddress || password)) {
-    callback(400, {'Error': 'Missing fields to update.'})
+    callBack(400, {'Error': 'Missing fields to update.'})
     return
   }
 
@@ -158,11 +159,11 @@ userHandler._users.put = (data, callback) => {
       Object.assign(userObject, filteredInput)
 
       // Store updates
-      helpers.writeUser(email, userObject, 'w', callback)
+      helpers.writeUser(email, userObject, 'w', callBack)
     })
     .catch(err => {
       console.log(err)
-      callback(404, {'Error': 'User does not exist.'})
+      callBack(404, {'Error': 'User does not exist.'})
     })
 }
 
@@ -175,10 +176,12 @@ userHandler._users.put = (data, callback) => {
 userHandler._users.delete = (data, callBack) => {
   // Validate email
   const [email] = helpers.validate(data.queryStringObject.email)
-  if (!email) {
-    callBack(400, {'Error': 'Missing required field.'})
+
+  if (!helpers.isRequiredFieldProvided(
+    email, callBack)) {
     return
   }
+
   helpers.deleteUser(email)
     .then(() => callBack(200, {
       'Success': 'User deleted successfully.'
@@ -186,8 +189,12 @@ userHandler._users.delete = (data, callBack) => {
     .catch(err => {
       const errorString = err.toString()
       errorString.includes('no such file or directory')
-        ? callBack(404, {'Error': 'User does not exist.'})
-        : callBack(500, {'Error': err.toString()})
+        ? callBack(404, {
+            'Error': 'User does not exist.'
+          })
+        : callBack(500, {
+            'Error': err.toString()
+          })
     })
 }
 

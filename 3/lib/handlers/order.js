@@ -20,10 +20,8 @@ orderHandler._order.post = (data, callBack) => {
   // Get tokenId from header
   const [tokenId] = helpers.validate(data.headers.token)
 
-  if (!tokenId) {
-    callBack(401, {
-      'Error': 'Authentication token not provided.'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
     return
   }
 
@@ -32,11 +30,9 @@ orderHandler._order.post = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      // Check whether token is valid
-      if (Date.now() > tokenObject.expires) {
-        callBack(401, {
-          'Error': 'Invalid token. Please login again.'
-        })
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
@@ -45,12 +41,6 @@ orderHandler._order.post = (data, callBack) => {
       // Read users directory
       helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
         .then(fileNames => {
-          if (!fileNames.length) {
-            // No file in users directory
-            callBack(400, {'Error': 'User not found.'})
-            return
-          }
-
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
             email === tokenObject.email &&
@@ -104,7 +94,8 @@ orderHandler._order.post = (data, callBack) => {
                   // file name as order ID
                   helpers.openFile(
                     helpers.filePath(
-                      helpers.baseDir, 'orders', id), 'wx'
+                      helpers.baseDir, 'orders', id
+                    ), 'wx'
                   )
                     .then(fileDescriptor => {
                       helpers.writeFile(
@@ -161,10 +152,13 @@ orderHandler._order.get = (data, callBack) => {
     data.queryStringObject.id
   )
 
-  if (!(tokenId && orderId)) {
-    callBack(400, {
-      'Error': 'Authentication token not provided. Missing required field.'
-    })
+  if (!helpers.isTokenProvided(
+    tokenId, callBack)) {
+    return
+  }
+
+  if (!helpers.isRequiredFieldProvided(
+    orderId, callBack)) {
     return
   }
 
@@ -173,11 +167,9 @@ orderHandler._order.get = (data, callBack) => {
     .then(token => {
       const tokenObject = helpers.parseJsonToObject(token)
 
-      // Check whether token is valid
-      if (Date.now() > tokenObject.expires) {
-        callBack(401, {
-          'Error': 'Invalid token. Please login again.'
-        })
+      // Check whether token is expired
+      if (!helpers.isTokenExpired(
+        tokenObject.expires, callBack)) {
         return
       }
 
@@ -186,12 +178,6 @@ orderHandler._order.get = (data, callBack) => {
       // Read users directory
       helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
         .then(fileNames => {
-          if (!fileNames.length) {
-            // No file in users directory
-            callBack(400, {'Error': 'User not found.'})
-            return
-          }
-
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
             email === tokenObject.email &&
