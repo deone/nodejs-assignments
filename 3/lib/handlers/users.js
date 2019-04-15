@@ -41,9 +41,7 @@ userHandler._users.post = (data, callBack) => {
   }
 
   helpers.readFile(
-    helpers.filePath(
-      helpers.baseDir, 'users', email
-    ),
+    helpers.userDir(email),
     'utf8'
   )
     .then(user => callBack(400, {
@@ -85,9 +83,7 @@ userHandler._users.get = (data, callBack) => {
 
   // Look up user
   helpers.readFile(
-    helpers.filePath(
-      helpers.baseDir, 'users', email
-    ),
+    helpers.userDir(email),
     'utf8'
   )
     .then(data => {
