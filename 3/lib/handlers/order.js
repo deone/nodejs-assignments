@@ -39,7 +39,7 @@ orderHandler._order.post = (data, callBack) => {
       // Token is valid
       // Get user object
       // Read users directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+      helpers.readDir(helpers.userDir())
         .then(fileNames => {
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
@@ -93,9 +93,7 @@ orderHandler._order.post = (data, callBack) => {
                   // - Write order object to file with
                   // file name as order ID
                   helpers.openFile(
-                    helpers.filePath(
-                      helpers.baseDir, 'orders', id
-                    ), 'wx'
+                    helpers.orderDir(id), 'wx'
                   )
                     .then(fileDescriptor => {
                       helpers.writeFile(
@@ -176,17 +174,13 @@ orderHandler._order.get = (data, callBack) => {
       // Token is valid
       // Get user object
       // Read users directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+      helpers.readDir(helpers.userDir())
         .then(fileNames => {
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
             email === tokenObject.email &&
               // Get order
-              helpers.readDir(
-                helpers.filePath(
-                  helpers.baseDir, 'orders'
-                )
-              )
+              helpers.readDir(helpers.orderDir())
                 .then(orderFileNames => {
                   if (!orderFileNames.length) {
                     // No file in orders directory
@@ -197,11 +191,7 @@ orderHandler._order.get = (data, callBack) => {
                   orderFileNames.forEach(orderFileName => {
                     orderId === orderFileName.slice(0, -5) &&
                       helpers.readFile(
-                        helpers.filePath(
-                          helpers.baseDir,
-                          'orders',
-                          orderId
-                        ),
+                        helpers.orderDir(orderId),
                         'utf8'
                       )
                         .then(order => {

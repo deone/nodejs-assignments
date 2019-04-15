@@ -18,13 +18,6 @@ helpers.writeFile = promisify(fs.writeFile)
 helpers.deleteFile = promisify(fs.unlink)
 helpers.readDir = promisify(fs.readdir)
 
-helpers.filePath = (baseDir, dir, fileName) =>
-  !fileName
-    ? path.join(baseDir, dir, '/')
-    : path.join(
-        baseDir, dir, fileName.concat('.', 'json')
-      )
-
 helpers.cFilePath = baseDir =>
   dir =>
     fileName =>
