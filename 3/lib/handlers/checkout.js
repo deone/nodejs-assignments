@@ -53,7 +53,7 @@ checkoutHandler._checkout.post = (data, callBack) => {
       }
 
       // Get user email
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+      helpers.readDir(helpers.userDir())
         .then(fileNames => {
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
@@ -62,13 +62,9 @@ checkoutHandler._checkout.post = (data, callBack) => {
             email === tokenObject.email &&
               // Get order
               helpers.readFile(
-                helpers.filePath(
-                  helpers.baseDir,
-                    'orders',
-                    orderId
-                  ),
-                  'utf8'
-                )
+                helpers.orderDir(orderId),
+                'utf8'
+              )
                 .then(order => {
                   const orderObject = helpers.parseJsonToObject(order)
 
@@ -117,14 +113,7 @@ checkoutHandler._checkout.post = (data, callBack) => {
                           }
                           orderObject.mailSent = true
                           // Update order
-                          helpers.openFile(
-                            helpers.filePath(
-                              helpers.baseDir,
-                              'orders',
-                              orderId
-                            ),
-                            'w'
-                          )
+                          helpers.openFile(helpers.orderDir(orderId), 'w')
                             .then(fileDescriptor => {
                               helpers.writeFile(
                                 fileDescriptor,

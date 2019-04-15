@@ -36,6 +36,7 @@ helpers.cFilePath = baseDir =>
 
 helpers.baseDirFunc = helpers.cFilePath(helpers.baseDir)
 helpers.userDir = helpers.baseDirFunc('users')
+helpers.orderDir = helpers.baseDirFunc('orders')
 helpers.tokenDir = helpers.baseDirFunc('tokens')
 helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
