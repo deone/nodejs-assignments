@@ -18,7 +18,7 @@ helpers.writeFile = promisify(fs.writeFile)
 helpers.deleteFile = promisify(fs.unlink)
 helpers.readDir = promisify(fs.readdir)
 
-helpers.cFilePath = baseDir =>
+helpers.filePath = baseDir =>
   dir =>
     fileName =>
       !fileName
@@ -27,7 +27,7 @@ helpers.cFilePath = baseDir =>
             baseDir, dir, fileName.concat('.', 'json')
           )
 
-helpers.baseDirFunc = helpers.cFilePath(helpers.baseDir)
+helpers.baseDirFunc = helpers.filePath(helpers.baseDir)
 helpers.userDir = helpers.baseDirFunc('users')
 helpers.orderDir = helpers.baseDirFunc('orders')
 helpers.tokenDir = helpers.baseDirFunc('tokens')
@@ -67,11 +67,7 @@ helpers.writeUser = (
   caller = 'users'
 ) => {
   helpers.openFile(
-    helpers.filePath(
-      helpers.baseDir,
-      'users',
-      email
-    ),
+    helpers.userDir(email),
     fileOpenMode
   )
     .then(fileDescriptor => {
@@ -126,19 +122,19 @@ helpers.requestDispatcher = (
 // User helpers
 helpers.getUser = email =>
   helpers.readFile(
-    helpers.filePath(helpers.baseDir, 'users', email),
+    helpers.userDir(email),
     'utf8'
   )
 
 helpers.deleteUser = email =>
   helpers.deleteFile(
-    helpers.filePath(helpers.baseDir, 'users', email)
+    helpers.userDir(email)
   )
 
 // Token helpers
 helpers.getToken = tokenId =>
   helpers.readFile(
-    helpers.filePath(helpers.baseDir, 'tokens', tokenId),
+    helpers.tokenDir(tokenId),
     'utf8'
   )
 
@@ -149,7 +145,7 @@ helpers.createToken = (tokenId, email, callBack) => {
 
   // Store the token
   helpers.openFile(
-    helpers.filePath(helpers.baseDir, 'tokens', tokenId),
+    helpers.tokenDir(tokenId),
     'wx'
   )
     .then(fileDescriptor =>
@@ -169,7 +165,7 @@ helpers.createToken = (tokenId, email, callBack) => {
 
 helpers.deleteToken = tokenId =>
   helpers.deleteFile(
-    helpers.filePath(helpers.baseDir, 'tokens', tokenId)
+    helpers.tokenDir(tokenId)
   )
 
 helpers.sendRequest = (
