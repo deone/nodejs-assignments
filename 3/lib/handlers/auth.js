@@ -33,9 +33,7 @@ authHandler._login.post = (data, callBack) => {
   }
 
   // Lookup user with email
-  helpers.readFile(helpers.filePath(
-    helpers.baseDir, 'users', email), 'utf8'
-  )
+  helpers.readFile(helpers.userDir(email), 'utf8')
     .then(data => {
       const userObject = helpers.parseJsonToObject(data)
       // Hash the sent password, and compare it to
@@ -51,7 +49,7 @@ authHandler._login.post = (data, callBack) => {
 
       // Check if user has a token
       // Read tokens directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'tokens'))
+      helpers.readDir(helpers.tokenDir())
         .then(fileNames => {
           if (!fileNames.length) {
             console.log('No token files')

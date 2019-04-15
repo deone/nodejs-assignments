@@ -38,7 +38,7 @@ cartHandler._cart.get = (data, callBack) => {
       // Token is valid
       // Get user object
       // Read users directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+      helpers.readDir(helpers.userDir())
         .then(fileNames => {
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)
@@ -108,9 +108,7 @@ cartHandler._cart.put = (data, callBack) => {
       // Token is valid
       // Get menu item and validate
       // Check whether menu item is on menu
-      helpers.readDir(
-        helpers.filePath(helpers.baseDir, 'menuitems')
-      )
+      helpers.readDir(helpers.menuItemDir())
         .then(fileNames => {
           const menu = fileNames.map(fileName =>
             fileName.slice(0, -5)
@@ -125,17 +123,15 @@ cartHandler._cart.put = (data, callBack) => {
           }
 
           // Item is on menu, get item
-          helpers.readDir(helpers.filePath(
-            helpers.baseDir, 'menuitems')
-          )
+          helpers.readDir(helpers.menuItemDir())
             .then(fileNames => {
               fileNames.forEach(fileName => {
 
                 // This is same as
                 // if (item === fileName.slice(0, -5)) {...}
                 item === fileName.slice(0, -5) &&
-                  helpers.readFile(helpers.filePath(
-                    helpers.baseDir, 'menuitems', item), 'utf8'
+                  helpers.readFile(
+                    helpers.menuItemDir(item), 'utf8'
                   )
                     .then(menuItem => {
                       const menuItemObject = helpers.parseJsonToObject(
@@ -145,9 +141,7 @@ cartHandler._cart.put = (data, callBack) => {
                       // Get cart, so we can
                       // update it with menu item
                       helpers.readDir(
-                        helpers.filePath(
-                          helpers.baseDir, 'users'
-                        )
+                        helpers.userDir()
                       )
                         .then(fileNames => {
                           fileNames.forEach(fileName => {
@@ -237,7 +231,7 @@ cartHandler._cart.delete = (data, callBack) => {
 
       // Get user object
       // Read users directory
-      helpers.readDir(helpers.filePath(helpers.baseDir, 'users'))
+      helpers.readDir(helpers.userDir())
         .then(fileNames => {
           fileNames.forEach(fileName => {
             const email = fileName.slice(0, -5)

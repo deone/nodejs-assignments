@@ -25,6 +25,20 @@ helpers.filePath = (baseDir, dir, fileName) =>
         baseDir, dir, fileName.concat('.', 'json')
       )
 
+helpers.cFilePath = baseDir =>
+  dir =>
+    fileName =>
+      !fileName
+        ? path.join(baseDir, dir, '/')
+        : path.join(
+            baseDir, dir, fileName.concat('.', 'json')
+          )
+
+helpers.baseDirFunc = helpers.cFilePath(helpers.baseDir)
+helpers.userDir = helpers.baseDirFunc('users')
+helpers.tokenDir = helpers.baseDirFunc('tokens')
+helpers.menuItemDir = helpers.baseDirFunc('menuitems')
+
 // Validate email properly, maybe with regex
 helpers.validate = (...data) =>
   data.map(item =>

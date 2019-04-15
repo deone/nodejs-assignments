@@ -7,7 +7,8 @@ const menuHandler = {}
 
 menuHandler.menu = (data, callback) =>
   helpers.requestDispatcher(
-    data, callback, ['get'], menuHandler._menu)
+    data, callback, ['get'], menuHandler._menu
+  )
 
 menuHandler._menu = {}
 
@@ -36,9 +37,7 @@ menuHandler._menu.get = (data, callBack) => {
 
       // Token is valid
       // Read menuitems directory
-      helpers.readDir(
-        helpers.filePath(helpers.baseDir, 'menuitems')
-      )
+      helpers.readDir(helpers.menuItemDir())
         .then(fileNames => {
           if (!fileNames.length) {
             // There are no menu items
@@ -52,11 +51,7 @@ menuHandler._menu.get = (data, callBack) => {
           const promises = fileNames.map(fileName => {
             // Get menu item from each file
             return helpers.readFile(
-                    helpers.filePath(
-                      helpers.baseDir,
-                      'menuitems',
-                      fileName.slice(0, -5)
-                    ),
+                    helpers.menuItemDir(fileName.slice(0, -5)),
                     'utf8'
                   )
                     .then(menuItem =>
