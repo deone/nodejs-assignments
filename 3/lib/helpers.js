@@ -9,6 +9,11 @@ const config = require('./config')
 
 const helpers = {}
 
+helpers.errors = {}
+helpers.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
+helpers.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
+helpers.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
+
 helpers.baseDir = path.join(__dirname, '/../.data/')
 helpers.templateDir = path.join(__dirname, '/../templates/')
 
@@ -34,13 +39,13 @@ helpers.tokenDir = helpers.baseDirFunc('tokens')
 helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
 
-const map = f => xs => xs.map(f)
+helpers.map = f => xs => xs.map(f)
 
 // Validate email properly, maybe with regex
-const validate = x =>
+const validator = x =>
   typeof x === 'string' && x.trim().length > 0 ? x.trim() : false
 
-helpers.validate = map(validate)
+helpers.validate = helpers.map(validator)
 
 // Create a SHA256 hash
 helpers.hash = str =>
@@ -60,52 +65,19 @@ helpers.parseJsonToObject = str => {
   }
 }
 
-helpers.writeUser = (
-  email,
-  object,
-  fileOpenMode,
-  callBack,
-  caller = 'users'
-) => {
-  const write = helpers.fileWriter(object)
-  helpers.openFile(
-    helpers.userDir(email),
-    fileOpenMode
-  )
-    .then(write)
-    .then(
-      () => {
-        caller === 'cart'
-          ? callBack(200, object.cart)
-          : caller === 'order'
-            ? callBack(200, object.orders)
-            : callBack(
-                200,
-                {
-                  'Success': `User ${{
-                  'w': 'update', 'wx': 'create'
-                  }[fileOpenMode]}d successfully.`
-                }
-              )
-      }
-    )
-    .catch(err => callBack(500, {'Error': err.toString()}))
-
-}
-
-const createString = (strLength, chars) =>
-  Array(strLength).fill().map(i =>
-    chars.charAt(
-      Math.floor(Math.random() * chars.length)
-    )
-  ).join('')
+const createString = strLength =>
+  chars =>
+    Array(strLength).fill().map(i =>
+      chars.charAt(
+        Math.floor(Math.random() * chars.length)
+      )
+    ).join('')
 
 // Create a string of random alphanumeric characters, of a given length
 helpers.createRandomString = strLength =>
-  createString(
-    strLength,
-    'abcdefghijklmnopqrstuvwxyz0123456789'
-  )
+  createString
+    (strLength)
+    ('abcdefghijklmnopqrstuvwxyz0123456789')
 
 helpers.requestDispatcher = callBack =>
   handlersContainer =>
@@ -161,6 +133,41 @@ helpers.deleteToken = tokenId =>
   helpers.deleteFile(
     helpers.tokenDir(tokenId)
   )
+
+
+
+helpers.writeUser = (
+  email,
+  object,
+  fileOpenMode,
+  callBack,
+  caller = 'users'
+) => {
+  const write = helpers.fileWriter(object)
+  helpers.openFile(
+    helpers.userDir(email),
+    fileOpenMode
+  )
+    .then(write)
+    .then(
+      () => {
+        caller === 'cart'
+          ? callBack(200, object.cart)
+          : caller === 'order'
+            ? callBack(200, object.orders)
+            : callBack(
+                200,
+                {
+                  'Success': `User ${{
+                  'w': 'update', 'wx': 'create'
+                  }[fileOpenMode]}d successfully.`
+                }
+              )
+      }
+    )
+    .catch(err => callBack(500, {'Error': err.toString()}))
+
+}
 
 helpers.sendRequest = (
   payload,
@@ -232,11 +239,6 @@ helpers.getTemplate = (templateName, data, callBack) => {
     callback('A valid template name was not specified');
   }
 }; */
-
-helpers.errors = {}
-helpers.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
-helpers.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
-helpers.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
 
 
 module.exports = helpers
