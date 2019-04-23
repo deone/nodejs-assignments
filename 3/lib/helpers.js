@@ -99,16 +99,16 @@ helpers.deleteUser = email =>
     helpers.userDir(email)
   )
 
+// Basically a curry-wrapped helpers.writeFile
+helpers.fileWriter = data =>
+  fd => helpers.writeFile(fd, JSON.stringify(data))
+
 // Token helpers
 helpers.getToken = tokenId =>
   helpers.readFile(
     helpers.tokenDir(tokenId),
     'utf8'
   )
-
-// Basically a curry-wrapped helpers.writeFile
-helpers.fileWriter = data =>
-  fd => helpers.writeFile(fd, JSON.stringify(data))
 
 helpers.createToken = callBack =>
   email =>
@@ -135,7 +135,7 @@ helpers.deleteToken = tokenId =>
   )
 
 
-
+// Curry these
 helpers.writeUser = (
   email,
   object,

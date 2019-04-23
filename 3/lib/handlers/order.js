@@ -14,6 +14,32 @@ orderHandler.order = callBack =>
 
 orderHandler._order = {}
 
+const placeOrder = items => {
+  // - Set ID to random string
+  const id = helpers.createRandomString(20)
+
+  // - Set paid and mailSent properties
+  // on order object to false
+  const paid = false
+  const mailSent = false
+
+  // - Get price for each item in
+  // cart and create order item objects
+
+  // - Set items property on order
+  // object to list of order item objects
+  const totalPrice = items.reduce(
+    (a, b) => a + b.price, 0
+  )
+
+  // - Set totalPrice property on
+  // order object to total price of items
+  // - Create order object
+  return {
+    id, paid, mailSent, totalPrice, items
+  }
+}
+
 // Order - post
 // Required data: token ID
 // Optional data: none
@@ -67,36 +93,13 @@ orderHandler._order.post = callBack =>
                     }
 
                     // Place order
-                    // - Set ID to random string
-                    const id = helpers.createRandomString(20)
-
-                    // - Set paid and mailSent properties
-                    // on order object to false
-                    const paid = false
-                    const mailSent = false
-
-                    // - Get price for each item in
-                    // cart and create order item objects
-                    const items = userObject.cart
-
-                    // - Set items property on order
-                    // object to list of order item objects
-                    const totalPrice = items.reduce(
-                      (a, b) => a + b.price, 0
-                    )
-
-                    // - Set totalPrice property on
-                    // order object to total price of items
-                    // - Create order object
-                    const order = {
-                      id, email, paid, mailSent, totalPrice, items
-                    }
+                    const order = Object.assign(placeOrder(cart), { email })
 
                     // - Write order object to file with
                     // file name as order ID
                     const write = helpers.fileWriter(order)
                     helpers.openFile(
-                      helpers.orderDir(id), 'wx'
+                      helpers.orderDir(order.id), 'wx'
                     )
                       .then(write)
                       .catch(err => callBack(500, {
@@ -115,7 +118,7 @@ orderHandler._order.post = callBack =>
                       userObject.orders = []
                     }
 
-                    const userOrder = {'id': id, 'value': totalPrice}
+                    const userOrder = {'id': order.id, 'value': order.totalPrice}
                     userObject.orders.push(userOrder)
 
                     // - Update user object on file
