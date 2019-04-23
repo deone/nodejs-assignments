@@ -110,15 +110,13 @@ helpers.createRandomString = strLength =>
     'abcdefghijklmnopqrstuvwxyz0123456789'
   )
 
-helpers.requestDispatcher = (
-  data,
-  callBack,
-  acceptableMethods,
-  handlersContainer
-) =>
-  acceptableMethods.includes(data.method)
-    ? handlersContainer[data.method](data, callBack)
-    : callBack(405)
+helpers.requestDispatcher = callBack =>
+  handlersContainer =>
+    acceptableMethods =>
+      data =>
+        acceptableMethods.includes(data.method)
+          ? handlersContainer[data.method](callBack)(data)
+          : callBack(405)
 
 // User helpers
 helpers.getUser = email =>

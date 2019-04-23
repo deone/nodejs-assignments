@@ -13,8 +13,8 @@ const userHandler = require('./lib/handlers/user')
 const orderHandler = require('./lib/handlers/order')
 const checkoutHandler = require('./lib/handlers/checkout')
 
-const notFoundHandler = (data, callBack) =>
-  callBack(404, 'Not Found')
+const notFoundHandler = callBack =>
+  data => callBack(404, 'Not Found')
 
 // HTML handler
 const frontEnd = require('./lib/handlers/frontend')
@@ -110,7 +110,7 @@ const server = http.createServer((req, res) => {
     };
 
     // handle request
-    chosenHandler(data, callBack)
+    chosenHandler(callBack)(data)
   })
 })
 
