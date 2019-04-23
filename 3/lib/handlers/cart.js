@@ -17,7 +17,7 @@ cartHandler._cart = {}
 // Optional data - none
 cartHandler._cart.get = (data, callBack) => {
   // Get tokenId from header
-  const [tokenId] = helpers.validate(data.headers.token)
+  const [tokenId] = helpers.validate([data.headers.token])
 
   if (!helpers.isTokenProvided(
     tokenId, callBack)) {
@@ -79,10 +79,10 @@ cartHandler._cart.get = (data, callBack) => {
 // Optional data - none
 cartHandler._cart.put = (data, callBack) => {
   // Get tokenID from header  
-  const [tokenId, item] = helpers.validate(
+  const [tokenId, item] = helpers.validate([
     data.headers.token,
     data.payload.item
-  )
+  ])
 
   if (!helpers.isTokenProvided(
     tokenId, callBack)) {
@@ -200,10 +200,10 @@ cartHandler._cart.put = (data, callBack) => {
 // Optional data - none
 cartHandler._cart.delete = (data, callBack) => {
   // Get tokenID from header  
-  const [tokenId, menuItem] = helpers.validate(
+  const [tokenId, menuItem] = helpers.validate([
     data.headers.token,
     data.payload.item
-  )
+  ])
 
   if (!helpers.isTokenProvided(
     tokenId, callBack)) {
