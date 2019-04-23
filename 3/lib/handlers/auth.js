@@ -22,10 +22,10 @@ authHandler._logout = {}
 // Required data: email, password
 // Optional data: none
 authHandler._login.post = (data, callBack) => {
-  const [email, password] = helpers.validate(
+  const [email, password] = helpers.validate([
     data.payload.email,
     data.payload.password
-  )
+  ])
 
   if (!(email && password)) {
     callBack(400, {'Error': 'Missing required fields.'})
@@ -118,7 +118,7 @@ authHandler._login.post = (data, callBack) => {
 // Required data: tokenId
 // Optional data: none
 authHandler._logout.post = (data, callBack) => {
-  const [tokenId] = helpers.validate(data.headers.token)
+  const [tokenId] = helpers.validate([data.headers.token])
 
   if (!helpers.isTokenProvided(
     tokenId, callBack)) {
