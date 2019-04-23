@@ -67,33 +67,30 @@ helpers.writeUser = (
   callBack,
   caller = 'users'
 ) => {
+  const write = helpers.fileWriter(object)
   helpers.openFile(
     helpers.userDir(email),
     fileOpenMode
   )
-    .then(fileDescriptor => {
-      helpers.writeFile(fileDescriptor, JSON.stringify(object))
-        .then(() => {
-          caller === 'cart'
-            ? callBack(200, object.cart)
-            : caller === 'order'
-              ? callBack(200, object.orders)
-              : callBack(
-                  200,
-                  {
-                    'Success': `User ${{
-                    'w': 'update', 'wx': 'create'
-                    }[fileOpenMode]}d successfully.`
-                  }
-                )
-        })
-        .catch(err => callBack(500, {
-          'Error': err.toString()
-        }))
-    })
-    .catch(err => callBack(500, {
-      'Error': err.toString()
-    }))
+    .then(write)
+    .then(
+      () => {
+        caller === 'cart'
+          ? callBack(200, object.cart)
+          : caller === 'order'
+            ? callBack(200, object.orders)
+            : callBack(
+                200,
+                {
+                  'Success': `User ${{
+                  'w': 'update', 'wx': 'create'
+                  }[fileOpenMode]}d successfully.`
+                }
+              )
+      }
+    )
+    .catch(err => callBack(500, {'Error': err.toString()}))
+
 }
 
 const createString = (strLength, chars) =>
@@ -137,6 +134,7 @@ helpers.getToken = tokenId =>
     'utf8'
   )
 
+// Basically a curry-wrapped helpers.writeFile
 helpers.fileWriter = data =>
   fd => helpers.writeFile(fd, JSON.stringify(data))
 
@@ -155,7 +153,7 @@ helpers.createToken = callBack =>
         'wx'
       )
         .then(write)
-        .then(() => callBack(200, tokenObject))
+        .then(callBack(200, tokenObject))
         .catch(err => callBack(500, {'Error': err.toString()}))
     }
 
