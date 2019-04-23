@@ -34,27 +34,27 @@ checkoutHandler._checkout.post = callBack =>
       data.payload.orderId,
       data.payload.stripeToken
     ])
-  
+
     if (!helpers.isTokenProvided(
       tokenId, callBack)) {
       return
     }
-  
+
     if (!(orderId && stripeToken)) {
       callBack(400, {'Error': 'Required fields missing.'})
       return
     }
-  
+
     helpers.getToken(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
-  
+
         // Check whether token is expired
         if (!helpers.isTokenExpired(
           tokenObject.expires, callBack)) {
           return
         }
-  
+
         // Get user email
         helpers.readDir(helpers.userDir())
           .then(fileNames => {
@@ -78,7 +78,7 @@ checkoutHandler._checkout.post = callBack =>
                       description: `${email}_${tokenId}_${Date.now()}`,
                       source: stripeToken
                     })
-  
+
                     helpers.sendRequest(
                       stripePayload,
                       'api.stripe.com',
@@ -89,7 +89,7 @@ checkoutHandler._checkout.post = callBack =>
                           callBack(500, {'Error': 'Unable to process payment.'})
                           return
                         }
-  
+
                         orderObject.paid = true
                         // Send mail
                         const mailgunPayload = queryString.stringify({
@@ -98,7 +98,7 @@ checkoutHandler._checkout.post = callBack =>
                           'subject': `Order No. ${orderObject.id}`,
                           'text': `Dear ${email}, an order with a total amount of ${orderObject.totalPrice} was made by you.`
                         })
-  
+
                         // Send email if payment is successful
                         helpers.sendRequest(
                           mailgunPayload,

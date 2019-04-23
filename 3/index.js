@@ -107,7 +107,7 @@ const server = http.createServer((req, res) => {
       'method' : method,
       'headers' : headers,
       'payload' : helpers.parseJsonToObject(buffer)
-    };
+    }
 
     // handle request
     chosenHandler(callBack)(data)
