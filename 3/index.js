@@ -9,7 +9,7 @@ const helpers = require('./lib/helpers')
 const authHandler = require('./lib/handlers/auth')
 const menuHandler = require('./lib/handlers/menu')
 const cartHandler = require('./lib/handlers/cart')
-const userHandler = require('./lib/handlers/users')
+const userHandler = require('./lib/handlers/user')
 const orderHandler = require('./lib/handlers/order')
 const checkoutHandler = require('./lib/handlers/checkout')
 
@@ -116,7 +116,7 @@ const server = http.createServer((req, res) => {
 
 const router = {
   '': frontEnd.index,
-  'api/users': userHandler.users,
+  'api/user': userHandler.user,
   'api/login': authHandler.login,
   'api/logout': authHandler.logout,
   'api/menu': menuHandler.menu,

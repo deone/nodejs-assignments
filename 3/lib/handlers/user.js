@@ -1,25 +1,25 @@
-/* Users handlers */
+/* User handlers */
 
 // Dependencies
 const helpers = require('../helpers')
 
 const userHandler = {}
 
-userHandler.users = (data, callback) =>
+userHandler.user = (data, callback) =>
   helpers.requestDispatcher(
     data, callback,
     ['post', 'get', 'put', 'delete'],
-    userHandler._users
+    userHandler._user
   )
 
 // Container for user methods
-userHandler._users = {}
+userHandler._user = {}
 
-// Users - post
+// User - post
 // Required data: firstName, lastName,
 // email, streetAddress, password
 // Optional data: none
-userHandler._users.post = (data, callBack) => {
+userHandler._user.post = (data, callBack) => {
   // Check that all required fields are filled out
   const [
     firstName,
@@ -67,12 +67,12 @@ userHandler._users.post = (data, callBack) => {
     })
 }
 
-// Users - get
+// User - get
 // Required data: email
 // Optional data: none
 // @TODO Only let an authenticated user access
 // their object. Dont let them access anyone elses.
-userHandler._users.get = (data, callBack) => {
+userHandler._user.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
   const [email] = helpers.validate([data.queryStringObject.email])
 
@@ -103,13 +103,13 @@ userHandler._users.get = (data, callBack) => {
     })
 }
 
-// Users - put
+// User - put
 // Required data: email
 // Optional data: firstName, lastName, streetAddress,
 // password (at least one must be specified)
 // @TODO Only let an authenticated user up their object.
 // Dont let them access update elses.
-userHandler._users.put = (data, callBack) => {
+userHandler._user.put = (data, callBack) => {
   // Validate required field 
   const [email] = helpers.validate([data.payload.email])
 
@@ -163,13 +163,13 @@ userHandler._users.put = (data, callBack) => {
     })
 }
 
-// Users - delete
+// User - delete
 // Required data: email
 // Optional data: none
 // @TODO Only let an authenticated user delete their object.
 // Don't let them delete or update someone elses.
 // @TODO Cleanup (delete) any other data files associated with the user
-userHandler._users.delete = (data, callBack) => {
+userHandler._user.delete = (data, callBack) => {
   // Validate email
   const [email] = helpers.validate([data.queryStringObject.email])
 
