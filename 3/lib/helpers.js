@@ -235,35 +235,32 @@ helpers.getTemplate = (templateName, data, callBack) => {
   }
 }; */
 
-helpers.isTokenProvided = (tokenId, callBack) => {
-  if (!tokenId) {
-    callBack(401, {
-      'Error': 'Authentication token not provided.'
-    })
-    return false
-  }
-  return true
-}
+helpers.errors = {}
+helpers.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
+helpers.errors.INVALID_TOKEN = 'Invalid token. Please login again.'
+helpers.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
 
-helpers.isTokenExpired = (tokenExpiry, callBack) => {
-  if (Date.now() > tokenExpiry) {
-    callBack(401, {
-      'Error': 'Invalid token. Please login again.'
-    })
-    return false
+helpers.isTokenExpired = callBack =>
+  tokenExpiry => {
+    if (Date.now() > tokenExpiry) {
+      callBack(401, {
+        'Error': 'Invalid token. Please login again.'
+      })
+      return false
+    }
+    return true
   }
-  return true
-}
 
-helpers.isRequiredFieldProvided = (field, callBack) => {
-  if (!field) {
-    callBack(400, {
-      'Error': 'Missing required field.'
-    })
-    return false
+helpers.isRequiredFieldProvided = callBack =>
+  field => {
+    if (!field) {
+      callBack(400, {
+        'Error': 'Missing required field.'
+      })
+      return false
+    }
+    return true
   }
-  return true
-}
 
 
 module.exports = helpers
