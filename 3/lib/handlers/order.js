@@ -14,6 +14,25 @@ orderHandler.order = callBack =>
 
 orderHandler._order = {}
 
+const updateUser = (user, orderId, totalPrice) => {
+  // - Empty cart on user object
+  user.cart = []
+
+  // - Set orders property on
+  // user object to list of objects
+  // containing order ID and totalPrice
+
+  // - First time user is placing an order
+  if (!user.hasOwnProperty('orders')) {
+    // Set property to empty list
+    user.orders = []
+  }
+
+  user.orders.push({'id': orderId, 'value': totalPrice})
+
+  return user
+}
+
 const placeOrder = items => {
   // - Set ID to random string
   const id = helpers.createRandomString(20)
@@ -106,25 +125,12 @@ orderHandler._order.post = callBack =>
                         'Error': err.toString()
                       }))
 
-                    // - Empty cart on user object
-                    userObject.cart = []
-
-                    // - Set orders property on
-                    // user object to list of order IDs
-
-                    // - First time user is placing an order
-                    if (!userObject.hasOwnProperty('orders')) {
-                      // Set property to empty list
-                      userObject.orders = []
-                    }
-
-                    const userOrder = {'id': order.id, 'value': order.totalPrice}
-                    userObject.orders.push(userOrder)
+                    const updatedUser = updateUser(
+                      userObject, order.id, order.totalPrice)
 
                     // - Update user object on file
                     helpers.writeUser(
-                      email, userObject, 'w', callBack, 'order'
-                    )
+                      email, updatedUser, 'w', callBack, 'order')
                   })
                   .catch(err => callBack(500, {
                     'Error': err.toString()
