@@ -94,17 +94,11 @@ orderHandler._order.post = callBack =>
 
                     // - Write order object to file with
                     // file name as order ID
+                    const write = helpers.fileWriter(order)
                     helpers.openFile(
                       helpers.orderDir(id), 'wx'
                     )
-                      .then(fileDescriptor => {
-                        helpers.writeFile(
-                          fileDescriptor, JSON.stringify(order)
-                        )
-                          .catch(err => callBack(500, {
-                            'Error': err.toString()
-                          }))
-                      })
+                      .then(write)
                       .catch(err => callBack(500, {
                         'Error': err.toString()
                       }))

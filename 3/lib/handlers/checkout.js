@@ -115,20 +115,16 @@ checkoutHandler._checkout.post = callBack =>
                               return
                             }
                             orderObject.mailSent = true
+
                             // Update order
+                            const write = helpers.fileWriter(orderObject)
                             helpers.openFile(helpers.orderDir(orderId), 'w')
-                              .then(fileDescriptor => {
-                                helpers.writeFile(
-                                  fileDescriptor,
-                                  JSON.stringify(orderObject)
-                                )
-                                  .catch(err => callBack(500, {
-                                    'Error': err.toString()
-                                  }))
+                              .then(write)
+                              .then(
                                 callBack(200, {
                                   'Success': 'Payment processed and user notified successfully.'
                                 })
-                              })
+                              )
                               .catch(err => callBack(500, {
                                 'Error': err.toString()
                               }))
