@@ -22,8 +22,8 @@ cartHandler._cart.get = callBack =>
     // Get tokenId from header
     const [tokenId] = helpers.validate([data.headers.token])
 
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
@@ -87,28 +87,28 @@ cartHandler._cart.put = callBack =>
       data.headers.token,
       data.payload.item
     ])
-  
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
-  
+
     if (!helpers.isRequiredFieldProvided(
       item, callBack)) {
       return
     }
-  
+
     // Get token
     helpers.getToken(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
-  
+
         // Check whether token is expired
         if (!helpers.isTokenExpired(
           tokenObject.expires, callBack)) {
           return
         }
-  
+
         // Token is valid
         // Get menu item and validate
         // Check whether menu item is on menu
@@ -117,7 +117,7 @@ cartHandler._cart.put = callBack =>
             const menu = fileNames.map(fileName =>
               fileName.slice(0, -5)
             )
-  
+
             if (!menu.includes(item)) {
               // Item is not on menu
               callBack(400, {
@@ -125,12 +125,12 @@ cartHandler._cart.put = callBack =>
               })
               return
             }
-  
+
             // Item is on menu, get item
             helpers.readDir(helpers.menuItemDir())
               .then(fileNames => {
                 fileNames.forEach(fileName => {
-  
+
                   // This is same as
                   // if (item === fileName.slice(0, -5)) {...}
                   item === fileName.slice(0, -5) &&
@@ -141,7 +141,7 @@ cartHandler._cart.put = callBack =>
                         const menuItemObject = helpers.parseJsonToObject(
                           menuItem
                         )
-  
+
                         // Get cart, so we can
                         // update it with menu item
                         helpers.readDir(
@@ -158,13 +158,13 @@ cartHandler._cart.put = callBack =>
                                   .then(user => {
                                     const userObject =
                                       helpers.parseJsonToObject(user)
-  
+
                                     if (!userObject.hasOwnProperty('cart')) {
                                       userObject.cart = []
                                     }
                                     delete menuItemObject.id
                                     userObject.cart.push(menuItemObject)
-  
+
                                     // Store updates
                                     helpers.writeUser(
                                       email, userObject, 'w', callBack, 'cart'
@@ -209,31 +209,31 @@ cartHandler._cart.delete = callBack =>
       data.headers.token,
       data.queryStringObject.item
     ])
-  
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
-  
+
     if (!helpers.isRequiredFieldProvided(
       menuItem, callBack)) {
       return
     }
-  
+
     // Get token
     helpers.getToken(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
-  
+
         // Check whether token is expired
         if (!helpers.isTokenExpired(
           tokenObject.expires, callBack)) {
           return
         }
-  
+
         // Token is valid
         // Get menu item and validate
-  
+
         // Get user object
         // Read users directory
         helpers.readDir(helpers.userDir())
@@ -245,14 +245,14 @@ cartHandler._cart.delete = callBack =>
                 helpers.getUser(email)
                   .then(user => {
                     const userObject = helpers.parseJsonToObject(user)
-  
+
                     if (!userObject.hasOwnProperty('cart')) {
                       callBack(400, {
                         'Error': 'User has no shopping cart.'
                       })
                       return
                     }
-  
+
                     const cart = userObject.cart
                     if (!cart.length) {
                       callBack(400, {
@@ -260,7 +260,7 @@ cartHandler._cart.delete = callBack =>
                       })
                       return
                     }
-  
+
                     // Beware! Filter matches each item
                     // with condition and filters,
                     // Doesn't just delete the first
@@ -268,7 +268,7 @@ cartHandler._cart.delete = callBack =>
                     userObject.cart = cart.filter(item =>
                       item.name !== menuItem
                     )
-  
+
                     // Store updates
                     helpers.writeUser(
                       email, userObject, 'w', callBack, 'cart'

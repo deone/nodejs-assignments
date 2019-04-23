@@ -35,8 +35,8 @@ checkoutHandler._checkout.post = callBack =>
       data.payload.stripeToken
     ])
 
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
 

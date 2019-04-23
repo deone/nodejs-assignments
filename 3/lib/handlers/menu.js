@@ -22,8 +22,8 @@ menuHandler._menu.get = callBack =>
     // Get tokenId from header
     const [tokenId] = helpers.validate([data.headers.token])
 
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
 

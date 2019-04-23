@@ -22,8 +22,8 @@ orderHandler._order.post = callBack =>
     // Get tokenId from header
     const [tokenId] = helpers.validate([data.headers.token])
 
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
@@ -153,8 +153,8 @@ orderHandler._order.get = callBack =>
       data.queryStringObject.id
     ])
 
-    if (!helpers.isTokenProvided(
-      tokenId, callBack)) {
+    if (!tokenId) {
+      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
