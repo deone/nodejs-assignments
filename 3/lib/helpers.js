@@ -137,30 +137,27 @@ helpers.getToken = tokenId =>
     'utf8'
   )
 
-helpers.createToken = (tokenId, email, callBack) => {
-  // Set an expiration date 1 hour in the future.
-  const expires = Date.now() + 1000 * 60 * 60
-  const tokenObject = { email, tokenId, expires }
+helpers.fileWriter = data =>
+  fd => helpers.writeFile(fd, JSON.stringify(data))
 
-  // Store the token
-  helpers.openFile(
-    helpers.tokenDir(tokenId),
-    'wx'
-  )
-    .then(fileDescriptor =>
-      helpers.writeFile(
-          fileDescriptor,
-          JSON.stringify(tokenObject)
-        )
-        .then(() =>
-          callBack(200, tokenObject))
-        .catch(err =>
-          callBack(500, {'Error': err.toString()}))
-    )
-    .catch(err =>
-      callBack(500, {'Error': err.toString()})
-  )
-}
+helpers.createToken = callBack =>
+  email =>
+    tokenId => {
+      // Set an expiration date 1 hour in the future.
+      const expires = Date.now() + 1000 * 60 * 60
+      const tokenObject = { email, tokenId, expires }
+
+      const write = helpers.fileWriter(tokenObject)
+
+      // Store the token
+      helpers.openFile(
+        helpers.tokenDir(tokenId),
+        'wx'
+      )
+        .then(write)
+        .then(() => callBack(200, tokenObject))
+        .catch(err => callBack(500, {'Error': err.toString()}))
+    }
 
 helpers.deleteToken = tokenId =>
   helpers.deleteFile(
