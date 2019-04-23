@@ -78,8 +78,8 @@ userHandler._user.get = callBack =>
     // Validate email - do this properly, maybe with regex
     const [email] = helpers.validate([data.queryStringObject.email])
 
-    if (!helpers.isRequiredFieldProvided(
-      email, callBack)) {
+    if (!email) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -129,8 +129,8 @@ userHandler._user.put = callBack =>
       data.payload.streetAddress
     ])
 
-    if (!helpers.isRequiredFieldProvided(
-      email, callBack)) {
+    if (!email) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -177,8 +177,8 @@ userHandler._user.delete = callBack =>
     // Validate email
     const [email] = helpers.validate([data.queryStringObject.email])
 
-    if (!helpers.isRequiredFieldProvided(
-      email, callBack)) {
+    if (!email) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 

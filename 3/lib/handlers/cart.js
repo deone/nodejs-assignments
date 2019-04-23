@@ -33,8 +33,8 @@ cartHandler._cart.get = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 
@@ -93,8 +93,8 @@ cartHandler._cart.put = callBack =>
       return
     }
 
-    if (!helpers.isRequiredFieldProvided(
-      item, callBack)) {
+    if (!item) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -104,8 +104,8 @@ cartHandler._cart.put = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 
@@ -215,8 +215,8 @@ cartHandler._cart.delete = callBack =>
       return
     }
 
-    if (!helpers.isRequiredFieldProvided(
-      menuItem, callBack)) {
+    if (!menuItem) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -226,8 +226,8 @@ cartHandler._cart.delete = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 

@@ -33,8 +33,8 @@ orderHandler._order.post = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 
@@ -158,8 +158,8 @@ orderHandler._order.get = callBack =>
       return
     }
 
-    if (!helpers.isRequiredFieldProvided(
-      orderId, callBack)) {
+    if (!orderId) {
+      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -169,8 +169,8 @@ orderHandler._order.get = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 

@@ -33,8 +33,8 @@ menuHandler._menu.get = callBack =>
         const tokenObject = helpers.parseJsonToObject(token)
 
         // Check whether token is expired
-        if (!helpers.isTokenExpired(
-          tokenObject.expires, callBack)) {
+        if (Date.now() > tokenObject.expires) {
+          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 
