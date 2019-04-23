@@ -26,11 +26,11 @@ checkoutHandler._checkout = {}
   Send email to user
 */
 checkoutHandler._checkout.post = (data, callBack) => {
-  const [tokenId, orderId, stripeToken] = helpers.validate(
+  const [tokenId, orderId, stripeToken] = helpers.validate([
     data.headers.token,
     data.payload.orderId,
     data.payload.stripeToken
-  )
+  ])
 
   if (!helpers.isTokenProvided(
     tokenId, callBack)) {
