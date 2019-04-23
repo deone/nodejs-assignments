@@ -27,13 +27,13 @@ userHandler._users.post = (data, callBack) => {
     email,
     password,
     streetAddress
-  ] = helpers.validate(
+  ] = helpers.validate([
     data.payload.firstName,
     data.payload.lastName,
     data.payload.email,
     data.payload.password,
     data.payload.streetAddress
-  )
+  ])
 
   if (!(firstName && lastName &&  email &&  streetAddress &&  password)) {
     callBack(400, {'Error': 'Missing required fields.'})
@@ -74,7 +74,7 @@ userHandler._users.post = (data, callBack) => {
 // their object. Dont let them access anyone elses.
 userHandler._users.get = (data, callBack) => {
   // Validate email - do this properly, maybe with regex
-  const [email] = helpers.validate(data.queryStringObject.email)
+  const [email] = helpers.validate([data.queryStringObject.email])
 
   if (!helpers.isRequiredFieldProvided(
     email, callBack)) {
@@ -111,7 +111,7 @@ userHandler._users.get = (data, callBack) => {
 // Dont let them access update elses.
 userHandler._users.put = (data, callBack) => {
   // Validate required field 
-  const [email] = helpers.validate(data.payload.email)
+  const [email] = helpers.validate([data.payload.email])
 
   // Validate optional fields, if provided
   const [
@@ -119,12 +119,12 @@ userHandler._users.put = (data, callBack) => {
     lastName,
     password,
     streetAddress
-  ] = helpers.validate(
+  ] = helpers.validate([
     data.payload.firstName,
     data.payload.lastName,
     data.payload.password,
     data.payload.streetAddress
-  )
+  ])
 
   if (!helpers.isRequiredFieldProvided(
     email, callBack)) {
@@ -171,7 +171,7 @@ userHandler._users.put = (data, callBack) => {
 // @TODO Cleanup (delete) any other data files associated with the user
 userHandler._users.delete = (data, callBack) => {
   // Validate email
-  const [email] = helpers.validate(data.queryStringObject.email)
+  const [email] = helpers.validate([data.queryStringObject.email])
 
   if (!helpers.isRequiredFieldProvided(
     email, callBack)) {

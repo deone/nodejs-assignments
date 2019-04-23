@@ -33,13 +33,14 @@ helpers.orderDir = helpers.baseDirFunc('orders')
 helpers.tokenDir = helpers.baseDirFunc('tokens')
 helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
+
+const map = f => xs => xs.map(f)
+
 // Validate email properly, maybe with regex
-helpers.validate = (...data) =>
-  data.map(item =>
-    typeof item === 'string' && item.trim().length > 0
-      ? item.trim()
-      : false
-  )
+const validate = x =>
+  typeof x === 'string' && x.trim().length > 0 ? x.trim() : false
+
+helpers.validate = map(validate)
 
 // Create a SHA256 hash
 helpers.hash = str =>
