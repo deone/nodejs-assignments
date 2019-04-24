@@ -3,35 +3,22 @@
 // Dependencies
 const helpers = require('../helpers')
 
-const orderHandler = {}
+const updateUser = user =>
+  order => {
+    // - First time user is placing an order
+    if (!user.hasOwnProperty('orders')) {
+      // Set property to empty list
+      user.orders = []
+    }
 
-orderHandler.order = callBack =>
-  data => {
-    const dispatch =
-      helpers.requestDispatcher(callBack)(orderHandler._order)
-    dispatch(['post', 'get'])(data)
+    // Empty cart on user object
+    user.cart = []
+
+    // Update orders
+    user.orders = [user.orders, ...[order]]
+
+    return user
   }
-
-orderHandler._order = {}
-
-const updateUser = (user, orderId, totalPrice) => {
-  // - Empty cart on user object
-  user.cart = []
-
-  // - Set orders property on
-  // user object to list of objects
-  // containing order ID and totalPrice
-
-  // - First time user is placing an order
-  if (!user.hasOwnProperty('orders')) {
-    // Set property to empty list
-    user.orders = []
-  }
-
-  user.orders = [user.orders, ...[{'id': orderId, 'value': totalPrice}]]
-
-  return user
-}
 
 const placeOrder = items => {
   // Set ID to random string
@@ -53,6 +40,17 @@ const placeOrder = items => {
   }
 }
 
+const orderHandler = {}
+
+orderHandler.order = callBack =>
+  data => {
+    const dispatch =
+      helpers.requestDispatcher(callBack)(orderHandler._order)
+    dispatch(['post', 'get'])(data)
+  }
+
+orderHandler._order = {}
+
 // Order - post
 // Required data: token ID
 // Optional data: none
@@ -67,7 +65,7 @@ orderHandler._order.post = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
+    helpers.get(helpers.tokenDir)(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
 
@@ -81,23 +79,23 @@ orderHandler._order.post = callBack =>
         // Get user object
         // Read users directory
         helpers.readDir(helpers.userDir())
-          .then(fileNames => {
-            fileNames.forEach(fileName => {
-              const email = fileName.slice(0, -5)
+          .then(xs => {
+            xs.forEach(x => {
+              const email = x.slice(0, -5)
               email === tokenObject.email &&
                 // Get cart
-                helpers.getUser(email)
-                  .then(user => {
-                    const userObject = helpers.parseJsonToObject(user)
+                helpers.get(helpers.userDir)(email)
+                  .then(u => {
+                    const user = helpers.parseJsonToObject(u)
 
-                    if (!userObject.hasOwnProperty('cart')) {
+                    if (!user.hasOwnProperty('cart')) {
                       callBack(400, {
                         'Error': 'You have no shopping cart.'
                       })
                       return
                     }
 
-                    const cart = userObject.cart
+                    const cart = user.cart
                     if (!cart.length) {
                       callBack(400, {
                         'Error': "Your shopping cart is empty."
@@ -106,10 +104,10 @@ orderHandler._order.post = callBack =>
                     }
 
                     // Place order
-                    const order = Object.assign(placeOrder(cart), { email })
+                    const order = Object.assign(
+                      placeOrder(cart), { email })
 
-                    // - Write order object to file with
-                    // file name as order ID
+                    // Write order object to file
                     const write = helpers.fileWriter(order)
                     helpers.openFile(
                       helpers.orderDir(order.id), 'wx'
@@ -119,10 +117,14 @@ orderHandler._order.post = callBack =>
                         'Error': err.toString()
                       }))
 
-                    const updatedUser = updateUser(
-                      userObject, order.id, order.totalPrice)
+                    // Update user
+                    const o = {
+                      orderId: order.id,
+                      totalPrice: order.totalPrice
+                    }
+                    const updatedUser = updateUser(user)(o)
 
-                    // - Update user object on file
+                    // Write updated user to file
                     helpers.writeUser(
                       email, updatedUser, 'w', callBack, 'order')
                   })
@@ -161,12 +163,12 @@ orderHandler._order.get = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+    helpers.get(helpers.tokenDir)(tokenId)
+      .then(x => {
+        const token = helpers.parseJsonToObject(x)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -175,28 +177,29 @@ orderHandler._order.get = callBack =>
         // Get user object
         // Read users directory
         helpers.readDir(helpers.userDir())
-          .then(fileNames => {
-            fileNames.forEach(fileName => {
-              const email = fileName.slice(0, -5)
-              email === tokenObject.email &&
+          .then(ys => {
+            ys.forEach(y => {
+              const email = y.slice(0, -5)
+              email === token.email &&
                 // Get order
                 helpers.readDir(helpers.orderDir())
-                  .then(orderFileNames => {
-                    if (!orderFileNames.length) {
+                  .then(zs => {
+                    if (!zs.length) {
                       // No file in orders directory
                       callBack(400, {'Error': 'Order not found.'})
                       return
                     }
 
-                    orderFileNames.forEach(orderFileName => {
-                      orderId === orderFileName.slice(0, -5) &&
+                    zs.forEach(z => {
+                      orderId === z.slice(0, -5) &&
                         helpers.readFile(
                           helpers.orderDir(orderId),
                           'utf8'
                         )
-                          .then(order => {
-                            const orderObject = helpers.parseJsonToObject(order)
-                            callBack(200, orderObject)
+                          .then(o => {
+                            const order =
+                              helpers.parseJsonToObject(o)
+                            callBack(200, order)
                           })
                           .catch(err => callBack(500, {
                             'Error': err.toString()
