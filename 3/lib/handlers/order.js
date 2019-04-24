@@ -66,11 +66,11 @@ orderHandler._order.post = callBack =>
 
     // Get token
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -82,7 +82,7 @@ orderHandler._order.post = callBack =>
           .then(xs => {
             xs.forEach(x => {
               const email = x.slice(0, -5)
-              email === tokenObject.email &&
+              email === token.email &&
                 // Get cart
                 helpers.get(helpers.userDir)(email)
                   .then(u => {
