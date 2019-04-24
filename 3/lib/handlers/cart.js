@@ -258,8 +258,8 @@ cartHandler._cart.delete = callBack =>
                     // with condition and filters,
                     // Doesn't just delete the first
                     // item that matches.
-                    const keepItem = item => item.name !== menuItem
-                    userObject.cart = helpers.filter(keepItem)(userObject.cart)
+                    const isNeeded = item => item.name !== menuItem
+                    userObject.cart = helpers.filter(isNeeded)(userObject.cart)
 
                     // Store updates
                     helpers.writeUser(

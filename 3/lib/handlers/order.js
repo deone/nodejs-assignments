@@ -15,7 +15,7 @@ const updateUser = user =>
     user.cart = []
 
     // Update orders
-    user.orders = [user.orders, ...[order]]
+    user.orders = user.orders.concat([order])
 
     return user
   }

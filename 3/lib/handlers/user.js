@@ -45,16 +45,16 @@ userHandler._user.post = callBack =>
       helpers.userDir(email),
       'utf8'
     )
-      .then(user => callBack(400, {
+      .then(u => callBack(400, {
         'Error': 'User already exists.'
       }))
       .catch(err => {
         // Hash password
         const hashedPassword = helpers.hash(password)
 
-        // Create the user object
+        // Create user
         if (hashedPassword) {
-          const userObject = {
+          const user = {
             firstName,
             lastName,
             email,
@@ -63,7 +63,7 @@ userHandler._user.post = callBack =>
           }
 
           // Store the user
-          helpers.writeUser(email, userObject, 'wx', callBack)
+          helpers.writeUser(email, user, 'wx', callBack)
         }
       })
   }
@@ -88,10 +88,10 @@ userHandler._user.get = callBack =>
       helpers.userDir(email),
       'utf8'
     )
-      .then(data => {
-        const userObject = helpers.parseJsonToObject(data)
-        delete userObject.hashedPassword
-        callBack(200, userObject)
+      .then(u => {
+        const user = helpers.parseJsonToObject(u)
+        delete user.hashedPassword
+        callBack(200, user)
       })
       .catch(err => {
         const errorString = err.toString()
@@ -140,25 +140,35 @@ userHandler._user.put = callBack =>
     }
 
     helpers.get(helpers.userDir)(email)
-      .then(data => {
+      .then(u => {
+        const user = helpers.parseJsonToObject(u)
         const input = { firstName, lastName, streetAddress, password }
 
         // Filter fields that
         // don't have values and
         // shouldn't be updated
-        const filteredInput = Object.entries(input)
+        /* const filteredInput = Object.entries(input)
           .filter(item => item[1] !== false)
           .reduce((acc, item) => {
             acc[item[0]] = item[1]
             return acc
-          }, {})
+          }, {}) */
+
+        const isTrue = item => item[1] !== false
+        const reduce = f => x => x.reduce(f, {})
+        const objectify = (obj, item) => {
+          obj[item[0]] = item[1]
+          return obj 
+        }
+
+        const values = helpers.filter(isTrue)(Object.entries(input))
+        const filteredInput = reduce(objectify)(values)
 
         // Update fields if necessary
-        const userObject = helpers.parseJsonToObject(data)
-        Object.assign(userObject, filteredInput)
+        Object.assign(user, filteredInput)
 
         // Store updates
-        helpers.writeUser(email, userObject, 'w', callBack)
+        helpers.writeUser(email, user, 'w', callBack)
       })
       .catch(err => {
         console.log(err)
