@@ -40,6 +40,14 @@ helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
 helpers.filter = f => xs => xs.filter(f)
 helpers.map = f => xs => xs.map(f)
+helpers.find = f => xs => xs.find(f)
+
+helpers.delete = dir => x => helpers.deleteFile(dir(x))
+helpers.get = dir => x => helpers.readFile(dir(x), 'utf8')
+
+// Basically a curry-wrapped helpers.writeFile
+helpers.fileWriter = data =>
+  fd => helpers.writeFile(fd, JSON.stringify(data))
 
 // Validate email properly, maybe with regex
 const validator = x =>
@@ -87,29 +95,6 @@ helpers.requestDispatcher = callBack =>
           ? handlersContainer[data.method](callBack)(data)
           : callBack(405)
 
-// User helpers
-helpers.getUser = email =>
-  helpers.readFile(
-    helpers.userDir(email),
-    'utf8'
-  )
-
-helpers.deleteUser = email =>
-  helpers.deleteFile(
-    helpers.userDir(email)
-  )
-
-// Basically a curry-wrapped helpers.writeFile
-helpers.fileWriter = data =>
-  fd => helpers.writeFile(fd, JSON.stringify(data))
-
-// Token helpers
-helpers.getToken = tokenId =>
-  helpers.readFile(
-    helpers.tokenDir(tokenId),
-    'utf8'
-  )
-
 helpers.createToken = callBack =>
   email =>
     tokenId => {
@@ -128,11 +113,6 @@ helpers.createToken = callBack =>
         .then(callBack(200, tokenObject))
         .catch(err => callBack(500, {'Error': err.toString()}))
     }
-
-helpers.deleteToken = tokenId =>
-  helpers.deleteFile(
-    helpers.tokenDir(tokenId)
-  )
 
 
 // Curry these

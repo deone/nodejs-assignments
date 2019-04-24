@@ -3,6 +3,11 @@
 // Dependencies
 const helpers = require('../helpers')
 
+const getToken = x => {
+  const tokenId = x.slice(0, -5)
+  return helpers.get(helpers.tokenDir)(tokenId)
+}
+
 const authHandler = {}
 
 authHandler.login = callBack =>
@@ -42,12 +47,8 @@ authHandler._login.post = callBack =>
     // Lookup user with email
     helpers.readFile(helpers.userDir(email), 'utf8')
       .then(data => {
-        const userObject = helpers.parseJsonToObject(data)
-        // Hash the sent password, and compare it to
-        // the password stored in the user object
-        const hashedPassword = helpers.hash(password)
-
-        if (!(hashedPassword === userObject.hashedPassword)) {
+        const user = helpers.parseJsonToObject(data)
+        if (helpers.hash(password) !== user.hashedPassword) {
           callBack(400, {
             'Error': "Password did not match the user's stored password."
           })
@@ -55,61 +56,60 @@ authHandler._login.post = callBack =>
         }
 
         // Check if user has a token
-        // Read tokens directory
         helpers.readDir(helpers.tokenDir())
-          .then(fileNames => {
-            if (!fileNames.length) {
-              console.log('No token files')
-              // No token files, create one
-              const tokenId = helpers.createRandomString(20)
-              createAuthToken(tokenId)
-            } else {
-              // There are token files
-              // Loop through list of file names
-              const promises = fileNames.map(fileName => {
-                const tokenId = fileName.slice(0, -5)
-                return helpers.getToken(tokenId)
-                        .then(token =>
-                          helpers.parseJsonToObject(token))
+          .then(xs => {
+            if (!xs.length) {
+              // First case - no tokens
+              createAuthToken(
+                helpers.createRandomString(20)
+              )
+              return
+            }
+
+            // There are token files
+            // Get all tokens
+            const promises = helpers.map(getToken)(xs)
+
+            const p = Promise.all(promises)
+            p
+              .then(
+                xs => {
+                  const tokens =
+                    helpers
+                      .map(helpers.parseJsonToObject)(xs)
+
+                  // Extract email from tokens
+                  const getEmail = x => x.email
+                  const emails = helpers.map(getEmail)(tokens)
+
+                  const userHasToken = !emails.includes(email) ? false : true
+                  if (!userHasToken) {
+                    // Second case - user does not have token
+                    createAuthToken(helpers.createRandomString(20))
+                    return
+                  }
+
+                  // Third case - user has token
+                  const findToken = token => token.email === email
+                  const token = helpers.find(findToken)(tokens)
+
+                  Date.now() > token.expires
+                    // if token is expired, delete and create another
+                    ? helpers.delete(helpers.tokenDir)(token.tokenId)
+                        .then(() => createAuthToken(
+                          helpers.createRandomString(20)
+                        ))
                         .catch(err => callBack(500, {
                           'Error': err.toString()
                         }))
-              })
-
-              Promise.all(promises).then(tokens => {
-                const emails = tokens.map(
-                  token => token.email
-                )
-
-                if (!emails.includes(email)) {
-                  console.log('User does not have token')
-                  const tokenId = helpers.createRandomString(20)
-                  createAuthToken(tokenId)
-                } else {
-                  console.log('User has token')
-                  // User has token
-                  // Check validity
-                  const tokenObject = tokens.find(
-                    token => token.email === email
-                  )
-
-                  tokenObject.expires < Date.now()
-                    // if token is invalid, delete it
-                    ? helpers.deleteToken(tokenObject.tokenId)
-                      .then(() => {
-                        // and create a new one
-                        const tokenId = helpers.createRandomString(20)
-                        createAuthToken(tokenId)
-                      })
-                      .catch(err => callBack(500, {
-                        'Error': err.toString()
-                      }))
 
                     // else, return it
-                    : callBack(200, tokenObject)
+                    : callBack(200, token)
                 }
-              })
-            }
+              )
+              .catch(err => callBack(500, {
+                'Error': err.toString()
+              }))
           })
           .catch(err => callBack(500, {
             'Error': err.toString()
@@ -133,7 +133,7 @@ authHandler._logout.post = callBack =>
       return
     }
 
-    helpers.deleteToken(tokenId)
+    helpers.delete(helpers.tokenDir)(tokenId)
       .then(callBack(
         200, {'Success': 'User logged out.'}
       ))
