@@ -44,6 +44,12 @@ helpers.find = f => xs => xs.find(f)
 
 helpers.delete = dir => x => helpers.deleteFile(dir(x))
 helpers.get = dir => x => helpers.readFile(dir(x), 'utf8')
+helpers.getItem = dir =>
+  x => {
+    // Remove '.json' from end of string
+    const item = x.slice(0, -5)
+    return helpers.get(dir)(item)
+  }
 
 // Basically a curry-wrapped helpers.writeFile
 helpers.fileWriter = data =>

@@ -29,11 +29,11 @@ menuHandler._menu.get = callBack =>
 
     // Get token
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -41,8 +41,8 @@ menuHandler._menu.get = callBack =>
         // Token is valid
         // Read menuitems directory
         helpers.readDir(helpers.menuItemDir())
-          .then(fileNames => {
-            if (!fileNames.length) {
+          .then(xs => {
+            if (!xs.length) {
               // There are no menu items
               callBack(200, {
                 'Message': 'There are no items on the menu.'
@@ -50,22 +50,12 @@ menuHandler._menu.get = callBack =>
               return
             }
 
-            // There are menu items
-            const promises = fileNames.map(fileName => {
-              // Get menu item from each file
-              return helpers.readFile(
-                      helpers.menuItemDir(fileName.slice(0, -5)),
-                      'utf8'
-                    )
-                      .then(menuItem =>
-                        helpers.parseJsonToObject(menuItem))
-                      .catch(err => callBack(500, {
-                        'Error': err.toString()
-                      }))
-            })
+            const promises = helpers.map(
+              helpers.getItem(helpers.menuItemDir)
+            )(xs)
 
-            Promise.all(promises).then(menuItems => {
-              callBack(200, menuItems)
+            Promise.all(promises).then(ms => {
+              callBack(200, helpers.map(helpers.parseJsonToObject)(ms))
             })
 
           })

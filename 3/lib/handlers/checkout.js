@@ -46,34 +46,34 @@ checkoutHandler._checkout.post = callBack =>
     }
 
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
 
         // Get user email
         helpers.readDir(helpers.userDir())
-          .then(fileNames => {
-            fileNames.forEach(fileName => {
-              const email = fileName.slice(0, -5)
+          .then(xs => {
+            xs.forEach(x => {
+              const email = x.slice(0, -5)
               // This is same as
-              // if (email === tokenObject.email) {...}
-              email === tokenObject.email &&
+              // if (email === token.email) {...}
+              email === token.email &&
                 // Get order
                 helpers.readFile(
                   helpers.orderDir(orderId),
                   'utf8'
                 )
-                  .then(order => {
-                    const orderObject = helpers.parseJsonToObject(order)
+                  .then(o => {
+                    const order = helpers.parseJsonToObject(o)
   
                     // Make payment
                     const stripePayload = queryString.stringify({
-                      amount: Math.round(orderObject.totalPrice * 100),
+                      amount: Math.round(order.totalPrice * 100),
                       currency: 'usd',
                       description: `${email}_${tokenId}_${Date.now()}`,
                       source: stripeToken
@@ -90,13 +90,13 @@ checkoutHandler._checkout.post = callBack =>
                           return
                         }
 
-                        orderObject.paid = true
+                        order.paid = true
                         // Send mail
                         const mailgunPayload = queryString.stringify({
                           'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
                           'to': 'alwaysdeone@gmail.com',
-                          'subject': `Order No. ${orderObject.id}`,
-                          'text': `Dear ${email}, an order with a total amount of ${orderObject.totalPrice} was made by you.`
+                          'subject': `Order No. ${order.id}`,
+                          'text': `Dear ${email}, an order with a total amount of ${order.totalPrice} was made by you.`
                         })
 
                         // Send email if payment is successful
@@ -114,10 +114,10 @@ checkoutHandler._checkout.post = callBack =>
                               })
                               return
                             }
-                            orderObject.mailSent = true
+                            order.mailSent = true
 
                             // Update order
-                            const write = helpers.fileWriter(orderObject)
+                            const write = helpers.fileWriter(order)
                             helpers.openFile(helpers.orderDir(orderId), 'w')
                               .then(write)
                               .then(

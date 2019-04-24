@@ -3,11 +3,6 @@
 // Dependencies
 const helpers = require('../helpers')
 
-const getToken = x => {
-  const tokenId = x.slice(0, -5)
-  return helpers.get(helpers.tokenDir)(tokenId)
-}
-
 const authHandler = {}
 
 authHandler.login = callBack =>
@@ -68,7 +63,9 @@ authHandler._login.post = callBack =>
 
             // There are token files
             // Get all tokens
-            const promises = helpers.map(getToken)(xs)
+            const promises = helpers.map(
+              helpers.getItem(helpers.tokenDir)
+            )(xs)
 
             const p = Promise.all(promises)
             p
