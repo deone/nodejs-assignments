@@ -147,13 +147,6 @@ userHandler._user.put = callBack =>
         // Filter fields that
         // don't have values and
         // shouldn't be updated
-        /* const filteredInput = Object.entries(input)
-          .filter(item => item[1] !== false)
-          .reduce((acc, item) => {
-            acc[item[0]] = item[1]
-            return acc
-          }, {}) */
-
         const isTrue = item => item[1] !== false
         const reduce = f => x => x.reduce(f, {})
         const objectify = (obj, item) => {
