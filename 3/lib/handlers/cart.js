@@ -246,15 +246,8 @@ cartHandler._cart.delete = callBack =>
                   .then(user => {
                     const userObject = helpers.parseJsonToObject(user)
 
-                    if (!userObject.hasOwnProperty('cart')) {
-                      callBack(400, {
-                        'Error': 'User has no shopping cart.'
-                      })
-                      return
-                    }
-
-                    const cart = userObject.cart
-                    if (!cart.length) {
+                    if (!userObject.cart.length ||
+                      !userObject.hasOwnProperty('cart')) {
                       callBack(400, {
                         'Error': 'Shopping cart is empty.'
                       })
@@ -265,9 +258,8 @@ cartHandler._cart.delete = callBack =>
                     // with condition and filters,
                     // Doesn't just delete the first
                     // item that matches.
-                    userObject.cart = cart.filter(item =>
-                      item.name !== menuItem
-                    )
+                    const keepItem = item => item.name !== menuItem
+                    userObject.cart = helpers.filter(keepItem)(userObject.cart)
 
                     // Store updates
                     helpers.writeUser(

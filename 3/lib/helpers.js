@@ -38,6 +38,7 @@ helpers.orderDir = helpers.baseDirFunc('orders')
 helpers.tokenDir = helpers.baseDirFunc('tokens')
 helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
+helpers.filter = f => xs => xs.filter(f)
 helpers.map = f => xs => xs.map(f)
 
 // Validate email properly, maybe with regex
