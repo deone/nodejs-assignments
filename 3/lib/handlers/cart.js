@@ -29,11 +29,11 @@ cartHandler._cart.get = callBack =>
 
     // Get token
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -42,25 +42,25 @@ cartHandler._cart.get = callBack =>
         // Get user object
         // Read users directory
         helpers.readDir(helpers.userDir())
-          .then(fileNames => {
-            fileNames.forEach(fileName => {
-              const email = fileName.slice(0, -5)
+          .then(xs => {
+            xs.forEach(x => {
+              const email = x.slice(0, -5)
 
               // This is same as
-              // if (email === tokenObject.email) {...}
-              email === tokenObject.email &&
+              // if (email === token.email) {...}
+              email === token.email &&
                 // Get cart
                 helpers.get(helpers.userDir)(email)
-                  .then(user => {
-                    const userObject = helpers.parseJsonToObject(user)
-                    if (!userObject.hasOwnProperty('cart')) {
-                      userObject.cart = []
+                  .then(u => {
+                    const user = helpers.parseJsonToObject(u)
+                    if (!user.hasOwnProperty('cart')) {
+                      user.cart = []
                       // Store updates
                       helpers.writeUser(
-                        email, userObject, 'w', callBack, 'cart'
+                        email, user, 'w', callBack, 'cart'
                       )
                     } else {
-                      callBack(200, userObject.cart)
+                      callBack(200, user.cart)
                     }
                   })
                   .catch(err => callBack(500, {
@@ -100,11 +100,11 @@ cartHandler._cart.put = callBack =>
 
     // Get token
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -113,10 +113,8 @@ cartHandler._cart.put = callBack =>
         // Get menu item and validate
         // Check whether menu item is on menu
         helpers.readDir(helpers.menuItemDir())
-          .then(fileNames => {
-            const menu = fileNames.map(fileName =>
-              fileName.slice(0, -5)
-            )
+          .then(xs => {
+            const menu = helpers.map(x => x.slice(0, -5))(xs)
 
             if (!menu.includes(item)) {
               // Item is not on menu
@@ -128,46 +126,43 @@ cartHandler._cart.put = callBack =>
 
             // Item is on menu, get item
             helpers.readDir(helpers.menuItemDir())
-              .then(fileNames => {
-                fileNames.forEach(fileName => {
-
+              .then(ys => {
+                ys.forEach(y => {
                   // This is same as
                   // if (item === fileName.slice(0, -5)) {...}
-                  item === fileName.slice(0, -5) &&
+                  item === y.slice(0, -5) &&
                     helpers.readFile(
                       helpers.menuItemDir(item), 'utf8'
                     )
-                      .then(menuItem => {
-                        const menuItemObject = helpers.parseJsonToObject(
-                          menuItem
-                        )
+                      .then(m => {
+                        const menuItem = helpers.parseJsonToObject(m)
 
                         // Get cart, so we can
                         // update it with menu item
                         helpers.readDir(
                           helpers.userDir()
                         )
-                          .then(fileNames => {
-                            fileNames.forEach(fileName => {
-                              const email = fileName.slice(0, -5)
+                          .then(zs => {
+                            zs.forEach(z => {
+                              const email = z.slice(0, -5)
                               // This is same as
-                              // if (email === tokenObject.email) {...}
-                              email === tokenObject.email &&
+                              // if (email === token.email) {...}
+                              email === token.email &&
                                 // Update cart
                                 helpers.get(helpers.userDir)(email)
-                                  .then(user => {
-                                    const userObject =
-                                      helpers.parseJsonToObject(user)
+                                  .then(u => {
+                                    const user =
+                                      helpers.parseJsonToObject(u)
 
-                                    if (!userObject.hasOwnProperty('cart')) {
-                                      userObject.cart = []
+                                    if (!user.hasOwnProperty('cart')) {
+                                      user.cart = []
                                     }
-                                    delete menuItemObject.id
-                                    userObject.cart.push(menuItemObject)
+                                    delete menuItem.id
+                                    user.cart.push(menuItem)
 
                                     // Store updates
                                     helpers.writeUser(
-                                      email, userObject, 'w', callBack, 'cart'
+                                      email, user, 'w', callBack, 'cart'
                                     )
                                   })
                                   .catch(err => callBack(500, {
@@ -222,11 +217,11 @@ cartHandler._cart.delete = callBack =>
 
     // Get token
     helpers.get(helpers.tokenDir)(tokenId)
-      .then(token => {
-        const tokenObject = helpers.parseJsonToObject(token)
+      .then(t => {
+        const token = helpers.parseJsonToObject(t)
 
         // Check whether token is expired
-        if (Date.now() > tokenObject.expires) {
+        if (Date.now() > token.expires) {
           callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
           return
         }
@@ -237,33 +232,29 @@ cartHandler._cart.delete = callBack =>
         // Get user object
         // Read users directory
         helpers.readDir(helpers.userDir())
-          .then(fileNames => {
-            fileNames.forEach(fileName => {
-              const email = fileName.slice(0, -5)
-              email === tokenObject.email &&
+          .then(xs => {
+            xs.forEach(x => {
+              const email = x.slice(0, -5)
+              email === token.email &&
                 // Update cart
                 helpers.get(helpers.userDir)(email)
-                  .then(user => {
-                    const userObject = helpers.parseJsonToObject(user)
+                  .then(u => {
+                    const user = helpers.parseJsonToObject(u)
 
-                    if (!userObject.cart.length ||
-                      !userObject.hasOwnProperty('cart')) {
+                    if (!user.cart.length ||
+                      !user.hasOwnProperty('cart')) {
                       callBack(400, {
                         'Error': 'Shopping cart is empty.'
                       })
                       return
                     }
 
-                    // Beware! Filter matches each item
-                    // with condition and filters,
-                    // Doesn't just delete the first
-                    // item that matches.
                     const isNeeded = item => item.name !== menuItem
-                    userObject.cart = helpers.filter(isNeeded)(userObject.cart)
+                    user.cart = helpers.filter(isNeeded)(user.cart)
 
                     // Store updates
                     helpers.writeUser(
-                      email, userObject, 'w', callBack, 'cart'
+                      email, user, 'w', callBack, 'cart'
                     )
                   })
                   .catch(err => callBack(500, {
