@@ -28,7 +28,7 @@ menuHandler._menu.get = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
+    helpers.get(helpers.tokenDir)(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
 

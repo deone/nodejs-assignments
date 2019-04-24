@@ -28,7 +28,7 @@ cartHandler._cart.get = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
+    helpers.get(helpers.tokenDir)(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
 
@@ -50,7 +50,7 @@ cartHandler._cart.get = callBack =>
               // if (email === tokenObject.email) {...}
               email === tokenObject.email &&
                 // Get cart
-                helpers.getUser(email)
+                helpers.get(helpers.userDir)(email)
                   .then(user => {
                     const userObject = helpers.parseJsonToObject(user)
                     if (!userObject.hasOwnProperty('cart')) {
@@ -99,7 +99,7 @@ cartHandler._cart.put = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
+    helpers.get(helpers.tokenDir)(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
 
@@ -154,7 +154,7 @@ cartHandler._cart.put = callBack =>
                               // if (email === tokenObject.email) {...}
                               email === tokenObject.email &&
                                 // Update cart
-                                helpers.getUser(email)
+                                helpers.get(helpers.userDir)(email)
                                   .then(user => {
                                     const userObject =
                                       helpers.parseJsonToObject(user)
@@ -221,7 +221,7 @@ cartHandler._cart.delete = callBack =>
     }
 
     // Get token
-    helpers.getToken(tokenId)
+    helpers.get(helpers.tokenDir)(tokenId)
       .then(token => {
         const tokenObject = helpers.parseJsonToObject(token)
 
@@ -242,7 +242,7 @@ cartHandler._cart.delete = callBack =>
               const email = fileName.slice(0, -5)
               email === tokenObject.email &&
                 // Update cart
-                helpers.getUser(email)
+                helpers.get(helpers.userDir)(email)
                   .then(user => {
                     const userObject = helpers.parseJsonToObject(user)
 

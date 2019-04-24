@@ -139,7 +139,7 @@ userHandler._user.put = callBack =>
       return
     }
 
-    helpers.getUser(email)
+    helpers.get(helpers.userDir)(email)
       .then(data => {
         const input = { firstName, lastName, streetAddress, password }
 
@@ -182,7 +182,7 @@ userHandler._user.delete = callBack =>
       return
     }
 
-    helpers.deleteUser(email)
+    helpers.delete(helpers.userDir)(email)
       .then(() => callBack(200, {
         'Success': 'User deleted successfully.'
       }))
