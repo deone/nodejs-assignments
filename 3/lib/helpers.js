@@ -55,6 +55,10 @@ helpers.getItem = dir =>
 helpers.fileWriter = data =>
   fd => helpers.writeFile(fd, JSON.stringify(data))
 
+helpers.pipe = (...functions) => data =>
+  functions.reduce((value, func) => func(value), data)
+
+
 // Validate email properly, maybe with regex
 const validator = x =>
   typeof x === 'string' && x.trim().length > 0 ? x.trim() : false

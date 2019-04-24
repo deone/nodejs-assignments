@@ -154,8 +154,10 @@ userHandler._user.put = callBack =>
           return obj 
         }
 
-        const values = helpers.filter(isTrue)(Object.entries(input))
-        const filteredInput = reduce(objectify)(values)
+        const filteredInput = helpers.pipe(
+          helpers.filter(isTrue),
+          reduce(objectify)
+        )(Object.entries(input))
 
         // Update fields if necessary
         Object.assign(user, filteredInput)
