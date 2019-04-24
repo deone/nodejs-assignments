@@ -38,8 +38,8 @@ helpers.orderDir = helpers.baseDirFunc('orders')
 helpers.tokenDir = helpers.baseDirFunc('tokens')
 helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 
-
 helpers.map = f => xs => xs.map(f)
+helpers.reduce = f => xs => xs.reduce(f, 0)
 
 // Validate email properly, maybe with regex
 const validator = x =>

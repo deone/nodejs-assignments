@@ -34,26 +34,19 @@ const updateUser = (user, orderId, totalPrice) => {
 }
 
 const placeOrder = items => {
-  // - Set ID to random string
+  // Set ID to random string
   const id = helpers.createRandomString(20)
 
-  // - Set paid and mailSent properties
-  // on order object to false
+  // Set paid and mailSent properties
+  // on order object
   const paid = false
   const mailSent = false
 
-  // - Get price for each item in
-  // cart and create order item objects
+  // compute total price
+  const addPrices = (a, b) => (a + b.price)
+  const totalPrice = helpers.reduce(addPrices)(items)
 
-  // - Set items property on order
-  // object to list of order item objects
-  const totalPrice = items.reduce(
-    (a, b) => a + b.price, 0
-  )
-
-  // - Set totalPrice property on
-  // order object to total price of items
-  // - Create order object
+  // return order object
   return {
     id, paid, mailSent, totalPrice, items
   }
