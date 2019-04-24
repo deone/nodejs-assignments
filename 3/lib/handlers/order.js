@@ -28,7 +28,7 @@ const updateUser = (user, orderId, totalPrice) => {
     user.orders = []
   }
 
-  user.orders.push({'id': orderId, 'value': totalPrice})
+  user.orders = [user.orders, ...[{'id': orderId, 'value': totalPrice}]]
 
   return user
 }
@@ -43,8 +43,9 @@ const placeOrder = items => {
   const mailSent = false
 
   // compute total price
+  const reduce = f => xs => xs.reduce(f, 0)
   const addPrices = (a, b) => (a + b.price)
-  const totalPrice = helpers.reduce(addPrices)(items)
+  const totalPrice = reduce(addPrices)(items)
 
   // return order object
   return {
