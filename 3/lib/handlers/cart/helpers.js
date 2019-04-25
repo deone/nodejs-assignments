@@ -23,7 +23,7 @@ helpers.getOrCreateCart = user =>
     if (!user.hasOwnProperty('cart')) {
       helpers.createCart(user)(callBack)
     }
-    callBack(200, user.cart)
+    callBack ? callBack(200, user.cart) : user.cart
   }
 
 
