@@ -41,6 +41,7 @@ helpers.menuItemDir = helpers.baseDirFunc('menuitems')
 helpers.filter = f => xs => xs.filter(f)
 helpers.map = f => xs => xs.map(f)
 helpers.find = f => xs => xs.find(f)
+helpers.forEach = f => xs => xs.forEach(f)
 
 helpers.delete = dir => x => helpers.deleteFile(dir(x))
 helpers.get = dir => x => helpers.readFile(dir(x), 'utf8')

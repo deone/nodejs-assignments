@@ -3,6 +3,35 @@
 // Dependencies
 const helpers = require('../helpers')
 
+const getCart = callBack =>
+  x => {
+    const user = helpers.parseJsonToObject(x)
+    if (!user.hasOwnProperty('cart')) {
+      user.cart = []
+      // Store updates
+      helpers.writeUser(
+        user.email, user, 'w', callBack, 'cart'
+      )
+    } else {
+      callBack(200, user.cart)
+    }
+  }
+
+const getUserCart = callBack =>
+  token =>
+    x => {
+      const email = x.slice(0, -5)
+      // This is same as
+      // if (email === token.email) {...}
+      email === token.email &&
+        // Get cart
+        helpers.get(helpers.userDir)(email)
+          .then(u => getCart(callBack)(u))
+          .catch(err => callBack(500, {
+            'Error': err.toString()
+          }))
+    }
+
 const cartHandler = {}
 
 cartHandler.cart = callBack =>
@@ -38,36 +67,12 @@ cartHandler._cart.get = callBack =>
           return
         }
 
-        // Token is valid
-        // Get user object
-        // Read users directory
         helpers.readDir(helpers.userDir())
-          .then(xs => {
-            xs.forEach(x => {
-              const email = x.slice(0, -5)
-
-              // This is same as
-              // if (email === token.email) {...}
-              email === token.email &&
-                // Get cart
-                helpers.get(helpers.userDir)(email)
-                  .then(u => {
-                    const user = helpers.parseJsonToObject(u)
-                    if (!user.hasOwnProperty('cart')) {
-                      user.cart = []
-                      // Store updates
-                      helpers.writeUser(
-                        email, user, 'w', callBack, 'cart'
-                      )
-                    } else {
-                      callBack(200, user.cart)
-                    }
-                  })
-                  .catch(err => callBack(500, {
-                    'Error': err.toString()
-                  }))
-            })
-          })
+          .then(
+            helpers.forEach(user =>
+              getUserCart(callBack)(token)(user)
+            )
+          )
           .catch(err =>
             callBack(500, {'Error': err.toString()})
           )
