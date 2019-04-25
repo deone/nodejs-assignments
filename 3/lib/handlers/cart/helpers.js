@@ -3,28 +3,22 @@ const utils = require('../../utils')
 
 const helpers = {}
 
-helpers.createCart = user =>
-  callBack => {
-    user.cart = []
-    // Write updated object
-    const write = utils.fileWriter(user)
-    utils.openFile(
-      utils.userDir(user.email),
-      'w'
-    )
-      .then(write)
-      .catch(err =>
-        callBack(500, {'Error': err.toString()})
-      )
-  }
+helpers.writeCart = user => {
+  // Write updated object
+  const write = utils.fileWriter(user)
+  utils.openFile(
+    utils.userDir(user.email),
+    'w'
+  ).then(write)
+}
 
-helpers.getOrCreateCart = user =>
-  callBack => {
-    if (!user.hasOwnProperty('cart')) {
-      helpers.createCart(user)(callBack)
-    }
-    callBack ? callBack(200, user.cart) : user.cart
+helpers.getOrCreateCart = user => {
+  if (!user.hasOwnProperty('cart')) {
+    user.cart = []
+    helpers.writeCart(user)
   }
+  return user.cart
+}
 
 
 module.exports = helpers
