@@ -1,43 +1,18 @@
 /* Cart handler */
 
 // Dependencies
-const helpers = require('../helpers')
+const utils = require('../../helpers')
 
-const getCart = callBack =>
-  x => {
-    const user = helpers.parseJsonToObject(x)
-    if (!user.hasOwnProperty('cart')) {
-      user.cart = []
-      // Store updates
-      helpers.writeUser(
-        user.email, user, 'w', callBack, 'cart'
-      )
-    } else {
-      callBack(200, user.cart)
-    }
-  }
+const path = require('path')
+const helpers = require(path.resolve(__dirname, "./helpers"))
 
-const getUserCart = callBack =>
-  token =>
-    x => {
-      const email = x.slice(0, -5)
-      // This is same as
-      // if (email === token.email) {...}
-      email === token.email &&
-        // Get cart
-        helpers.get(helpers.userDir)(email)
-          .then(u => getCart(callBack)(u))
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
-    }
 
 const cartHandler = {}
 
 cartHandler.cart = callBack =>
   data => {
     const dispatch =
-      helpers.requestDispatcher(callBack)(cartHandler._cart)
+      utils.requestDispatcher(callBack)(cartHandler._cart)
     dispatch(['get', 'put', 'delete'])(data)
   }
 
@@ -49,28 +24,28 @@ cartHandler._cart = {}
 cartHandler._cart.get = callBack =>
   data => {
     // Get tokenId from header
-    const [tokenId] = helpers.validate([data.headers.token])
+    const [tokenId] = utils.validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
-        helpers.readDir(helpers.userDir())
+        utils.readDir(utils.userDir())
           .then(
-            helpers.forEach(user =>
-              getUserCart(callBack)(token)(user)
+            utils.forEach(user =>
+              helpers.getUserCart(callBack)(token)(user)
             )
           )
           .catch(err =>
@@ -88,38 +63,38 @@ cartHandler._cart.get = callBack =>
 cartHandler._cart.put = callBack =>
   data => {
     // Get tokenID from header
-    const [tokenId, item] = helpers.validate([
+    const [tokenId, item] = utils.validate([
       data.headers.token,
       data.payload.item
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!item) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
         // Token is valid
         // Get menu item and validate
         // Check whether menu item is on menu
-        helpers.readDir(helpers.menuItemDir())
+        utils.readDir(utils.menuItemDir())
           .then(xs => {
-            const menu = helpers.map(x => x.slice(0, -5))(xs)
+            const menu = utils.map(x => x.slice(0, -5))(xs)
 
             if (!menu.includes(item)) {
               // Item is not on menu
@@ -130,22 +105,22 @@ cartHandler._cart.put = callBack =>
             }
 
             // Item is on menu, get item
-            helpers.readDir(helpers.menuItemDir())
+            utils.readDir(utils.menuItemDir())
               .then(ys => {
                 ys.forEach(y => {
                   // This is same as
                   // if (item === fileName.slice(0, -5)) {...}
                   item === y.slice(0, -5) &&
-                    helpers.readFile(
-                      helpers.menuItemDir(item), 'utf8'
+                    utils.readFile(
+                      utils.menuItemDir(item), 'utf8'
                     )
                       .then(m => {
-                        const menuItem = helpers.parseJsonToObject(m)
+                        const menuItem = utils.parseJsonToObject(m)
 
                         // Get cart, so we can
                         // update it with menu item
-                        helpers.readDir(
-                          helpers.userDir()
+                        utils.readDir(
+                          utils.userDir()
                         )
                           .then(zs => {
                             zs.forEach(z => {
@@ -154,10 +129,10 @@ cartHandler._cart.put = callBack =>
                               // if (email === token.email) {...}
                               email === token.email &&
                                 // Update cart
-                                helpers.get(helpers.userDir)(email)
+                                utils.get(utils.userDir)(email)
                                   .then(u => {
                                     const user =
-                                      helpers.parseJsonToObject(u)
+                                      utils.parseJsonToObject(u)
 
                                     if (!user.hasOwnProperty('cart')) {
                                       user.cart = []
@@ -166,7 +141,7 @@ cartHandler._cart.put = callBack =>
                                     user.cart.push(menuItem)
 
                                     // Store updates
-                                    helpers.writeUser(
+                                    utils.writeUser(
                                       email, user, 'w', callBack, 'cart'
                                     )
                                   })
@@ -205,29 +180,29 @@ cartHandler._cart.put = callBack =>
 cartHandler._cart.delete = callBack =>
   data => {
     // Get tokenID from header  
-    const [tokenId, menuItem] = helpers.validate([
+    const [tokenId, menuItem] = utils.validate([
       data.headers.token,
       data.queryStringObject.item
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!menuItem) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
@@ -236,15 +211,15 @@ cartHandler._cart.delete = callBack =>
 
         // Get user object
         // Read users directory
-        helpers.readDir(helpers.userDir())
+        utils.readDir(utils.userDir())
           .then(xs => {
             xs.forEach(x => {
               const email = x.slice(0, -5)
               email === token.email &&
                 // Update cart
-                helpers.get(helpers.userDir)(email)
+                utils.get(utils.userDir)(email)
                   .then(u => {
-                    const user = helpers.parseJsonToObject(u)
+                    const user = utils.parseJsonToObject(u)
 
                     if (!user.cart.length ||
                       !user.hasOwnProperty('cart')) {
@@ -255,10 +230,10 @@ cartHandler._cart.delete = callBack =>
                     }
 
                     const isNeeded = item => item.name !== menuItem
-                    user.cart = helpers.filter(isNeeded)(user.cart)
+                    user.cart = utils.filter(isNeeded)(user.cart)
 
                     // Store updates
-                    helpers.writeUser(
+                    utils.writeUser(
                       email, user, 'w', callBack, 'cart'
                     )
                   })
