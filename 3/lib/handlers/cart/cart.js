@@ -43,11 +43,21 @@ cartHandler._cart.get = callBack =>
         utils.readDir(utils.userDir())
           .then(
             utils.forEach(
+              // Array being looped over isn't
+              // declared because it is
+              // passed into forEach by then
+              // x represents a user file
               x => {
                 const email = x.slice(0, -5)
                 if (email === token.email) {
+                  // Attempt to read user object from
+                  // file and return promise, user
                   const user = utils.get(utils.userDir)(email)
-                  user.then(x => helpers.getOrCreateCart(x)(callBack))
+                  user.then(
+                    x => helpers.getOrCreateCart(
+                      utils.parseJsonToObject(x)
+                    )(callBack)
+                  )
                 }
               }
             )
@@ -108,6 +118,9 @@ cartHandler._cart.put = callBack =>
             // Item is on menu, get item
             utils.readDir(utils.menuItemDir())
               .then(ys => {
+
+
+
                 ys.forEach(y => {
                   // This is same as
                   // if (item === fileName.slice(0, -5)) {...}
@@ -146,27 +159,16 @@ cartHandler._cart.put = callBack =>
                                       email, user, 'w', callBack, 'cart'
                                     )
                                   })
-                                  .catch(err => callBack(500, {
-                                    'Error': err.toString()
-                                  }))
                             })
                           })
-                          .catch(err => callBack(500, {
-                            'Error': err.toString()
-                          }))
                       })
-                      .catch(err => callBack(500, {
-                        'Error': err.toString()
-                      }))
                 })
+
+
+
+
               })
-              .catch(err => callBack(500, {
-                'Error': err.toString()
-              }))
           })
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
       })
       .catch(err =>
         callBack(500, {

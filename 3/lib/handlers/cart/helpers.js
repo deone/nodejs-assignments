@@ -3,9 +3,8 @@ const utils = require('../../utils')
 
 const helpers = {}
 
-helpers.getOrCreateCart = u =>
+helpers.getOrCreateCart = user =>
   callBack => {
-    const user = utils.parseJsonToObject(u)
     if (!user.hasOwnProperty('cart')) {
       user.cart = []
       // Write updated object
