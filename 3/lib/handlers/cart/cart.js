@@ -42,8 +42,14 @@ cartHandler._cart.get = callBack =>
 
         utils.readDir(utils.userDir())
           .then(
-            utils.forEach(user =>
-              helpers.getUserCart(callBack)(token)(user)
+            utils.forEach(
+              x => {
+                const email = x.slice(0, -5)
+                if (email === token.email) {
+                  const u = utils.get(utils.userDir)(email)
+                  u.then(x => helpers.getOrCreateCart(x)(callBack))
+                }
+              }
             )
           )
           .catch(err =>
