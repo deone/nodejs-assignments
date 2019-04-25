@@ -1,15 +1,13 @@
 /* HTML handlers */
 
-const path = require('path')
-
 // Dependencies
-const helpers = require('../helpers')
+const utils = require('../utils')
 
 const handlers = {}
 
 handlers.index = (data, callBack) =>
   data.method === 'get'
-    ? helpers.getTemplate('index', data, callBack)
+    ? utils.getTemplate('index', data, callBack)
         .then(string => {
           callBack(200, string, 'html')
         })

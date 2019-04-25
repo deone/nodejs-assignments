@@ -7,23 +7,23 @@ const crypto = require('crypto')
 
 const config = require('./config')
 
-const helpers = {}
+const utils = {}
 
-helpers.errors = {}
-helpers.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
-helpers.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
-helpers.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
+utils.errors = {}
+utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
+utils.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
+utils.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
 
-helpers.baseDir = path.join(__dirname, '/../.data/')
-helpers.templateDir = path.join(__dirname, '/../templates/')
+utils.baseDir = path.join(__dirname, '/../.data/')
+utils.templateDir = path.join(__dirname, '/../templates/')
 
-helpers.openFile = promisify(fs.open)
-helpers.readFile = promisify(fs.readFile)
-helpers.writeFile = promisify(fs.writeFile)
-helpers.deleteFile = promisify(fs.unlink)
-helpers.readDir = promisify(fs.readdir)
+utils.openFile = promisify(fs.open)
+utils.readFile = promisify(fs.readFile)
+utils.writeFile = promisify(fs.writeFile)
+utils.deleteFile = promisify(fs.unlink)
+utils.readDir = promisify(fs.readdir)
 
-helpers.filePath = baseDir =>
+utils.filePath = baseDir =>
   dir =>
     fileName =>
       !fileName
@@ -32,42 +32,42 @@ helpers.filePath = baseDir =>
             baseDir, dir, fileName.concat('.', 'json')
           )
 
-helpers.baseDirFunc = helpers.filePath(helpers.baseDir)
-helpers.userDir = helpers.baseDirFunc('users')
-helpers.orderDir = helpers.baseDirFunc('orders')
-helpers.tokenDir = helpers.baseDirFunc('tokens')
-helpers.menuItemDir = helpers.baseDirFunc('menuitems')
+utils.baseDirFunc = utils.filePath(utils.baseDir)
+utils.userDir = utils.baseDirFunc('users')
+utils.orderDir = utils.baseDirFunc('orders')
+utils.tokenDir = utils.baseDirFunc('tokens')
+utils.menuItemDir = utils.baseDirFunc('menuitems')
 
-helpers.filter = f => xs => xs.filter(f)
-helpers.map = f => xs => xs.map(f)
-helpers.find = f => xs => xs.find(f)
-helpers.forEach = f => xs => xs.forEach(f)
+utils.filter = f => xs => xs.filter(f)
+utils.map = f => xs => xs.map(f)
+utils.find = f => xs => xs.find(f)
+utils.forEach = f => xs => xs.forEach(f)
 
-helpers.delete = dir => x => helpers.deleteFile(dir(x))
-helpers.get = dir => x => helpers.readFile(dir(x), 'utf8')
-helpers.getItem = dir =>
+utils.delete = dir => x => utils.deleteFile(dir(x))
+utils.get = dir => x => utils.readFile(dir(x), 'utf8')
+utils.getItem = dir =>
   x => {
     // Remove '.json' from end of string
     const item = x.slice(0, -5)
-    return helpers.get(dir)(item)
+    return utils.get(dir)(item)
   }
 
-helpers.compose = (...functions) => data =>
+utils.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)
 
-// Basically a curry-wrapped helpers.writeFile
-helpers.fileWriter = data =>
-  fd => helpers.writeFile(fd, JSON.stringify(data))
+// Basically a curry-wrapped utils.writeFile
+utils.fileWriter = data =>
+  fd => utils.writeFile(fd, JSON.stringify(data))
 
 
 // Validate email properly, maybe with regex
 const validator = x =>
   typeof x === 'string' && x.trim().length > 0 ? x.trim() : false
 
-helpers.validate = helpers.map(validator)
+utils.validate = utils.map(validator)
 
 // Create a SHA256 hash
-helpers.hash = str =>
+utils.hash = str =>
   typeof str == 'string' && str.length > 0
     ? crypto.createHmac(
         'sha256',
@@ -76,7 +76,7 @@ helpers.hash = str =>
     : false
 
 // Parse a JSON string to an object in all cases, without throwing
-helpers.parseJsonToObject = str => {
+utils.parseJsonToObject = str => {
   try {
     return JSON.parse(str)
   } catch(e) {
@@ -93,12 +93,12 @@ const createString = strLength =>
     ).join('')
 
 // Create a string of random alphanumeric characters, of a given length
-helpers.createRandomString = strLength =>
+utils.createRandomString = strLength =>
   createString
     (strLength)
     ('abcdefghijklmnopqrstuvwxyz0123456789')
 
-helpers.requestDispatcher = callBack =>
+utils.requestDispatcher = callBack =>
   handlersContainer =>
     acceptableMethods =>
       data =>
@@ -106,18 +106,18 @@ helpers.requestDispatcher = callBack =>
           ? handlersContainer[data.method](callBack)(data)
           : callBack(405)
 
-helpers.createToken = callBack =>
+utils.createToken = callBack =>
   email =>
     tokenId => {
       // Set an expiration date 1 hour in the future.
       const expires = Date.now() + 1000 * 60 * 60
       const tokenObject = { email, tokenId, expires }
 
-      const write = helpers.fileWriter(tokenObject)
+      const write = utils.fileWriter(tokenObject)
 
       // Store the token
-      helpers.openFile(
-        helpers.tokenDir(tokenId),
+      utils.openFile(
+        utils.tokenDir(tokenId),
         'wx'
       )
         .then(write)
@@ -127,16 +127,16 @@ helpers.createToken = callBack =>
 
 
 // Curry these
-helpers.writeUser = (
+utils.writeUser = (
   email,
   object,
   fileOpenMode,
   callBack,
   caller = 'users'
 ) => {
-  const write = helpers.fileWriter(object)
-  helpers.openFile(
-    helpers.userDir(email),
+  const write = utils.fileWriter(object)
+  utils.openFile(
+    utils.userDir(email),
     fileOpenMode
   )
     .then(write)
@@ -160,7 +160,7 @@ helpers.writeUser = (
 
 }
 
-helpers.sendRequest = (
+utils.sendRequest = (
   payload,
   hostName,
   path,
@@ -196,7 +196,7 @@ helpers.sendRequest = (
   req.end()
 }
 
-helpers.getTemplate = (templateName, data, callBack) => {
+utils.getTemplate = (templateName, data, callBack) => {
   templateName = typeof templateName === 'string' && templateName.length > 0
     ? templateName
     : false
@@ -206,13 +206,13 @@ helpers.getTemplate = (templateName, data, callBack) => {
     : {}
 
   return templateName
-    ? helpers.readFile(path.join(
-        helpers.templateDir, `${templateName}.html`
+    ? utils.readFile(path.join(
+        utils.templateDir, `${templateName}.html`
       ), 'utf8')
     : callBack('A valid template name was not specified.');
 }
 
-/* helpers.getTemplate = function(templateName,data,callback){
+/* utils.getTemplate = function(templateName,data,callback){
   templateName = typeof(templateName) == 'string' && templateName.length > 0 ? templateName : false;
   data = typeof(data) == 'object' && data !== null ? data : {};
   if(templateName){
@@ -220,7 +220,7 @@ helpers.getTemplate = (templateName, data, callBack) => {
     fs.readFile(templatesDir+templateName+'.html', 'utf8', function(err,str){
       if(!err && str && str.length > 0){
         // Do interpolation on the string
-        var finalString = helpers.interpolate(str,data);
+        var finalString = utils.interpolate(str,data);
         callback(false,finalString);
       } else {
         callback('No template could be found');
@@ -232,4 +232,4 @@ helpers.getTemplate = (templateName, data, callBack) => {
 }; */
 
 
-module.exports = helpers
+module.exports = utils
