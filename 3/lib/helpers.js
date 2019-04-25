@@ -51,12 +51,12 @@ helpers.getItem = dir =>
     return helpers.get(dir)(item)
   }
 
+helpers.compose = (...functions) => data =>
+  functions.reduceRight((value, func) => func(value), data)
+
 // Basically a curry-wrapped helpers.writeFile
 helpers.fileWriter = data =>
   fd => helpers.writeFile(fd, JSON.stringify(data))
-
-helpers.pipe = (...functions) => data =>
-  functions.reduce((value, func) => func(value), data)
 
 
 // Validate email properly, maybe with regex

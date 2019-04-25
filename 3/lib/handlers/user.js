@@ -144,23 +144,34 @@ userHandler._user.put = callBack =>
         const user = helpers.parseJsonToObject(u)
         const input = { firstName, lastName, streetAddress, password }
 
-        // Filter fields that
-        // don't have values and
-        // shouldn't be updated
-        const isTrue = item => item[1] !== false
+        // Update input with hashed password
+        if (input.password !== false) {
+          input.hashedPassword = helpers.hash(input.password)
+        }
+
+        const notPasswordField = item => item[0] !== 'password'
+        const notFalse = item => item[1] !== false
+
         const reduce = f => x => x.reduce(f, {})
         const objectify = (obj, item) => {
           obj[item[0]] = item[1]
-          return obj 
+          return obj
         }
 
-        const filteredInput = helpers.pipe(
-          helpers.filter(isTrue),
-          reduce(objectify)
-        )(Object.entries(input))
+        // Remove password field
+        // Remove fields that don't have values
+        // Make object from resulting array
+        const getFieldsToUpdate = helpers.compose(
+          reduce(objectify),
+          helpers.compose(
+            helpers.filter(notFalse),
+            helpers.filter(notPasswordField)
+          )
+        )
+        const fields = getFieldsToUpdate(Object.entries(input))
 
         // Update fields if necessary
-        Object.assign(user, filteredInput)
+        Object.assign(user, fields)
 
         // Store updates
         helpers.writeUser(email, user, 'w', callBack)
