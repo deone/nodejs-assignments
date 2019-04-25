@@ -2,9 +2,7 @@
 
 // Dependencies
 const utils = require('../../helpers')
-
-const path = require('path')
-const helpers = require(path.resolve(__dirname, "./helpers"))
+const helpers = require('./helpers')
 
 
 const cartHandler = {}
