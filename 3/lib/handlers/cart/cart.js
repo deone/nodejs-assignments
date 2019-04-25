@@ -1,7 +1,7 @@
 /* Cart handler */
 
 // Dependencies
-const utils = require('../../helpers')
+const utils = require('../../utils')
 const helpers = require('./helpers')
 
 

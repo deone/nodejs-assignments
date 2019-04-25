@@ -1,7 +1,7 @@
 /* Order handler */
 
 // Dependencies
-const helpers = require('../helpers')
+const utils = require('../utils')
 
 const updateUser = user =>
   order => {
@@ -22,7 +22,7 @@ const updateUser = user =>
 
 const placeOrder = items => {
   // Set ID to random string
-  const id = helpers.createRandomString(20)
+  const id = utils.createRandomString(20)
 
   // Set paid and mailSent properties
   // on order object
@@ -45,7 +45,7 @@ const orderHandler = {}
 orderHandler.order = callBack =>
   data => {
     const dispatch =
-      helpers.requestDispatcher(callBack)(orderHandler._order)
+      utils.requestDispatcher(callBack)(orderHandler._order)
     dispatch(['post', 'get'])(data)
   }
 
@@ -57,36 +57,36 @@ orderHandler._order = {}
 orderHandler._order.post = callBack =>
   data => {
     // Get tokenId from header
-    const [tokenId] = helpers.validate([data.headers.token])
+    const [tokenId] = utils.validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
         // Token is valid
         // Get user object
         // Read users directory
-        helpers.readDir(helpers.userDir())
+        utils.readDir(utils.userDir())
           .then(xs => {
             xs.forEach(x => {
               const email = x.slice(0, -5)
               email === token.email &&
                 // Get cart
-                helpers.get(helpers.userDir)(email)
+                utils.get(utils.userDir)(email)
                   .then(u => {
-                    const user = helpers.parseJsonToObject(u)
+                    const user = utils.parseJsonToObject(u)
 
                     if (!user.hasOwnProperty('cart')) {
                       callBack(400, {
@@ -108,9 +108,9 @@ orderHandler._order.post = callBack =>
                       placeOrder(cart), { email })
 
                     // Write order object to file
-                    const write = helpers.fileWriter(order)
-                    helpers.openFile(
-                      helpers.orderDir(order.id), 'wx'
+                    const write = utils.fileWriter(order)
+                    utils.openFile(
+                      utils.orderDir(order.id), 'wx'
                     )
                       .then(write)
                       .catch(err => callBack(500, {
@@ -125,7 +125,7 @@ orderHandler._order.post = callBack =>
                     const updatedUser = updateUser(user)(o)
 
                     // Write updated user to file
-                    helpers.writeUser(
+                    utils.writeUser(
                       email, updatedUser, 'w', callBack, 'order')
                   })
                   .catch(err => callBack(500, {
@@ -147,42 +147,42 @@ orderHandler._order.post = callBack =>
 // Optional data: none
 orderHandler._order.get = callBack =>
   data => {
-    const [tokenId, orderId] = helpers.validate([
+    const [tokenId, orderId] = utils.validate([
       data.headers.token,
       data.queryStringObject.id
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!orderId) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(x => {
-        const token = helpers.parseJsonToObject(x)
+        const token = utils.parseJsonToObject(x)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
         // Token is valid
         // Get user object
         // Read users directory
-        helpers.readDir(helpers.userDir())
+        utils.readDir(utils.userDir())
           .then(ys => {
             ys.forEach(y => {
               const email = y.slice(0, -5)
               email === token.email &&
                 // Get order
-                helpers.readDir(helpers.orderDir())
+                utils.readDir(utils.orderDir())
                   .then(zs => {
                     if (!zs.length) {
                       // No file in orders directory
@@ -192,13 +192,13 @@ orderHandler._order.get = callBack =>
 
                     zs.forEach(z => {
                       orderId === z.slice(0, -5) &&
-                        helpers.readFile(
-                          helpers.orderDir(orderId),
+                        utils.readFile(
+                          utils.orderDir(orderId),
                           'utf8'
                         )
                           .then(o => {
                             const order =
-                              helpers.parseJsonToObject(o)
+                              utils.parseJsonToObject(o)
                             callBack(200, order)
                           })
                           .catch(err => callBack(500, {

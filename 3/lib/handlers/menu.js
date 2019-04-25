@@ -1,14 +1,14 @@
 /* Menu handler */
 
 // Dependencies
-const helpers = require('../helpers')
+const utils = require('../utils')
 
 const menuHandler = {}
 
 menuHandler.menu = callBack =>
   data => {
     const dispatch =
-      helpers.requestDispatcher(callBack)(menuHandler._menu)
+      utils.requestDispatcher(callBack)(menuHandler._menu)
     dispatch(['get'])(data)
   }
 
@@ -20,27 +20,27 @@ menuHandler._menu = {}
 menuHandler._menu.get = callBack =>
   data => {
     // Get tokenId from header
-    const [tokenId] = helpers.validate([data.headers.token])
+    const [tokenId] = utils.validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     // Get token
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
         // Token is valid
         // Read menuitems directory
-        helpers.readDir(helpers.menuItemDir())
+        utils.readDir(utils.menuItemDir())
           .then(xs => {
             if (!xs.length) {
               // There are no menu items
@@ -50,12 +50,12 @@ menuHandler._menu.get = callBack =>
               return
             }
 
-            const promises = helpers.map(
-              helpers.getItem(helpers.menuItemDir)
+            const promises = utils.map(
+              utils.getItem(utils.menuItemDir)
             )(xs)
 
             Promise.all(promises).then(ms => {
-              callBack(200, helpers.map(helpers.parseJsonToObject)(ms))
+              callBack(200, utils.map(utils.parseJsonToObject)(ms))
             })
 
           })

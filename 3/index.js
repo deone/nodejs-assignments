@@ -3,7 +3,7 @@ const http = require('http')
 const { StringDecoder } = require('string_decoder')
 
 const config = require('./lib/config')
-const helpers = require('./lib/helpers')
+const utils = require('./lib/utils')
 
 // Handlers
 const authHandler = require('./lib/handlers/auth')
@@ -106,7 +106,7 @@ const server = http.createServer((req, res) => {
       'queryStringObject' : queryStringObject,
       'method' : method,
       'headers' : headers,
-      'payload' : helpers.parseJsonToObject(buffer)
+      'payload' : utils.parseJsonToObject(buffer)
     }
 
     // handle request

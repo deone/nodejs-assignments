@@ -1,5 +1,5 @@
 /* Cart helpers */
-const utils = require('../../helpers')
+const utils = require('../../utils')
 
 const helpers = {}
 

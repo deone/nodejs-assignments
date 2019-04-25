@@ -3,7 +3,7 @@
 // Dependencies
 const queryString = require('querystring')
 
-const helpers = require('../helpers')
+const utils = require('../utils')
 const config = require('../config')
 
 const checkoutHandler = {}
@@ -11,7 +11,7 @@ const checkoutHandler = {}
 checkoutHandler.checkout = callBack =>
   data => {
     const dispatch =
-      helpers.requestDispatcher(callBack)(checkoutHandler._checkout)
+      utils.requestDispatcher(callBack)(checkoutHandler._checkout)
     dispatch(['post'])(data)
   }
 
@@ -29,14 +29,14 @@ checkoutHandler._checkout = {}
 */
 checkoutHandler._checkout.post = callBack =>
   data => {
-    const [tokenId, orderId, stripeToken] = helpers.validate([
+    const [tokenId, orderId, stripeToken] = utils.validate([
       data.headers.token,
       data.payload.orderId,
       data.payload.stripeToken
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': helpers.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
       return
     }
 
@@ -45,18 +45,18 @@ checkoutHandler._checkout.post = callBack =>
       return
     }
 
-    helpers.get(helpers.tokenDir)(tokenId)
+    utils.get(utils.tokenDir)(tokenId)
       .then(t => {
-        const token = helpers.parseJsonToObject(t)
+        const token = utils.parseJsonToObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': helpers.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
           return
         }
 
         // Get user email
-        helpers.readDir(helpers.userDir())
+        utils.readDir(utils.userDir())
           .then(xs => {
             xs.forEach(x => {
               const email = x.slice(0, -5)
@@ -64,12 +64,12 @@ checkoutHandler._checkout.post = callBack =>
               // if (email === token.email) {...}
               email === token.email &&
                 // Get order
-                helpers.readFile(
-                  helpers.orderDir(orderId),
+                utils.readFile(
+                  utils.orderDir(orderId),
                   'utf8'
                 )
                   .then(o => {
-                    const order = helpers.parseJsonToObject(o)
+                    const order = utils.parseJsonToObject(o)
   
                     // Make payment
                     const stripePayload = queryString.stringify({
@@ -79,7 +79,7 @@ checkoutHandler._checkout.post = callBack =>
                       source: stripeToken
                     })
 
-                    helpers.sendRequest(
+                    utils.sendRequest(
                       stripePayload,
                       'api.stripe.com',
                       '/v1/charges',
@@ -100,7 +100,7 @@ checkoutHandler._checkout.post = callBack =>
                         })
 
                         // Send email if payment is successful
-                        helpers.sendRequest(
+                        utils.sendRequest(
                           mailgunPayload,
                           'api.mailgun.net',
                           `/v3/${config.mailgunDomain}/messages`,
@@ -117,8 +117,8 @@ checkoutHandler._checkout.post = callBack =>
                             order.mailSent = true
 
                             // Update order
-                            const write = helpers.fileWriter(order)
-                            helpers.openFile(helpers.orderDir(orderId), 'w')
+                            const write = utils.fileWriter(order)
+                            utils.openFile(utils.orderDir(orderId), 'w')
                               .then(write)
                               .then(
                                 callBack(200, {

@@ -1,14 +1,14 @@
 /* User handlers */
 
 // Dependencies
-const helpers = require('../helpers')
+const utils = require('../utils')
 
 const userHandler = {}
 
 userHandler.user = callBack =>
   data => {
     const dispatch =
-      helpers.requestDispatcher(callBack)(userHandler._user)
+      utils.requestDispatcher(callBack)(userHandler._user)
     dispatch(['post', 'get', 'put', 'delete'])(data)
   }
 
@@ -28,7 +28,7 @@ userHandler._user.post = callBack =>
       email,
       password,
       streetAddress
-    ] = helpers.validate([
+    ] = utils.validate([
       data.payload.firstName,
       data.payload.lastName,
       data.payload.email,
@@ -41,8 +41,8 @@ userHandler._user.post = callBack =>
       return
     }
 
-    helpers.readFile(
-      helpers.userDir(email),
+    utils.readFile(
+      utils.userDir(email),
       'utf8'
     )
       .then(u => callBack(400, {
@@ -50,7 +50,7 @@ userHandler._user.post = callBack =>
       }))
       .catch(err => {
         // Hash password
-        const hashedPassword = helpers.hash(password)
+        const hashedPassword = utils.hash(password)
 
         // Create user
         if (hashedPassword) {
@@ -63,7 +63,7 @@ userHandler._user.post = callBack =>
           }
 
           // Store the user
-          helpers.writeUser(email, user, 'wx', callBack)
+          utils.writeUser(email, user, 'wx', callBack)
         }
       })
   }
@@ -76,20 +76,20 @@ userHandler._user.post = callBack =>
 userHandler._user.get = callBack =>
   data => {
     // Validate email - do this properly, maybe with regex
-    const [email] = helpers.validate([data.queryStringObject.email])
+    const [email] = utils.validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Look up user
-    helpers.readFile(
-      helpers.userDir(email),
+    utils.readFile(
+      utils.userDir(email),
       'utf8'
     )
       .then(u => {
-        const user = helpers.parseJsonToObject(u)
+        const user = utils.parseJsonToObject(u)
         delete user.hashedPassword
         callBack(200, user)
       })
@@ -114,7 +114,7 @@ userHandler._user.get = callBack =>
 userHandler._user.put = callBack =>
   data => {
     // Validate required field
-    const [email] = helpers.validate([data.payload.email])
+    const [email] = utils.validate([data.payload.email])
 
     // Validate optional fields, if provided
     const [
@@ -122,7 +122,7 @@ userHandler._user.put = callBack =>
       lastName,
       password,
       streetAddress
-    ] = helpers.validate([
+    ] = utils.validate([
       data.payload.firstName,
       data.payload.lastName,
       data.payload.password,
@@ -130,7 +130,7 @@ userHandler._user.put = callBack =>
     ])
 
     if (!email) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -139,14 +139,14 @@ userHandler._user.put = callBack =>
       return
     }
 
-    helpers.get(helpers.userDir)(email)
+    utils.get(utils.userDir)(email)
       .then(u => {
-        const user = helpers.parseJsonToObject(u)
+        const user = utils.parseJsonToObject(u)
         const input = { firstName, lastName, streetAddress, password }
 
         // Update input with hashed password
         if (input.password !== false) {
-          input.hashedPassword = helpers.hash(input.password)
+          input.hashedPassword = utils.hash(input.password)
         }
 
         const notPasswordField = item => item[0] !== 'password'
@@ -161,11 +161,11 @@ userHandler._user.put = callBack =>
         // Remove password field
         // Remove fields that don't have values
         // Make object from resulting array
-        const getFieldsToUpdate = helpers.compose(
+        const getFieldsToUpdate = utils.compose(
           reduce(objectify),
-          helpers.compose(
-            helpers.filter(notFalse),
-            helpers.filter(notPasswordField)
+          utils.compose(
+            utils.filter(notFalse),
+            utils.filter(notPasswordField)
           )
         )
         const fields = getFieldsToUpdate(Object.entries(input))
@@ -174,7 +174,7 @@ userHandler._user.put = callBack =>
         Object.assign(user, fields)
 
         // Store updates
-        helpers.writeUser(email, user, 'w', callBack)
+        utils.writeUser(email, user, 'w', callBack)
       })
       .catch(err => {
         console.log(err)
@@ -191,14 +191,14 @@ userHandler._user.put = callBack =>
 userHandler._user.delete = callBack =>
   data => {
     // Validate email
-    const [email] = helpers.validate([data.queryStringObject.email])
+    const [email] = utils.validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': helpers.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
 
-    helpers.delete(helpers.userDir)(email)
+    utils.delete(utils.userDir)(email)
       .then(() => callBack(200, {
         'Success': 'User deleted successfully.'
       }))
