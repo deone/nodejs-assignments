@@ -46,14 +46,11 @@ cartHandler._cart.get = callBack =>
               x => {
                 const email = x.slice(0, -5)
                 if (email === token.email) {
-                  const u = utils.get(utils.userDir)(email)
-                  u.then(x => helpers.getOrCreateCart(x)(callBack))
+                  const user = utils.get(utils.userDir)(email)
+                  user.then(x => helpers.getOrCreateCart(x)(callBack))
                 }
               }
             )
-          )
-          .catch(err =>
-            callBack(500, {'Error': err.toString()})
           )
       })
       .catch(err =>
