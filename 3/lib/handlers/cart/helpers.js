@@ -1,15 +1,15 @@
 /* Cart helpers */
-const h = require('../../helpers')
+const utils = require('../../helpers')
 
 const helpers = {}
 
 helpers.getCart = callBack =>
   x => {
-    const user = h.parseJsonToObject(x)
+    const user = utils.parseJsonToObject(x)
     if (!user.hasOwnProperty('cart')) {
       user.cart = []
       // Store updates
-      h.writeUser(
+      utils.writeUser(
         user.email, user, 'w', callBack, 'cart'
       )
     } else {
@@ -25,7 +25,7 @@ helpers.getUserCart = callBack =>
       // if (email === token.email) {...}
       email === token.email &&
         // Get cart
-        h.get(h.userDir)(email)
+        utils.get(utils.userDir)(email)
           .then(u => helpers.getCart(callBack)(u))
           .catch(err => callBack(500, {
             'Error': err.toString()
