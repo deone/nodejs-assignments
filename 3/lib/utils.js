@@ -42,13 +42,15 @@ utils.filter = f => xs => xs.filter(f)
 utils.map = f => xs => xs.map(f)
 utils.find = f => xs => xs.find(f)
 utils.forEach = f => xs => xs.forEach(f)
+utils.slice = start => end => s => s.slice(start, end)
 
 utils.delete = dir => x => utils.deleteFile(dir(x))
 utils.get = dir => x => utils.readFile(dir(x), 'utf8')
+// Rename this to getByFileName
 utils.getItem = dir =>
   x => {
     // Remove '.json' from end of string
-    const item = x.slice(0, -5)
+    const item = utils.slice(0)(-5)(x)
     return utils.get(dir)(item)
   }
 
