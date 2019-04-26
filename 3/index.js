@@ -8,10 +8,11 @@ const utils = require('./lib/utils')
 // Handlers
 const authHandler = require('./lib/handlers/auth')
 const menuHandler = require('./lib/handlers/menu')
-const cartHandler = require('./lib/handlers/cart/cart')
 const userHandler = require('./lib/handlers/user')
-const orderHandler = require('./lib/handlers/order')
 const checkoutHandler = require('./lib/handlers/checkout')
+
+const cartHandler = require('./lib/handlers/cart/cart')
+const orderHandler = require('./lib/handlers/order/order')
 
 const notFoundHandler = callBack =>
   data => callBack(404, 'Not Found')
