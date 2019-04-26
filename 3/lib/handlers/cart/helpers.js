@@ -3,7 +3,7 @@ const utils = require('../../utils')
 
 const helpers = {}
 
-helpers.writeCart = user => {
+helpers.writeUser = user => {
   // Write updated object
   const write = utils.fileWriter(user)
   utils.openFile(
@@ -15,7 +15,7 @@ helpers.writeCart = user => {
 helpers.getOrCreateCart = user => {
   if (!user.hasOwnProperty('cart')) {
     user.cart = []
-    helpers.writeCart(user)
+    helpers.writeUser(user)
   }
   return user.cart
 }

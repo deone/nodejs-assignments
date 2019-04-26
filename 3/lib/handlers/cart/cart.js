@@ -40,28 +40,14 @@ cartHandler._cart.get = callBack =>
           return
         }
 
-        utils.readDir(utils.userDir())
-          .then(
-            utils.forEach(
-              // Array being looped over isn't
-              // declared because it is
-              // passed into forEach by then
-              // x represents a user file
-              x => {
-                const email = x.slice(0, -5)
-                if (email === token.email) {
-                  // Attempt to read user object from
-                  // file and return promise, user
-                  const user = utils.get(utils.userDir)(email)
-                  user.then(
-                    x => helpers.getOrCreateCart(
-                      utils.parseJsonToObject(x)
-                    )(callBack)
-                  )
-                }
-              }
-            )
+        utils.get(utils.userDir)(token.email)
+          .then(user => {
+              const cart = helpers.getOrCreateCart(
+                utils.parseJsonToObject(user))
+              callBack(200, cart)
+            }
           )
+
       })
       .catch(err =>
         callBack(500, {'Error': err.toString()})
@@ -100,73 +86,40 @@ cartHandler._cart.put = callBack =>
           return
         }
 
-        // Token is valid
-        // Get menu item and validate
         // Check whether menu item is on menu
         utils.readDir(utils.menuItemDir())
           .then(xs => {
-            const menu = utils.map(x => x.slice(0, -5))(xs)
-
+            const menu = utils.map(utils.slice(0)(-5))(xs)
             if (!menu.includes(item)) {
-              // Item is not on menu
+              // Requested item is not on menu
               callBack(400, {
                 'Error': 'Item requested is not on menu.'
               })
               return
             }
 
-            // Item is on menu, get item
-            utils.readDir(utils.menuItemDir())
-              .then(ys => {
+            // Get user
+            utils.get(utils.userDir)(token.email)
+              .then(u => {
+                const user = utils.parseJsonToObject(u)
 
+                // Get menu item
+                utils.get(utils.menuItemDir)(item)
+                  .then(m => {
+                    const menuItem = utils.parseJsonToObject(m)
 
+                    // Get cart
+                    const cart = helpers.getOrCreateCart(user)
 
-                ys.forEach(y => {
-                  // This is same as
-                  // if (item === fileName.slice(0, -5)) {...}
-                  item === y.slice(0, -5) &&
-                    utils.readFile(
-                      utils.menuItemDir(item), 'utf8'
-                    )
-                      .then(m => {
-                        const menuItem = utils.parseJsonToObject(m)
+                    // Remove menu item ID and
+                    // update cart with menu item
+                    delete menuItem.id
+                    user.cart = user.cart.concat([menuItem])
 
-                        // Get cart, so we can
-                        // update it with menu item
-                        utils.readDir(
-                          utils.userDir()
-                        )
-                          .then(zs => {
-                            zs.forEach(z => {
-                              const email = z.slice(0, -5)
-                              // This is same as
-                              // if (email === token.email) {...}
-                              email === token.email &&
-                                // Update cart
-                                utils.get(utils.userDir)(email)
-                                  .then(u => {
-                                    const user =
-                                      utils.parseJsonToObject(u)
-
-                                    if (!user.hasOwnProperty('cart')) {
-                                      user.cart = []
-                                    }
-                                    delete menuItem.id
-                                    user.cart.push(menuItem)
-
-                                    // Store updates
-                                    utils.writeUser(
-                                      email, user, 'w', callBack, 'cart'
-                                    )
-                                  })
-                            })
-                          })
-                      })
-                })
-
-
-
-
+                    // Write user and return cart
+                    helpers.writeUser(user)
+                    callBack(200, user.cart)
+                  })
               })
           })
       })
