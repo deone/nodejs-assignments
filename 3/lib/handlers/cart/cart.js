@@ -42,16 +42,17 @@ cartHandler._cart.get = callBack =>
 
         utils.get(utils.userDir)(token.email)
           .then(user => {
-              const cart = helpers.getOrCreateCart(
+              const cart = helpers.getOrCreateCart(callBack)(
                 utils.parseJsonToObject(user))
               callBack(200, cart)
             }
           )
-
+          .catch(err =>
+            callBack(500, {'Error': err.toString()})
+          )
       })
       .catch(err =>
-        callBack(500, {'Error': err.toString()})
-      )
+        callBack(500, {'Error': err.toString()}))
   }
 
 // Cart - put
@@ -92,9 +93,7 @@ cartHandler._cart.put = callBack =>
             const menu = utils.map(utils.slice(0)(-5))(xs)
             if (!menu.includes(item)) {
               // Requested item is not on menu
-              callBack(400, {
-                'Error': 'Item requested is not on menu.'
-              })
+              callBack(400, {'Error': 'Item requested is not on menu.'})
               return
             }
 
@@ -102,32 +101,34 @@ cartHandler._cart.put = callBack =>
             utils.get(utils.userDir)(token.email)
               .then(u => {
                 const user = utils.parseJsonToObject(u)
-
                 // Get menu item
                 utils.get(utils.menuItemDir)(item)
                   .then(m => {
                     const menuItem = utils.parseJsonToObject(m)
-
                     // Get cart
-                    const cart = helpers.getOrCreateCart(user)
-
+                    const cart = helpers.getOrCreateCart(callBack)(user)
                     // Remove menu item ID and
                     // update cart with menu item
                     delete menuItem.id
                     user.cart = user.cart.concat([menuItem])
 
                     // Write user and return cart
-                    helpers.writeUser(user)
+                    utils.writeUser(callBack)(user)
                     callBack(200, user.cart)
                   })
+                  .catch(err =>
+                    callBack(500, {'Error': err.toString()})
+                  )
               })
+              .catch(err =>
+                callBack(500, {'Error': err.toString()})
+              )
           })
+          .catch(err =>
+            callBack(500, {'Error': err.toString()}))
       })
       .catch(err =>
-        callBack(500, {
-          'Error': err.toString()
-        })
-      )
+        callBack(500, {'Error': err.toString()}))
   }
 
 // Cart - delete
@@ -171,13 +172,15 @@ cartHandler._cart.delete = callBack =>
             user.cart = utils.filter(isNeeded)(user.cart)
 
             // Write user and return cart
-            helpers.writeUser(user)
+            utils.writeUser(callBack)(user)
             callBack(200, user.cart)
           })
+          .catch(err =>
+            callBack(500, {'Error': err.toString()})
+          )
       })
-      .catch(err => callBack(500, {
-        'Error': err.toString()
-      }))
+      .catch(err =>
+        callBack(500, {'Error': err.toString()}))
   }
 
 

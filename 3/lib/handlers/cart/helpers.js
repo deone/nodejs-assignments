@@ -3,22 +3,14 @@ const utils = require('../../utils')
 
 const helpers = {}
 
-helpers.writeUser = user => {
-  // Write updated object
-  const write = utils.fileWriter(user)
-  utils.openFile(
-    utils.userDir(user.email),
-    'w'
-  ).then(write)
-}
-
-helpers.getOrCreateCart = user => {
-  if (!user.hasOwnProperty('cart')) {
-    user.cart = []
-    helpers.writeUser(user)
+helpers.getOrCreateCart = callBack =>
+  user => {
+    if (!user.hasOwnProperty('cart')) {
+      user.cart = []
+      utils.writeUser(callBack)(user)
+    }
+    return user.cart
   }
-  return user.cart
-}
 
 
 module.exports = helpers

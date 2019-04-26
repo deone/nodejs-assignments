@@ -126,9 +126,20 @@ utils.createToken = callBack =>
         .catch(err => callBack(500, {'Error': err.toString()}))
     }
 
+utils.writeUser = callBack =>
+  user => {
+    const write = utils.fileWriter(user)
+    utils.openFile(
+      utils.userDir(user.email),
+      'w'
+    )
+    .then(write)
+    .catch(err =>
+      callBack(500, {'Error': err.toString()}))
+  }
 
 // Curry these
-utils.writeUser = (
+/* utils.writeUser = (
   email,
   object,
   fileOpenMode,
@@ -159,7 +170,7 @@ utils.writeUser = (
     )
     .catch(err => callBack(500, {'Error': err.toString()}))
 
-}
+} */
 
 utils.sendRequest = (
   payload,
