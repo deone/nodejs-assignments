@@ -136,7 +136,7 @@ cartHandler._cart.put = callBack =>
 cartHandler._cart.delete = callBack =>
   data => {
     // Get tokenID from header  
-    const [tokenId, menuItem] = utils.validate([
+    const [tokenId, item] = utils.validate([
       data.headers.token,
       data.queryStringObject.item
     ])
@@ -146,7 +146,7 @@ cartHandler._cart.delete = callBack =>
       return
     }
 
-    if (!menuItem) {
+    if (!item) {
       callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
       return
     }
@@ -162,45 +162,18 @@ cartHandler._cart.delete = callBack =>
           return
         }
 
-        // Token is valid
-        // Get menu item and validate
+        // Get user
+        utils.get(utils.userDir)(token.email)
+          .then(u => {
+            const user = utils.parseJsonToObject(u)
 
-        // Get user object
-        // Read users directory
-        utils.readDir(utils.userDir())
-          .then(xs => {
-            xs.forEach(x => {
-              const email = x.slice(0, -5)
-              email === token.email &&
-                // Update cart
-                utils.get(utils.userDir)(email)
-                  .then(u => {
-                    const user = utils.parseJsonToObject(u)
+            const isNeeded = x => x.name !== item
+            user.cart = utils.filter(isNeeded)(user.cart)
 
-                    if (!user.cart.length ||
-                      !user.hasOwnProperty('cart')) {
-                      callBack(400, {
-                        'Error': 'Shopping cart is empty.'
-                      })
-                      return
-                    }
-
-                    const isNeeded = item => item.name !== menuItem
-                    user.cart = utils.filter(isNeeded)(user.cart)
-
-                    // Store updates
-                    utils.writeUser(
-                      email, user, 'w', callBack, 'cart'
-                    )
-                  })
-                  .catch(err => callBack(500, {
-                    'Error': err.toString()
-                  }))
-            })
+            // Write user and return cart
+            helpers.writeUser(user)
+            callBack(200, user.cart)
           })
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
       })
       .catch(err => callBack(500, {
         'Error': err.toString()
