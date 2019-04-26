@@ -46,8 +46,7 @@ utils.slice = start => end => s => s.slice(start, end)
 
 utils.delete = dir => x => utils.deleteFile(dir(x))
 utils.get = dir => x => utils.readFile(dir(x), 'utf8')
-// Rename this to getByFileName
-utils.getItem = dir =>
+utils.getByFileName = dir =>
   x => {
     // Remove '.json' from end of string
     const item = utils.slice(0)(-5)(x)

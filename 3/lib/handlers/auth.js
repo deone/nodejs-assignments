@@ -64,7 +64,7 @@ authHandler._login.post = callBack =>
             // There are token files
             // Get all tokens
             const promises = utils.map(
-              utils.getItem(utils.tokenDir)
+              utils.getByFileName(utils.tokenDir)
             )(xs)
 
             const p = Promise.all(promises)

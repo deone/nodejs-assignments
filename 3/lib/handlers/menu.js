@@ -39,7 +39,7 @@ menuHandler._menu.get = callBack =>
         }
 
         // Token is valid
-        // Read menuitems directory
+        // Read menu items directory
         utils.readDir(utils.menuItemDir())
           .then(xs => {
             if (!xs.length) {
@@ -51,7 +51,7 @@ menuHandler._menu.get = callBack =>
             }
 
             const promises = utils.map(
-              utils.getItem(utils.menuItemDir)
+              utils.getByFileName(utils.menuItemDir)
             )(xs)
 
             Promise.all(promises).then(ms => {
@@ -59,9 +59,6 @@ menuHandler._menu.get = callBack =>
             })
 
           })
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
       })
       .catch(err => callBack(500, {
         'Error': err.toString()
