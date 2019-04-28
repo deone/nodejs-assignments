@@ -48,8 +48,7 @@ cartHandler._cart.get = callBack =>
             }
           )
           .catch(err =>
-            callBack(500, {'Error': err.toString()})
-          )
+            callBack(500, {'Error': err.toString()}))
       })
       .catch(err =>
         callBack(500, {'Error': err.toString()}))
@@ -113,16 +112,15 @@ cartHandler._cart.put = callBack =>
                     user.cart = user.cart.concat([menuItem])
 
                     // Write user and return cart
-                    utils.writeUser(callBack)(user)
-                    callBack(200, user.cart)
+                    utils.writeUser(user)
+                      .then(callBack(200, user.cart))
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                   })
                   .catch(err =>
-                    callBack(500, {'Error': err.toString()})
-                  )
+                    callBack(500, {'Error': err.toString()}))
               })
               .catch(err =>
-                callBack(500, {'Error': err.toString()})
-              )
+                callBack(500, {'Error': err.toString()}))
           })
           .catch(err =>
             callBack(500, {'Error': err.toString()}))
@@ -172,8 +170,9 @@ cartHandler._cart.delete = callBack =>
             user.cart = utils.filter(isNeeded)(user.cart)
 
             // Write user and return cart
-            utils.writeUser(callBack)(user)
-            callBack(200, user.cart)
+            utils.writeUser(user)
+              .then(callBack(200, user.cart))
+              .catch(err => callBack(500, {'Error': err.toString()}))
           })
           .catch(err =>
             callBack(500, {'Error': err.toString()})
