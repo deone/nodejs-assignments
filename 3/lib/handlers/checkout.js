@@ -70,7 +70,7 @@ checkoutHandler._checkout.post = callBack =>
                 )
                   .then(o => {
                     const order = utils.parseJsonToObject(o)
-  
+
                     // Make payment
                     const stripePayload = queryString.stringify({
                       amount: Math.round(order.totalPrice * 100),
@@ -117,32 +117,27 @@ checkoutHandler._checkout.post = callBack =>
                             order.mailSent = true
 
                             // Update order
-                            const write = utils.fileWriter(order)
-                            utils.openFile(utils.orderDir(orderId), 'w')
-                              .then(write)
+                            utils.writeFile(utils.orderDir(order.id),
+                              JSON.stringify(order))
                               .then(
                                 callBack(200, {
                                   'Success': 'Payment processed and user notified successfully.'
                                 })
                               )
-                              .catch(err => callBack(500, {
-                                'Error': err.toString()
-                              }))
+                              .catch(err =>
+                                callBack(500, {'Error': err.toString()}))
                         })
                     })
                   })
-                  .catch(err => callBack(500, {
-                    'Error': err.toString()
-                  }))
+                  .catch(err =>
+                    callBack(500, {'Error': err.toString()}))
             })
           })
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
+          .catch(err =>
+            callBack(500, {'Error': err.toString()}))
       })
-      .catch(err => callBack(500, {
-        'Error': err.toString()
-      }))
+      .catch(err =>
+        callBack(500, {'Error': err.toString()}))
   }
 
 
