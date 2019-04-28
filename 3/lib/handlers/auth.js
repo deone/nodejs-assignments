@@ -45,8 +45,7 @@ authHandler._login.post = callBack =>
         const user = utils.parseJsonToObject(data)
         if (utils.hash(password) !== user.hashedPassword) {
           callBack(400, {
-            'Error': "Password did not match the user's stored password."
-          })
+            'Error': "Password did not match the user's stored password."})
           return
         }
 
@@ -55,9 +54,7 @@ authHandler._login.post = callBack =>
           .then(xs => {
             if (!xs.length) {
               // First case - no tokens
-              createAuthToken(
-                utils.createRandomString(20)
-              )
+              createAuthToken(utils.createRandomString(20))
               return
             }
 
@@ -96,26 +93,21 @@ authHandler._login.post = callBack =>
                         .then(() => createAuthToken(
                           utils.createRandomString(20)
                         ))
-                        .catch(err => callBack(500, {
-                          'Error': err.toString()
-                        }))
-
+                        .catch(err =>
+                          callBack(500, {'Error': err.toString()}))
                     // else, return it
                     : callBack(200, token)
                 }
               )
-              .catch(err => callBack(500, {
-                'Error': err.toString()
-              }))
+              .catch(err =>
+                callBack(500, {'Error': err.toString()}))
           })
-          .catch(err => callBack(500, {
-            'Error': err.toString()
-          }))
+          .catch(err =>
+            callBack(500, {'Error': err.toString()}))
       })
       .catch(err => {
         console.log(err)
-        callBack(404, {'Error': 'User does not exist.'})
-      })
+        callBack(404, {'Error': 'User does not exist.'})})
   }
 
 // Logout - post
@@ -134,9 +126,8 @@ authHandler._logout.post = callBack =>
       .then(callBack(
         200, {'Success': 'User logged out.'}
       ))
-      .catch(err => callBack(500, {
-        'Error': err.toString()
-      }))
+      .catch(err =>
+        callBack(500, {'Error': err.toString()}))
   }
 
 

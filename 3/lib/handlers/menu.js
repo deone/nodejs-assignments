@@ -38,7 +38,6 @@ menuHandler._menu.get = callBack =>
           return
         }
 
-        // Token is valid
         // Read menu items directory
         utils.readDir(utils.menuItemDir())
           .then(xs => {
@@ -60,9 +59,8 @@ menuHandler._menu.get = callBack =>
 
           })
       })
-      .catch(err => callBack(500, {
-        'Error': err.toString()
-      }))
+      .catch(err =>
+        callBack(500, {'Error': err.toString()}))
   }
 
 
