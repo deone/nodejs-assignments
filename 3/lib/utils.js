@@ -126,51 +126,8 @@ utils.createToken = callBack =>
         .catch(err => callBack(500, {'Error': err.toString()}))
     }
 
-utils.writeUser = callBack =>
-  user => {
-    const write = utils.fileWriter(user)
-    utils.openFile(
-      utils.userDir(user.email),
-      'w'
-    )
-    .then(write)
-    .catch(err =>
-      callBack(500, {'Error': err.toString()}))
-  }
-
-// Curry these
-/* utils.writeUser = (
-  email,
-  object,
-  fileOpenMode,
-  callBack,
-  caller = 'users'
-) => {
-  const write = utils.fileWriter(object)
-  utils.openFile(
-    utils.userDir(email),
-    fileOpenMode
-  )
-    .then(write)
-    .then(
-      () => {
-        caller === 'cart'
-          ? callBack(200, object.cart)
-          : caller === 'order'
-            ? callBack(200, object.orders)
-            : callBack(
-                200,
-                {
-                  'Success': `User ${{
-                  'w': 'update', 'wx': 'create'
-                  }[fileOpenMode]}d successfully.`
-                }
-              )
-      }
-    )
-    .catch(err => callBack(500, {'Error': err.toString()}))
-
-} */
+utils.writeUser = user =>
+  utils.writeFile(utils.userDir(user.email), JSON.stringify(user))
 
 utils.sendRequest = (
   payload,

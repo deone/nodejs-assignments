@@ -63,10 +63,7 @@ userHandler._user.post = callBack =>
           }
 
           // Store the user
-          utils.writeFile(
-            utils.userDir(user.email),
-            JSON.stringify(user)
-          )
+          utils.writeUser(user)
             .then(callBack(200, {'Success': 'User created successfully.'}))
             .catch(err => callBack(500, {'Error': err.toString()}))
         }
@@ -179,10 +176,7 @@ userHandler._user.put = callBack =>
         Object.assign(user, fields)
 
         // Store updates
-        utils.writeFile(
-          utils.userDir(user.email),
-          JSON.stringify(user)
-        )
+        utils.writeUser(user)
           .then(callBack(200, {'Success': 'User updated successfully.'}))
           .catch(err => callBack(500, {'Error': err.toString()}))
       })
