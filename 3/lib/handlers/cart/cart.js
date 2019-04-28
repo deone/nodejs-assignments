@@ -172,7 +172,8 @@ cartHandler._cart.delete = callBack =>
             // Write user and return cart
             utils.writeUser(user)
               .then(callBack(200, user.cart))
-              .catch(err => callBack(500, {'Error': err.toString()}))
+              .catch(err =>
+                callBack(500, {'Error': err.toString()}))
           })
           .catch(err =>
             callBack(500, {'Error': err.toString()})

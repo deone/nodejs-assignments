@@ -59,11 +59,8 @@ orderHandler._order.post = callBack =>
               helpers.placeOrder(cart), { email: token.email })
 
             // Write order object to file
-            const write = utils.fileWriter(order)
-            utils.openFile(
-              utils.orderDir(order.id), 'wx'
-            )
-              .then(write)
+            utils.writeFile(utils.orderDir(order.id),
+              JSON.stringify(order))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
 
@@ -72,9 +69,12 @@ orderHandler._order.post = callBack =>
               orderId: order.id,
               totalPrice: order.totalPrice
             }
+
             const updatedUser = helpers.updateUser(user)(o)
-            utils.writeUser(callBack)(user)
-            callBack(200, updatedUser.orders)
+            utils.writeUser(updatedUser)
+              .then(callBack(200, user.orders))
+              .catch(err =>
+                callBack(500, {'Error': err.toString()}))
           })
           .catch(err =>
             callBack(500, {'Error': err.toString()}))
