@@ -41,8 +41,8 @@ authHandler._login.post = callBack =>
 
     // Lookup user with email
     utils.readFile(utils.userDir(email), 'utf8')
-      .then(data => {
-        const user = utils.parseJsonToObject(data)
+      .then(u => {
+        const user = utils.parseJsonToObject(u)
         if (utils.hash(password) !== user.hashedPassword) {
           callBack(400, {
             'Error': "Password did not match the user's stored password."})

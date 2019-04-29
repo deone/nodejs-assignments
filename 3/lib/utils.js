@@ -18,10 +18,10 @@ utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
 
 
 /* I/O */
-utils.readFile = promisify(fs.readFile)
-utils.writeFile = promisify(fs.writeFile)
-utils.deleteFile = promisify(fs.unlink)
 utils.readDir = promisify(fs.readdir)
+utils.readFile = promisify(fs.readFile)
+utils.deleteFile = promisify(fs.unlink)
+utils.writeFile = promisify(fs.writeFile)
 
 utils.delete = dir => x => utils.deleteFile(dir(x))
 utils.get = dir => x => utils.readFile(dir(x), 'utf8')
@@ -55,9 +55,9 @@ utils.templateDir = path.join(__dirname, '/../templates/')
 
 
 /* FP/Point-free utilities */
-utils.filter = f => xs => xs.filter(f)
 utils.map = f => xs => xs.map(f)
 utils.find = f => xs => xs.find(f)
+utils.filter = f => xs => xs.filter(f)
 utils.forEach = f => xs => xs.forEach(f)
 utils.slice = start => end => s => s.slice(start, end)
 utils.compose = (...functions) => data =>
@@ -124,15 +124,42 @@ utils.hash = str =>
 
 /* Request Handler */
 utils.requestDispatcher = callBack =>
-  handlersContainer =>
+  handlers =>
     acceptableMethods =>
       data =>
         acceptableMethods.includes(data.method)
-          ? handlersContainer[data.method](callBack)(data)
+          ? handlers[data.method](callBack)(data)
           : callBack(405)
 
+/* utils.setOptions = host =>
+  path =>
+    auth =>
+      payLoad => ({
+        hostname: host,
+        port: 443,
+        path: path,
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(payLoad)
+        }
+      })
 
+utils.sendRequest = callBack =>
+  options =>
+    payLoad => {
+      const req = https.request(options, res =>
+        res.on('data', d =>
+          res.statusCode === 200
+            ? callBack(false)
+            : callBack(true)))
 
+      req.on('error', console.error)
+
+      req.write(payLoad)
+      req.end()
+    } */
 
 utils.sendRequest = (
   payload,

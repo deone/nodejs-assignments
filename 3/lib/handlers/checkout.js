@@ -59,6 +59,14 @@ checkoutHandler._checkout.post = callBack =>
               source: stripeToken
             })
 
+            /* const stripeOptions = utils.setOptions(
+              'api.stripe.com',
+              '/v1/charges',
+              `Bearer ${config.stripeKey}`,
+              stripePayload)
+
+            utils.sendRequest(callBack, stripeOptions, stripePayload) */
+
             utils.sendRequest(
               stripePayload,
               'api.stripe.com',
@@ -69,45 +77,49 @@ checkoutHandler._checkout.post = callBack =>
                   callBack(500, {'Error': 'Unable to process payment.'})
                   return
                 }
+              }
+            )
 
-                order.paid = true
-                // Send mail
-                const mailgunPayload = queryString.stringify({
-                  'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
-                  'to': 'alwaysdeone@gmail.com',
-                  'subject': `Order No. ${order.id}`,
-                  'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
-                })
+            order.paid = true
 
-                // Send email if payment is successful
-                utils.sendRequest(
-                  mailgunPayload,
-                  'api.mailgun.net',
-                  `/v3/${config.mailgunDomain}/messages`,
-                  ('Basic ' + Buffer.from(
-                    (`api:${config.mailgunKey}`)
-                    ).toString('base64')),
-                  (err, data) => {
-                    if (err) {
-                      callBack(500, {
-                        'Error': 'Payment successful, but unable to notify user.'
-                      })
-                      return
-                    }
-                    order.mailSent = true
-
-                    // Update order
-                    utils.writeFile(utils.orderDir(order.id),
-                      JSON.stringify(order))
-                      .then(
-                        callBack(200, {
-                          'Success': 'Payment processed and user notified successfully.'
-                        })
-                      )
-                      .catch(err =>
-                        callBack(500, {'Error': err.toString()}))
-                })
+            // Send mail
+            const mailgunPayload = queryString.stringify({
+              'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
+              'to': 'alwaysdeone@gmail.com',
+              'subject': `Order No. ${order.id}`,
+              'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
             })
+
+            // Send email if payment is successful
+            utils.sendRequest(
+              mailgunPayload,
+              'api.mailgun.net',
+              `/v3/${config.mailgunDomain}/messages`,
+              ('Basic ' + Buffer.from(
+                (`api:${config.mailgunKey}`)
+                ).toString('base64')),
+              (err, data) => {
+                if (err) {
+                  callBack(500, {
+                    'Error': 'Payment successful, but unable to notify user.'
+                  })
+                  return
+                }
+              }
+            )
+
+            order.mailSent = true
+
+            // Update order
+            utils.writeFile(utils.orderDir(order.id),
+              JSON.stringify(order))
+              .then(
+                callBack(200, {
+                  'Success': 'Payment processed and user notified successfully.'
+                })
+              )
+              .catch(err =>
+                callBack(500, {'Error': err.toString()}))
           })
       })
       .catch(err =>
