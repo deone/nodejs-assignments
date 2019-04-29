@@ -9,39 +9,19 @@ const config = require('./config')
 
 const utils = {}
 
+
+/* Errors */
 utils.errors = {}
 utils.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
 utils.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
 utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
 
-utils.baseDir = path.join(__dirname, '/../.data/')
-utils.templateDir = path.join(__dirname, '/../templates/')
 
+/* I/O */
 utils.readFile = promisify(fs.readFile)
 utils.writeFile = promisify(fs.writeFile)
 utils.deleteFile = promisify(fs.unlink)
 utils.readDir = promisify(fs.readdir)
-
-utils.filePath = baseDir =>
-  dir =>
-    fileName =>
-      !fileName
-        ? path.join(baseDir, dir, '/')
-        : path.join(
-            baseDir, dir, fileName.concat('.', 'json')
-          )
-
-utils.baseDirFunc = utils.filePath(utils.baseDir)
-utils.userDir = utils.baseDirFunc('users')
-utils.orderDir = utils.baseDirFunc('orders')
-utils.tokenDir = utils.baseDirFunc('tokens')
-utils.menuItemDir = utils.baseDirFunc('menuitems')
-
-utils.filter = f => xs => xs.filter(f)
-utils.map = f => xs => xs.map(f)
-utils.find = f => xs => xs.find(f)
-utils.forEach = f => xs => xs.forEach(f)
-utils.slice = start => end => s => s.slice(start, end)
 
 utils.delete = dir => x => utils.deleteFile(dir(x))
 utils.get = dir => x => utils.readFile(dir(x), 'utf8')
@@ -51,25 +31,47 @@ utils.getByFileName = dir =>
     const item = utils.slice(0)(-5)(x)
     return utils.get(dir)(item)
   }
+utils.writeUser = user =>
+  utils.writeFile(utils.userDir(user.email), JSON.stringify(user))
 
+
+/* Directories/Paths */
+utils.filePath = baseDir =>
+  dir =>
+    fileName =>
+      !fileName
+        ? path.join(baseDir, dir, '/')
+        : path.join(
+            baseDir, dir, fileName.concat('.', 'json')
+          )
+
+const dataDirPath = path.join(__dirname, '/../.data/')
+utils.dataDir = utils.filePath(dataDirPath)
+utils.userDir = utils.dataDir('users')
+utils.orderDir = utils.dataDir('orders')
+utils.tokenDir = utils.dataDir('tokens')
+utils.menuItemDir = utils.dataDir('menuitems')
+utils.templateDir = path.join(__dirname, '/../templates/')
+
+
+/* FP/Point-free utilities */
+utils.filter = f => xs => xs.filter(f)
+utils.map = f => xs => xs.map(f)
+utils.find = f => xs => xs.find(f)
+utils.forEach = f => xs => xs.forEach(f)
+utils.slice = start => end => s => s.slice(start, end)
 utils.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)
 
+
+/* Validation */
 // Validate email properly, maybe with regex
 const validator = x =>
   typeof x === 'string' && x.trim().length > 0 ? x.trim() : false
-
 utils.validate = utils.map(validator)
 
-// Create a SHA256 hash
-utils.hash = str =>
-  typeof str == 'string' && str.length > 0
-    ? crypto.createHmac(
-        'sha256',
-        config.hashingSecret
-      ).update(str).digest('hex')
-    : false
 
+/* JSON to Object */
 // Parse a JSON string to an object in all cases, without throwing
 utils.parseJsonToObject = str => {
   try {
@@ -79,6 +81,8 @@ utils.parseJsonToObject = str => {
   }
 }
 
+
+/* String Operations */
 const createString = strLength =>
   chars =>
     Array(strLength).fill().map(i =>
@@ -93,6 +97,32 @@ utils.createRandomString = strLength =>
     (strLength)
     ('abcdefghijklmnopqrstuvwxyz0123456789')
 
+utils.createToken = callBack =>
+  email =>
+    tokenId => {
+      // Set an expiration date 1 hour in the future.
+      const expires = Date.now() + 1000 * 60 * 60
+      const token = { email, tokenId, expires }
+
+      // Store the token
+      utils.writeFile(utils.tokenDir(tokenId),
+        JSON.stringify(token))
+        .catch(err => callBack(500, {'Error': err.toString()}))
+
+      return token
+    }
+
+// Create a SHA256 hash
+utils.hash = str =>
+  typeof str == 'string' && str.length > 0
+    ? crypto.createHmac(
+        'sha256',
+        config.hashingSecret
+      ).update(str).digest('hex')
+    : false
+
+
+/* Request Handler */
 utils.requestDispatcher = callBack =>
   handlersContainer =>
     acceptableMethods =>
@@ -101,27 +131,8 @@ utils.requestDispatcher = callBack =>
           ? handlersContainer[data.method](callBack)(data)
           : callBack(405)
 
-utils.createToken = callBack =>
-  email =>
-    tokenId => {
-      // Set an expiration date 1 hour in the future.
-      const expires = Date.now() + 1000 * 60 * 60
-      const tokenObject = { email, tokenId, expires }
 
-      const write = utils.fileWriter(tokenObject)
 
-      // Store the token
-      utils.openFile(
-        utils.tokenDir(tokenId),
-        'wx'
-      )
-        .then(write)
-        .then(callBack(200, tokenObject))
-        .catch(err => callBack(500, {'Error': err.toString()}))
-    }
-
-utils.writeUser = user =>
-  utils.writeFile(utils.userDir(user.email), JSON.stringify(user))
 
 utils.sendRequest = (
   payload,
@@ -174,5 +185,6 @@ utils.getTemplate = (templateName, data, callBack) => {
       ), 'utf8')
     : callBack('A valid template name was not specified.');
 }
+
 
 module.exports = utils

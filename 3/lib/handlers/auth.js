@@ -37,7 +37,7 @@ authHandler._login.post = callBack =>
       return
     }
 
-    const createAuthToken = utils.createToken(callBack)(email)
+    const createToken = utils.createToken(callBack)(email)
 
     // Lookup user with email
     utils.readFile(utils.userDir(email), 'utf8')
@@ -53,8 +53,9 @@ authHandler._login.post = callBack =>
         utils.readDir(utils.tokenDir())
           .then(xs => {
             if (!xs.length) {
-              // First case - no tokens
-              createAuthToken(utils.createRandomString(20))
+              // First case - no tokens in directory
+              const token = createToken(utils.createRandomString(20))
+              callBack(200, token)
               return
             }
 
@@ -79,7 +80,8 @@ authHandler._login.post = callBack =>
                   const userHasToken = !emails.includes(email) ? false : true
                   if (!userHasToken) {
                     // Second case - user does not have token
-                    createAuthToken(utils.createRandomString(20))
+                    const token = createToken(utils.createRandomString(20))
+                    callBack(200, token)
                     return
                   }
 
@@ -90,9 +92,10 @@ authHandler._login.post = callBack =>
                   Date.now() > token.expires
                     // if token is expired, delete and create another
                     ? utils.delete(utils.tokenDir)(token.tokenId)
-                        .then(() => createAuthToken(
-                          utils.createRandomString(20)
-                        ))
+                        .then(() => {
+                          const token = createToken(utils.createRandomString(20))
+                          callBack(200, token)
+                        })
                         .catch(err =>
                           callBack(500, {'Error': err.toString()}))
                     // else, return it
