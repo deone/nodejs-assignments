@@ -10,14 +10,13 @@ const config = require('./config')
 const utils = {}
 
 utils.errors = {}
-utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
-utils.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
 utils.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
+utils.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
+utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
 
 utils.baseDir = path.join(__dirname, '/../.data/')
 utils.templateDir = path.join(__dirname, '/../templates/')
 
-utils.openFile = promisify(fs.open)
 utils.readFile = promisify(fs.readFile)
 utils.writeFile = promisify(fs.writeFile)
 utils.deleteFile = promisify(fs.unlink)
@@ -55,11 +54,6 @@ utils.getByFileName = dir =>
 
 utils.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)
-
-// Basically a curry-wrapped utils.writeFile
-utils.fileWriter = data =>
-  fd => utils.writeFile(fd, JSON.stringify(data))
-
 
 // Validate email properly, maybe with regex
 const validator = x =>
