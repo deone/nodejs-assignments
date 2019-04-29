@@ -52,26 +52,19 @@ checkoutHandler._checkout.post = callBack =>
             const order = utils.parseJsonToObject(o)
 
             // Make payment
-            const stripePayload = queryString.stringify({
+            const stripePayLoad = queryString.stringify({
               amount: Math.round(order.totalPrice * 100),
               currency: 'usd',
               description: `${token.email}_${tokenId}_${Date.now()}`,
               source: stripeToken
             })
 
-            /* const stripeOptions = utils.setOptions(
-              'api.stripe.com',
-              '/v1/charges',
-              `Bearer ${config.stripeKey}`,
-              stripePayload)
-
-            utils.sendRequest(callBack, stripeOptions, stripePayload) */
+            const stripeOptions = utils.setOptions(
+              'api.stripe.com', '/v1/charges', `Bearer ${config.stripeKey}`, stripePayLoad)
 
             utils.sendRequest(
-              stripePayload,
-              'api.stripe.com',
-              '/v1/charges',
-              `Bearer ${config.stripeKey}`,
+              stripePayLoad,
+              stripeOptions,
               (err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Unable to process payment.'})
@@ -83,7 +76,7 @@ checkoutHandler._checkout.post = callBack =>
             order.paid = true
 
             // Send mail
-            const mailgunPayload = queryString.stringify({
+            const mailgunPayLoad = queryString.stringify({
               'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
               'to': 'alwaysdeone@gmail.com',
               'subject': `Order No. ${order.id}`,
@@ -91,18 +84,16 @@ checkoutHandler._checkout.post = callBack =>
             })
 
             // Send email if payment is successful
+            const mailgunOptions = utils.setOptions(
+              'api.mailgun.net', `/v3/${config.mailgunDomain}/messages`,
+              ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')), mailgunPayLoad)
+
             utils.sendRequest(
-              mailgunPayload,
-              'api.mailgun.net',
-              `/v3/${config.mailgunDomain}/messages`,
-              ('Basic ' + Buffer.from(
-                (`api:${config.mailgunKey}`)
-                ).toString('base64')),
+              mailgunPayLoad,
+              mailgunOptions,
               (err, data) => {
                 if (err) {
-                  callBack(500, {
-                    'Error': 'Payment successful, but unable to notify user.'
-                  })
+                  callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
                   return
                 }
               }

@@ -131,55 +131,25 @@ utils.requestDispatcher = callBack =>
           ? handlers[data.method](callBack)(data)
           : callBack(405)
 
-/* utils.setOptions = host =>
-  path =>
-    auth =>
-      payLoad => ({
-        hostname: host,
-        port: 443,
-        path: path,
-        method: 'POST',
-        headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(payLoad)
-        }
-      })
-
-utils.sendRequest = callBack =>
-  options =>
-    payLoad => {
-      const req = https.request(options, res =>
-        res.on('data', d =>
-          res.statusCode === 200
-            ? callBack(false)
-            : callBack(true)))
-
-      req.on('error', console.error)
-
-      req.write(payLoad)
-      req.end()
-    } */
-
-utils.sendRequest = (
-  payload,
-  hostName,
-  path,
-  auth,
-  callBack
-) => {
-  const options = {
-    hostname: hostName,
+utils.setOptions = (host, path, auth, payLoad) => {
+  return {
+    hostname: host,
     port: 443,
     path: path,
     method: 'POST',
     headers: {
       'Authorization': auth,
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(payload)
+      'Content-Length': Buffer.byteLength(payLoad)
     }
   }
+}
 
+utils.sendRequest = (
+  payLoad,
+  options,
+  callBack
+) => {
   const req = https.request(options, res => {
     console.log(`Status code: ${res.statusCode}`)
   
@@ -193,7 +163,7 @@ utils.sendRequest = (
   
   req.on('error', error => console.error(error))
   
-  req.write(payload)
+  req.write(payLoad)
   req.end()
 }
 
