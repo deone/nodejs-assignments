@@ -1,10 +1,7 @@
 /* Checkout handler */
 
 // Dependencies
-const queryString = require('querystring')
-
 const utils = require('../utils')
-const config = require('../config')
 
 const checkoutHandler = {}
 
@@ -53,8 +50,7 @@ checkoutHandler._checkout.post = callBack =>
             const payLoad = utils.createPayLoad(token)(order)
 
             const stripePayLoad = payLoad(stripeToken)
-            const stripeOptions = utils.setOptions('api.stripe.com')
-              ('/v1/charges')(`Bearer ${config.stripeKey}`)(stripePayLoad)
+            const stripeOptions = utils.setOptions(stripePayLoad)
 
             // Make payment
             utils.sendRequest(stripePayLoad)(stripeOptions)
@@ -68,9 +64,7 @@ checkoutHandler._checkout.post = callBack =>
             order.paid = true
 
             const mailgunPayLoad = payLoad()
-            const mailgunOptions = utils.setOptions('api.mailgun.net')
-              (`/v3/${config.mailgunDomain}/messages`)
-              ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64'))(mailgunPayLoad)
+            const mailgunOptions = utils.setOptions(mailgunPayLoad)
 
             // Send email
             utils.sendRequest(mailgunPayLoad)(mailgunOptions)

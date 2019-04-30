@@ -132,20 +132,33 @@ utils.requestDispatcher = callBack =>
           ? handlers[data.method](callBack)(data)
           : callBack(405)
 
-utils.setOptions = host =>
-  path =>
-    auth =>
-      payLoad => ({
-        hostname: host,
-        port: 443,
-        path: path,
-        method: 'POST',
-        headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(payLoad)
-        }
-      })
+utils.setOptions = payLoad => {
+  let [host, path, auth] = [
+    'api.stripe.com',
+    '/v1/charges',
+    `Bearer ${config.stripeKey}`
+  ]
+
+  if (payLoad.includes('mailgun')) {
+    [host, path, auth] = [
+      'api.mailgun.net',
+      `/v3/${config.mailgunDomain}/messages`,
+      'Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')
+    ]
+  }
+
+  return {
+    hostname: host,
+    port: 443,
+    path: path,
+    method: 'POST',
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(payLoad)
+    }
+  }
+}
 
 utils.sendRequest = payLoad =>
   options =>
