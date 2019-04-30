@@ -91,7 +91,7 @@ authHandler._login.post = callBack =>
 
                   Date.now() > token.expires
                     // if token is expired, delete and create another
-                    ? utils.delete(utils.tokenDir)(token.tokenId)
+                    ? utils.delete(utils.tokenDir)(token.id)
                         .then(() => {
                           const token = createToken(utils.createRandomString(20))
                           callBack(200, token)

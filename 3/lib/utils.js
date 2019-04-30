@@ -100,13 +100,13 @@ utils.createRandomString = strLength =>
 
 utils.createToken = callBack =>
   email =>
-    tokenId => {
+    id => {
       // Set an expiration date 1 hour in the future.
       const expires = Date.now() + 1000 * 60 * 60
-      const token = { email, tokenId, expires }
+      const token = { email, id, expires }
 
       // Store the token
-      utils.writeFile(utils.tokenDir(tokenId),
+      utils.writeFile(utils.tokenDir(id),
         JSON.stringify(token))
         .catch(err => callBack(500, {'Error': err.toString()}))
 
@@ -187,7 +187,7 @@ utils.createPayLoad = token =>
         ? queryString.stringify({
             amount: Math.round(order.totalPrice * 100),
             currency: 'usd',
-            description: `${token.email}_${token.tokenId}_${Date.now()}`,
+            description: `${token.email}_${token.id}_${Date.now()}`,
             source: source
           })
         : queryString.stringify({
