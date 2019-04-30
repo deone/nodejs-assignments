@@ -1,14 +1,22 @@
 /* Menu handler */
 
 // Dependencies
-const utils = require('../utils')
+const {
+  request,
+  validate,
+  errors,
+  io,
+  dir,
+  json,
+  fp
+} = require('../utils')
 
 const menuHandler = {}
 
 menuHandler.menu = callBack =>
   data => {
     const dispatch =
-      utils.request.dispatch(callBack)(menuHandler._menu)
+      request.dispatch(callBack)(menuHandler._menu)
     dispatch(['get'])(data)
   }
 
@@ -20,26 +28,26 @@ menuHandler._menu = {}
 menuHandler._menu.get = callBack =>
   data => {
     // Get tokenId from header
-    const [tokenId] = utils.validate([data.headers.token])
+    const [tokenId] = validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     // Get token
-    utils.io.get(utils.dir.tokens)(tokenId)
+    io.get(dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.json.toObject(t)
+        const token = json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
         // Read menu items directory
-        utils.io.readDir(utils.dir.menuItems())
+        io.readDir(dir.menuItems())
           .then(xs => {
             if (!xs.length) {
               // There are no menu items
@@ -49,12 +57,12 @@ menuHandler._menu.get = callBack =>
               return
             }
 
-            const promises = utils.fp.map(
-              utils.io.getByFileName(utils.dir.menuItems)
+            const promises = fp.map(
+              io.getByFileName(dir.menuItems)
             )(xs)
 
             Promise.all(promises).then(ms => {
-              callBack(200, utils.fp.map(utils.json.toObject)(ms))
+              callBack(200, fp.map(json.toObject)(ms))
             })
 
           })

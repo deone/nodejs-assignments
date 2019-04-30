@@ -1,13 +1,13 @@
 /* HTML handlers */
 
 // Dependencies
-const utils = require('../utils')
+const { io } = require('../utils')
 
 const handlers = {}
 
 handlers.index = (data, callBack) =>
   data.method === 'get'
-    ? utils.io.getTemplate('index', data, callBack)
+    ? io.getTemplate('index', data, callBack)
         .then(string => {
           callBack(200, string, 'html')
         })

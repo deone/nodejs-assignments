@@ -1,14 +1,21 @@
 /* Checkout handler */
 
 // Dependencies
-const utils = require('../utils')
+const {
+  request,
+  validate,
+  errors,
+  io,
+  dir,
+  json
+} = require('../utils')
 
 const checkoutHandler = {}
 
 checkoutHandler.checkout = callBack =>
   data => {
     const dispatch =
-      utils.request.dispatch(callBack)(checkoutHandler._checkout)
+      request.dispatch(callBack)(checkoutHandler._checkout)
     dispatch(['post'])(data)
   }
 
@@ -18,14 +25,14 @@ checkoutHandler._checkout = {}
 // Required data - token ID. Stripe token and order ID in payload
 checkoutHandler._checkout.post = callBack =>
   data => {
-    const [tokenId, orderId, stripeToken] = utils.validate([
+    const [tokenId, orderId, stripeToken] = validate([
       data.headers.token,
       data.payload.orderId,
       data.payload.stripeToken
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
@@ -34,26 +41,26 @@ checkoutHandler._checkout.post = callBack =>
       return
     }
 
-    utils.io.get(utils.dir.tokens)(tokenId)
+    io.get(dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.json.toObject(t)
+        const token = json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
-        utils.io.get(utils.dir.orders)(orderId)
+        io.get(dir.orders)(orderId)
           .then(o => {
-            const order = utils.json.toObject(o)
-            const payLoad = utils.request.createPayLoad(token)(order)
+            const order = json.toObject(o)
+            const payLoad = request.createPayLoad(token)(order)
 
             const stripePayLoad = payLoad(stripeToken)
-            const stripeOptions = utils.request.setOptions(stripePayLoad)
+            const stripeOptions = request.setOptions(stripePayLoad)
 
             // Make payment
-            utils.request.send(stripePayLoad)(stripeOptions)
+            request.send(stripePayLoad)(stripeOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Unable to process payment.'})
@@ -64,10 +71,10 @@ checkoutHandler._checkout.post = callBack =>
             order.paid = true
 
             const mailgunPayLoad = payLoad()
-            const mailgunOptions = utils.request.setOptions(mailgunPayLoad)
+            const mailgunOptions = request.setOptions(mailgunPayLoad)
 
             // Send email
-            utils.request.send(mailgunPayLoad)(mailgunOptions)
+            request.send(mailgunPayLoad)(mailgunOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
@@ -78,7 +85,7 @@ checkoutHandler._checkout.post = callBack =>
             order.mailSent = true
 
             // Update order
-            utils.io.writeFile(utils.dir.orders(order.id),
+            io.writeFile(dir.orders(order.id),
               JSON.stringify(order))
               .then(
                 callBack(200, {

@@ -1,14 +1,23 @@
 /* User handlers */
 
 // Dependencies
-const utils = require('../utils')
+const {
+  request,
+  validate,
+  io,
+  dir,
+  crypto,
+  errors,
+  json,
+  fp
+} = require('../utils')
 
 const userHandler = {}
 
 userHandler.user = callBack =>
   data => {
     const dispatch =
-      utils.request.dispatch(callBack)(userHandler._user)
+      request.dispatch(callBack)(userHandler._user)
     dispatch(['post', 'get', 'put', 'delete'])(data)
   }
 
@@ -28,7 +37,7 @@ userHandler._user.post = callBack =>
       email,
       password,
       streetAddress
-    ] = utils.validate([
+    ] = validate([
       data.payload.firstName,
       data.payload.lastName,
       data.payload.email,
@@ -41,8 +50,8 @@ userHandler._user.post = callBack =>
       return
     }
 
-    utils.io.readFile(
-      utils.dir.users(email),
+    io.readFile(
+      dir.users(email),
       'utf8'
     )
       .then(u => callBack(400, {
@@ -50,7 +59,7 @@ userHandler._user.post = callBack =>
       }))
       .catch(err => {
         // Hash password
-        const hashedPassword = utils.crypto.hash(password)
+        const hashedPassword = crypto.hash(password)
 
         // Create user
         if (hashedPassword) {
@@ -63,7 +72,7 @@ userHandler._user.post = callBack =>
           }
 
           // Store the user
-          utils.io.writeUser(user)
+          io.writeUser(user)
             .then(callBack(200, {'Success': 'User created successfully.'}))
             .catch(err => callBack(500, {'Error': err.toString()}))
         }
@@ -78,20 +87,20 @@ userHandler._user.post = callBack =>
 userHandler._user.get = callBack =>
   data => {
     // Validate email - do this properly, maybe with regex
-    const [email] = utils.validate([data.queryStringObject.email])
+    const [email] = validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Look up user
-    utils.io.readFile(
-      utils.dir.users(email),
+    io.readFile(
+      dir.users(email),
       'utf8'
     )
       .then(u => {
-        const user = utils.json.toObject(u)
+        const user = json.toObject(u)
         delete user.hashedPassword
         callBack(200, user)
       })
@@ -116,7 +125,7 @@ userHandler._user.get = callBack =>
 userHandler._user.put = callBack =>
   data => {
     // Validate required field
-    const [email] = utils.validate([data.payload.email])
+    const [email] = validate([data.payload.email])
 
     // Validate optional fields, if provided
     const [
@@ -124,7 +133,7 @@ userHandler._user.put = callBack =>
       lastName,
       password,
       streetAddress
-    ] = utils.validate([
+    ] = validate([
       data.payload.firstName,
       data.payload.lastName,
       data.payload.password,
@@ -132,7 +141,7 @@ userHandler._user.put = callBack =>
     ])
 
     if (!email) {
-      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -141,14 +150,14 @@ userHandler._user.put = callBack =>
       return
     }
 
-    utils.io.get(utils.dir.users)(email)
+    io.get(dir.users)(email)
       .then(u => {
-        const user = utils.json.toObject(u)
+        const user = json.toObject(u)
         const input = { firstName, lastName, streetAddress, password }
 
         // Update input with hashed password
         if (input.password !== false) {
-          input.hashedPassword = utils.crypto.hash(input.password)
+          input.hashedPassword = crypto.hash(input.password)
         }
 
         const notPasswordField = item => item[0] !== 'password'
@@ -163,11 +172,11 @@ userHandler._user.put = callBack =>
         // Remove password field
         // Remove fields that don't have values
         // Make object from resulting array
-        const getFieldsToUpdate = utils.fp.compose(
+        const getFieldsToUpdate = fp.compose(
           reduce(objectify),
-          utils.fp.compose(
-            utils.fp.filter(notFalse),
-            utils.fp.filter(notPasswordField)
+          fp.compose(
+            fp.filter(notFalse),
+            fp.filter(notPasswordField)
           )
         )
         const fields = getFieldsToUpdate(Object.entries(input))
@@ -176,7 +185,7 @@ userHandler._user.put = callBack =>
         Object.assign(user, fields)
 
         // Store updates
-        utils.io.writeUser(user)
+        io.writeUser(user)
           .then(callBack(200, {'Success': 'User updated successfully.'}))
           .catch(err => callBack(500, {'Error': err.toString()}))
       })
@@ -195,14 +204,14 @@ userHandler._user.put = callBack =>
 userHandler._user.delete = callBack =>
   data => {
     // Validate email
-    const [email] = utils.validate([data.queryStringObject.email])
+    const [email] = validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
-    utils.io.delete(utils.dir.users)(email)
+    io.delete(dir.users)(email)
       .then(() => callBack(200, {
         'Success': 'User deleted successfully.'
       }))

@@ -1,8 +1,15 @@
 /* Order handler */
 
 // Dependencies
-const utils = require('../../utils')
 const helpers = require('./helpers')
+const {
+  request,
+  validate,
+  errors,
+  io,
+  dir,
+  json
+} = require('../../utils')
 
 
 const orderHandler = {}
@@ -10,7 +17,7 @@ const orderHandler = {}
 orderHandler.order = callBack =>
   data => {
     const dispatch =
-      utils.request.dispatch(callBack)(orderHandler._order)
+      request.dispatch(callBack)(orderHandler._order)
     dispatch(['post', 'get'])(data)
   }
 
@@ -22,27 +29,27 @@ orderHandler._order = {}
 orderHandler._order.post = callBack =>
   data => {
     // Get tokenId from header
-    const [tokenId] = utils.validate([data.headers.token])
+    const [tokenId] = validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     // Get token
-    utils.io.get(utils.dir.tokens)(tokenId)
+    io.get(dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.json.toObject(t)
+        const token = json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
-        utils.io.get(utils.dir.users)(token.email)
+        io.get(dir.users)(token.email)
           .then(u => {
-            const user = utils.json.toObject(u)
+            const user = json.toObject(u)
             if (!user.hasOwnProperty('cart')) {
               callBack(400, {'Error': 'You have no shopping cart.'})
               return
@@ -59,7 +66,7 @@ orderHandler._order.post = callBack =>
               helpers.placeOrder(cart), { email: token.email })
 
             // Write order object to file
-            utils.io.writeFile(utils.dir.orders(order.id),
+            io.writeFile(dir.orders(order.id),
               JSON.stringify(order))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
@@ -71,7 +78,7 @@ orderHandler._order.post = callBack =>
             }
 
             const updatedUser = helpers.updateUser(user)(o)
-            utils.io.writeUser(updatedUser)
+            io.writeUser(updatedUser)
               .then(callBack(200, user.orders))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
@@ -88,40 +95,40 @@ orderHandler._order.post = callBack =>
 // Optional data: none
 orderHandler._order.get = callBack =>
   data => {
-    const [tokenId, orderId] = utils.validate([
+    const [tokenId, orderId] = validate([
       data.headers.token,
       data.queryStringObject.id
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': utils.errors.TOKEN_NOT_PROVIDED})
+      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!orderId) {
-      callBack(400, {'Error': utils.errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     // Get token
-    utils.io.get(utils.dir.tokens)(tokenId)
+    io.get(dir.tokens)(tokenId)
       .then(x => {
-        const token = utils.json.toObject(x)
+        const token = json.toObject(x)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': utils.errors.TOKEN_EXPIRED})
+          callBack(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
-        utils.io.get(utils.dir.users)(token.email)
+        io.get(dir.users)(token.email)
           .then(user => {
-            !utils.json.toObject(user).orders
+            !json.toObject(user).orders
               ? callBack(404, {'Error': 'User has no orders.'})
               // Get order
-              : utils.io.get(utils.dir.orders)(orderId)
+              : io.get(dir.orders)(orderId)
                   .then(o => {
-                    const order = utils.json.toObject(o)
+                    const order = json.toObject(o)
                     callBack(200, order)
                   })
                   .catch(err =>

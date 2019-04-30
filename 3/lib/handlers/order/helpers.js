@@ -1,5 +1,5 @@
 /* Order helpers */
-const utils = require('../../utils')
+const { crypto } = require('../../utils')
 
 const helpers = {}
 
@@ -20,7 +20,7 @@ helpers.updateUser = user =>
 
 helpers.placeOrder = items => {
   // Set ID to random string
-  const id = utils.crypto.createRandomString(20)
+  const id = crypto.createRandomString(20)
 
   // Set paid and mailSent properties
   // on order object
