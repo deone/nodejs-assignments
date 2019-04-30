@@ -50,18 +50,13 @@ checkoutHandler._checkout.post = callBack =>
         utils.get(utils.orderDir)(orderId)
           .then(o => {
             const order = utils.parseJsonToObject(o)
+            const payLoad = utils.createPayLoad(token)(order)
 
-            // Make payment
-            const stripePayLoad = queryString.stringify({
-              amount: Math.round(order.totalPrice * 100),
-              currency: 'usd',
-              description: `${token.email}_${tokenId}_${Date.now()}`,
-              source: stripeToken
-            })
-
+            const stripePayLoad = payLoad(stripeToken)
             const stripeOptions = utils.setOptions('api.stripe.com')
               ('/v1/charges')(`Bearer ${config.stripeKey}`)(stripePayLoad)
 
+            // Make payment
             utils.sendRequest(stripePayLoad)(stripeOptions)
               ((err, data) => {
                 if (err) {
@@ -72,19 +67,12 @@ checkoutHandler._checkout.post = callBack =>
 
             order.paid = true
 
-            // Send mail
-            const mailgunPayLoad = queryString.stringify({
-              'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
-              'to': 'alwaysdeone@gmail.com',
-              'subject': `Order No. ${order.id}`,
-              'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
-            })
-
-            // Send email if payment is successful
+            const mailgunPayLoad = payLoad()
             const mailgunOptions = utils.setOptions('api.mailgun.net')
               (`/v3/${config.mailgunDomain}/messages`)
               ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64'))(mailgunPayLoad)
 
+            // Send email
             utils.sendRequest(mailgunPayLoad)(mailgunOptions)
               ((err, data) => {
                 if (err) {

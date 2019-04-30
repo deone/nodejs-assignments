@@ -2,8 +2,9 @@
 const fs = require('fs')
 const path = require('path')
 const https = require('https')
-const { promisify } = require('util')
 const crypto = require('crypto')
+const { promisify } = require('util')
+const queryString = require('querystring')
 
 const config = require('./config')
 
@@ -122,7 +123,7 @@ utils.hash = str =>
     : false
 
 
-/* Request Handler */
+/* Requests */
 utils.requestDispatcher = callBack =>
   handlers =>
     acceptableMethods =>
@@ -166,6 +167,25 @@ utils.sendRequest = payLoad =>
       req.end()
     }
 
+utils.createPayLoad = token =>
+  order =>
+    (source = null) =>
+      source
+        ? queryString.stringify({
+            amount: Math.round(order.totalPrice * 100),
+            currency: 'usd',
+            description: `${token.email}_${token.tokenId}_${Date.now()}`,
+            source: source
+          })
+        : queryString.stringify({
+            'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
+            'to': 'alwaysdeone@gmail.com',
+            'subject': `Order No. ${order.id}`,
+            'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
+          })
+
+
+/* Templates */
 utils.getTemplate = (templateName, data, callBack) => {
   templateName = typeof templateName === 'string' && templateName.length > 0
     ? templateName
