@@ -59,8 +59,8 @@ checkoutHandler._checkout.post = callBack =>
               source: stripeToken
             })
 
-            const stripeOptions = utils.setOptions(
-              'api.stripe.com', '/v1/charges', `Bearer ${config.stripeKey}`, stripePayLoad)
+            const stripeOptions = utils.setOptions('api.stripe.com')
+              ('/v1/charges')(`Bearer ${config.stripeKey}`)(stripePayLoad)
 
             utils.sendRequest(
               stripePayLoad,
@@ -84,9 +84,9 @@ checkoutHandler._checkout.post = callBack =>
             })
 
             // Send email if payment is successful
-            const mailgunOptions = utils.setOptions(
-              'api.mailgun.net', `/v3/${config.mailgunDomain}/messages`,
-              ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')), mailgunPayLoad)
+            const mailgunOptions = utils.setOptions('api.mailgun.net')
+              (`/v3/${config.mailgunDomain}/messages`)
+              ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64'))(mailgunPayLoad)
 
             utils.sendRequest(
               mailgunPayLoad,
