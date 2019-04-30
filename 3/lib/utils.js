@@ -146,27 +146,25 @@ utils.setOptions = host =>
         }
       })
 
-utils.sendRequest = (
-  payLoad,
-  options,
-  callBack
-) => {
-  const req = https.request(options, res => {
-    console.log(`Status code: ${res.statusCode}`)
-  
-    res.on('data', d => {
-      console.log(`${d}`)
-      res.statusCode === 200
-        ? callBack(false)
-        : callBack(true)
-    })
-  })
-  
-  req.on('error', error => console.error(error))
-  
-  req.write(payLoad)
-  req.end()
-}
+utils.sendRequest = payLoad =>
+  options =>
+    callBack => {
+      const req = https.request(options, res => {
+        console.log(`Status code: ${res.statusCode}`)
+      
+        res.on('data', d => {
+          console.log(`${d}`)
+          res.statusCode === 200
+            ? callBack(false)
+            : callBack(true)
+        })
+      })
+      
+      req.on('error', error => console.error(error))
+      
+      req.write(payLoad)
+      req.end()
+    }
 
 utils.getTemplate = (templateName, data, callBack) => {
   templateName = typeof templateName === 'string' && templateName.length > 0

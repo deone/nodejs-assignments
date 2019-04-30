@@ -62,16 +62,13 @@ checkoutHandler._checkout.post = callBack =>
             const stripeOptions = utils.setOptions('api.stripe.com')
               ('/v1/charges')(`Bearer ${config.stripeKey}`)(stripePayLoad)
 
-            utils.sendRequest(
-              stripePayLoad,
-              stripeOptions,
-              (err, data) => {
+            utils.sendRequest(stripePayLoad)(stripeOptions)
+              ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Unable to process payment.'})
                   return
                 }
-              }
-            )
+              })
 
             order.paid = true
 
@@ -88,16 +85,13 @@ checkoutHandler._checkout.post = callBack =>
               (`/v3/${config.mailgunDomain}/messages`)
               ('Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64'))(mailgunPayLoad)
 
-            utils.sendRequest(
-              mailgunPayLoad,
-              mailgunOptions,
-              (err, data) => {
+            utils.sendRequest(mailgunPayLoad)(mailgunOptions)
+              ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
                   return
                 }
-              }
-            )
+              })
 
             order.mailSent = true
 
