@@ -10,7 +10,7 @@ const cartHandler = {}
 cartHandler.cart = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(cartHandler._cart)
+      utils.request.dispatch(callBack)(cartHandler._cart)
     dispatch(['get', 'put', 'delete'])(data)
   }
 
@@ -30,9 +30,9 @@ cartHandler._cart.get = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -40,10 +40,10 @@ cartHandler._cart.get = callBack =>
           return
         }
 
-        utils.get(utils.userDir)(token.email)
+        utils.io.get(utils.dir.users)(token.email)
           .then(user => {
               const cart = helpers.getOrCreateCart(callBack)(
-                utils.parseJsonToObject(user))
+                utils.json.toObject(user))
               callBack(200, cart)
             }
           )
@@ -76,9 +76,9 @@ cartHandler._cart.put = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -87,9 +87,9 @@ cartHandler._cart.put = callBack =>
         }
 
         // Check whether menu item is on menu
-        utils.readDir(utils.menuItemDir())
+        utils.io.readDir(utils.dir.menuItems())
           .then(xs => {
-            const menu = utils.map(utils.slice(0)(-5))(xs)
+            const menu = utils.fp.map(utils.fp.slice(0)(-5))(xs)
             if (!menu.includes(item)) {
               // Requested item is not on menu
               callBack(400, {'Error': 'Item requested is not on menu.'})
@@ -97,13 +97,13 @@ cartHandler._cart.put = callBack =>
             }
 
             // Get user
-            utils.get(utils.userDir)(token.email)
+            utils.io.get(utils.dir.users)(token.email)
               .then(u => {
-                const user = utils.parseJsonToObject(u)
+                const user = utils.json.toObject(u)
                 // Get menu item
-                utils.get(utils.menuItemDir)(item)
+                utils.io.get(utils.dir.menuItems)(item)
                   .then(m => {
-                    const menuItem = utils.parseJsonToObject(m)
+                    const menuItem = utils.json.toObject(m)
                     // Get cart
                     const cart = helpers.getOrCreateCart(callBack)(user)
                     // Remove menu item ID and
@@ -112,7 +112,7 @@ cartHandler._cart.put = callBack =>
                     user.cart = user.cart.concat([menuItem])
 
                     // Write user and return cart
-                    utils.writeUser(user)
+                    utils.io.writeUser(user)
                       .then(callBack(200, user.cart))
                       .catch(err => callBack(500, {'Error': err.toString()}))
                   })
@@ -151,9 +151,9 @@ cartHandler._cart.delete = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -162,15 +162,15 @@ cartHandler._cart.delete = callBack =>
         }
 
         // Get user
-        utils.get(utils.userDir)(token.email)
+        utils.io.get(utils.dir.users)(token.email)
           .then(u => {
-            const user = utils.parseJsonToObject(u)
+            const user = utils.json.toObject(u)
 
             const isNeeded = x => x.name !== item
-            user.cart = utils.filter(isNeeded)(user.cart)
+            user.cart = utils.fp.filter(isNeeded)(user.cart)
 
             // Write user and return cart
-            utils.writeUser(user)
+            utils.io.writeUser(user)
               .then(callBack(200, user.cart))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))

@@ -8,7 +8,7 @@ const menuHandler = {}
 menuHandler.menu = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(menuHandler._menu)
+      utils.request.dispatch(callBack)(menuHandler._menu)
     dispatch(['get'])(data)
   }
 
@@ -28,9 +28,9 @@ menuHandler._menu.get = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -39,7 +39,7 @@ menuHandler._menu.get = callBack =>
         }
 
         // Read menu items directory
-        utils.readDir(utils.menuItemDir())
+        utils.io.readDir(utils.dir.menuItems())
           .then(xs => {
             if (!xs.length) {
               // There are no menu items
@@ -49,12 +49,12 @@ menuHandler._menu.get = callBack =>
               return
             }
 
-            const promises = utils.map(
-              utils.getByFileName(utils.menuItemDir)
+            const promises = utils.fp.map(
+              utils.io.getByFileName(utils.dir.menuItems)
             )(xs)
 
             Promise.all(promises).then(ms => {
-              callBack(200, utils.map(utils.parseJsonToObject)(ms))
+              callBack(200, utils.fp.map(utils.json.toObject)(ms))
             })
 
           })

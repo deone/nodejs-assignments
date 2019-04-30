@@ -8,7 +8,7 @@ const checkoutHandler = {}
 checkoutHandler.checkout = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(checkoutHandler._checkout)
+      utils.request.dispatch(callBack)(checkoutHandler._checkout)
     dispatch(['post'])(data)
   }
 
@@ -34,9 +34,9 @@ checkoutHandler._checkout.post = callBack =>
       return
     }
 
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -44,16 +44,16 @@ checkoutHandler._checkout.post = callBack =>
           return
         }
 
-        utils.get(utils.orderDir)(orderId)
+        utils.io.get(utils.dir.orders)(orderId)
           .then(o => {
-            const order = utils.parseJsonToObject(o)
-            const payLoad = utils.createPayLoad(token)(order)
+            const order = utils.json.toObject(o)
+            const payLoad = utils.request.createPayLoad(token)(order)
 
             const stripePayLoad = payLoad(stripeToken)
-            const stripeOptions = utils.setOptions(stripePayLoad)
+            const stripeOptions = utils.request.setOptions(stripePayLoad)
 
             // Make payment
-            utils.sendRequest(stripePayLoad)(stripeOptions)
+            utils.request.send(stripePayLoad)(stripeOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Unable to process payment.'})
@@ -64,10 +64,10 @@ checkoutHandler._checkout.post = callBack =>
             order.paid = true
 
             const mailgunPayLoad = payLoad()
-            const mailgunOptions = utils.setOptions(mailgunPayLoad)
+            const mailgunOptions = utils.request.setOptions(mailgunPayLoad)
 
             // Send email
-            utils.sendRequest(mailgunPayLoad)(mailgunOptions)
+            utils.request.send(mailgunPayLoad)(mailgunOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
@@ -78,7 +78,7 @@ checkoutHandler._checkout.post = callBack =>
             order.mailSent = true
 
             // Update order
-            utils.writeFile(utils.orderDir(order.id),
+            utils.io.writeFile(utils.dir.orders(order.id),
               JSON.stringify(order))
               .then(
                 callBack(200, {

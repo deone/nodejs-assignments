@@ -8,7 +8,7 @@ const userHandler = {}
 userHandler.user = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(userHandler._user)
+      utils.request.dispatch(callBack)(userHandler._user)
     dispatch(['post', 'get', 'put', 'delete'])(data)
   }
 
@@ -41,8 +41,8 @@ userHandler._user.post = callBack =>
       return
     }
 
-    utils.readFile(
-      utils.userDir(email),
+    utils.io.readFile(
+      utils.dir.users(email),
       'utf8'
     )
       .then(u => callBack(400, {
@@ -50,7 +50,7 @@ userHandler._user.post = callBack =>
       }))
       .catch(err => {
         // Hash password
-        const hashedPassword = utils.hash(password)
+        const hashedPassword = utils.crypto.hash(password)
 
         // Create user
         if (hashedPassword) {
@@ -63,7 +63,7 @@ userHandler._user.post = callBack =>
           }
 
           // Store the user
-          utils.writeUser(user)
+          utils.io.writeUser(user)
             .then(callBack(200, {'Success': 'User created successfully.'}))
             .catch(err => callBack(500, {'Error': err.toString()}))
         }
@@ -86,12 +86,12 @@ userHandler._user.get = callBack =>
     }
 
     // Look up user
-    utils.readFile(
-      utils.userDir(email),
+    utils.io.readFile(
+      utils.dir.users(email),
       'utf8'
     )
       .then(u => {
-        const user = utils.parseJsonToObject(u)
+        const user = utils.json.toObject(u)
         delete user.hashedPassword
         callBack(200, user)
       })
@@ -141,14 +141,14 @@ userHandler._user.put = callBack =>
       return
     }
 
-    utils.get(utils.userDir)(email)
+    utils.io.get(utils.dir.users)(email)
       .then(u => {
-        const user = utils.parseJsonToObject(u)
+        const user = utils.json.toObject(u)
         const input = { firstName, lastName, streetAddress, password }
 
         // Update input with hashed password
         if (input.password !== false) {
-          input.hashedPassword = utils.hash(input.password)
+          input.hashedPassword = utils.crypto.hash(input.password)
         }
 
         const notPasswordField = item => item[0] !== 'password'
@@ -163,11 +163,11 @@ userHandler._user.put = callBack =>
         // Remove password field
         // Remove fields that don't have values
         // Make object from resulting array
-        const getFieldsToUpdate = utils.compose(
+        const getFieldsToUpdate = utils.fp.compose(
           reduce(objectify),
-          utils.compose(
-            utils.filter(notFalse),
-            utils.filter(notPasswordField)
+          utils.fp.compose(
+            utils.fp.filter(notFalse),
+            utils.fp.filter(notPasswordField)
           )
         )
         const fields = getFieldsToUpdate(Object.entries(input))
@@ -176,7 +176,7 @@ userHandler._user.put = callBack =>
         Object.assign(user, fields)
 
         // Store updates
-        utils.writeUser(user)
+        utils.io.writeUser(user)
           .then(callBack(200, {'Success': 'User updated successfully.'}))
           .catch(err => callBack(500, {'Error': err.toString()}))
       })
@@ -202,7 +202,7 @@ userHandler._user.delete = callBack =>
       return
     }
 
-    utils.delete(utils.userDir)(email)
+    utils.io.delete(utils.dir.users)(email)
       .then(() => callBack(200, {
         'Success': 'User deleted successfully.'
       }))

@@ -107,7 +107,7 @@ const server = http.createServer((req, res) => {
       'queryStringObject' : queryStringObject,
       'method' : method,
       'headers' : headers,
-      'payload' : utils.parseJsonToObject(buffer)
+      'payload' : utils.json.toObject(buffer)
     }
 
     // handle request

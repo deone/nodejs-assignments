@@ -20,7 +20,7 @@ helpers.updateUser = user =>
 
 helpers.placeOrder = items => {
   // Set ID to random string
-  const id = utils.createRandomString(20)
+  const id = utils.crypto.createRandomString(20)
 
   // Set paid and mailSent properties
   // on order object

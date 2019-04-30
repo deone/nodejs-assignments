@@ -7,7 +7,7 @@ helpers.getOrCreateCart = callBack =>
   user => {
     if (!user.hasOwnProperty('cart')) {
       user.cart = []
-      utils.writeUser(user)
+      utils.io.writeUser(user)
         .catch(err => callBack(500, {'Error': err.toString()}))
     }
     return user.cart

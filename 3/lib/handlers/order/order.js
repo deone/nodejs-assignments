@@ -10,7 +10,7 @@ const orderHandler = {}
 orderHandler.order = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(orderHandler._order)
+      utils.request.dispatch(callBack)(orderHandler._order)
     dispatch(['post', 'get'])(data)
   }
 
@@ -30,9 +30,9 @@ orderHandler._order.post = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(t => {
-        const token = utils.parseJsonToObject(t)
+        const token = utils.json.toObject(t)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -40,9 +40,9 @@ orderHandler._order.post = callBack =>
           return
         }
 
-        utils.get(utils.userDir)(token.email)
+        utils.io.get(utils.dir.users)(token.email)
           .then(u => {
-            const user = utils.parseJsonToObject(u)
+            const user = utils.json.toObject(u)
             if (!user.hasOwnProperty('cart')) {
               callBack(400, {'Error': 'You have no shopping cart.'})
               return
@@ -59,7 +59,7 @@ orderHandler._order.post = callBack =>
               helpers.placeOrder(cart), { email: token.email })
 
             // Write order object to file
-            utils.writeFile(utils.orderDir(order.id),
+            utils.io.writeFile(utils.dir.orders(order.id),
               JSON.stringify(order))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
@@ -71,7 +71,7 @@ orderHandler._order.post = callBack =>
             }
 
             const updatedUser = helpers.updateUser(user)(o)
-            utils.writeUser(updatedUser)
+            utils.io.writeUser(updatedUser)
               .then(callBack(200, user.orders))
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
@@ -104,9 +104,9 @@ orderHandler._order.get = callBack =>
     }
 
     // Get token
-    utils.get(utils.tokenDir)(tokenId)
+    utils.io.get(utils.dir.tokens)(tokenId)
       .then(x => {
-        const token = utils.parseJsonToObject(x)
+        const token = utils.json.toObject(x)
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
@@ -114,14 +114,14 @@ orderHandler._order.get = callBack =>
           return
         }
 
-        utils.get(utils.userDir)(token.email)
+        utils.io.get(utils.dir.users)(token.email)
           .then(user => {
-            !utils.parseJsonToObject(user).orders
+            !utils.json.toObject(user).orders
               ? callBack(404, {'Error': 'User has no orders.'})
               // Get order
-              : utils.get(utils.orderDir)(orderId)
+              : utils.io.get(utils.dir.orders)(orderId)
                   .then(o => {
-                    const order = utils.parseJsonToObject(o)
+                    const order = utils.json.toObject(o)
                     callBack(200, order)
                   })
                   .catch(err =>

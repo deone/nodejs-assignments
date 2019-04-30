@@ -8,14 +8,14 @@ const authHandler = {}
 authHandler.login = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(authHandler._login)
+      utils.request.dispatch(callBack)(authHandler._login)
     dispatch(['post'])(data)
   }
 
 authHandler.logout = callBack =>
   data => {
     const dispatch =
-      utils.requestDispatcher(callBack)(authHandler._logout)
+      utils.request.dispatch(callBack)(authHandler._logout)
     dispatch(['post'])(data)
   }
 
@@ -37,32 +37,32 @@ authHandler._login.post = callBack =>
       return
     }
 
-    const createToken = utils.createToken(callBack)(email)
+    const createToken = utils.crypto.createToken(callBack)(email)
 
     // Lookup user with email
-    utils.readFile(utils.userDir(email), 'utf8')
+    utils.io.readFile(utils.dir.users(email), 'utf8')
       .then(u => {
-        const user = utils.parseJsonToObject(u)
-        if (utils.hash(password) !== user.hashedPassword) {
+        const user = utils.json.toObject(u)
+        if (utils.crypto.hash(password) !== user.hashedPassword) {
           callBack(400, {
             'Error': "Password did not match the user's stored password."})
           return
         }
 
         // Check if user has a token
-        utils.readDir(utils.tokenDir())
+        utils.io.readDir(utils.dir.tokens())
           .then(xs => {
             if (!xs.length) {
               // First case - no tokens in directory
-              const token = createToken(utils.createRandomString(20))
+              const token = createToken(utils.crypto.createRandomString(20))
               callBack(200, token)
               return
             }
 
             // There are token files
             // Get all tokens
-            const promises = utils.map(
-              utils.getByFileName(utils.tokenDir)
+            const promises = utils.fp.map(
+              utils.io.getByFileName(utils.dir.tokens)
             )(xs)
 
             const p = Promise.all(promises)
@@ -70,30 +70,30 @@ authHandler._login.post = callBack =>
               .then(
                 xs => {
                   const tokens =
-                    utils
-                      .map(utils.parseJsonToObject)(xs)
+                    utils.fp
+                      .map(utils.json.toObject)(xs)
 
                   // Extract email from tokens
                   const getEmail = x => x.email
-                  const emails = utils.map(getEmail)(tokens)
+                  const emails = utils.fp.map(getEmail)(tokens)
 
                   const userHasToken = !emails.includes(email) ? false : true
                   if (!userHasToken) {
                     // Second case - user does not have token
-                    const token = createToken(utils.createRandomString(20))
+                    const token = createToken(utils.crypto.createRandomString(20))
                     callBack(200, token)
                     return
                   }
 
                   // Third case - user has token
                   const findToken = token => token.email === email
-                  const token = utils.find(findToken)(tokens)
+                  const token = utils.fp.find(findToken)(tokens)
 
                   Date.now() > token.expires
                     // if token is expired, delete and create another
-                    ? utils.delete(utils.tokenDir)(token.id)
+                    ? utils.io.delete(utils.dir.tokens)(token.id)
                         .then(() => {
-                          const token = createToken(utils.createRandomString(20))
+                          const token = createToken(utils.crypto.createRandomString(20))
                           callBack(200, token)
                         })
                         .catch(err =>
@@ -125,7 +125,7 @@ authHandler._logout.post = callBack =>
       return
     }
 
-    utils.delete(utils.tokenDir)(tokenId)
+    utils.io.delete(utils.dir.tokens)(tokenId)
       .then(callBack(
         200, {'Success': 'User logged out.'}
       ))

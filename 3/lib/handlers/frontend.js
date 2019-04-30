@@ -7,7 +7,7 @@ const handlers = {}
 
 handlers.index = (data, callBack) =>
   data.method === 'get'
-    ? utils.getTemplate('index', data, callBack)
+    ? utils.io.getTemplate('index', data, callBack)
         .then(string => {
           callBack(200, string, 'html')
         })
