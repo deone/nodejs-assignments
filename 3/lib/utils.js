@@ -131,19 +131,17 @@ utils.requestDispatcher = callBack =>
           ? handlers[data.method](callBack)(data)
           : callBack(405)
 
-utils.setOptions = (host, path, auth, payLoad) => {
-  return {
-    hostname: host,
-    port: 443,
-    path: path,
-    method: 'POST',
-    headers: {
-      'Authorization': auth,
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(payLoad)
-    }
+utils.setOptions = (host, path, auth, payLoad) => ({
+  hostname: host,
+  port: 443,
+  path: path,
+  method: 'POST',
+  headers: {
+    'Authorization': auth,
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Length': Buffer.byteLength(payLoad)
   }
-}
+})
 
 utils.sendRequest = (
   payLoad,
