@@ -163,7 +163,6 @@ userHandler._user.put = callBack =>
         const notPasswordField = item => item[0] !== 'password'
         const notFalse = item => item[1] !== false
 
-        const reduce = f => x => x.reduce(f, {})
         const objectify = (obj, item) => {
           obj[item[0]] = item[1]
           return obj
@@ -173,7 +172,7 @@ userHandler._user.put = callBack =>
         // Remove fields that don't have values
         // Make object from resulting array
         const getFieldsToUpdate = fp.compose(
-          reduce(objectify),
+          fp.reduce(objectify)({}),
           fp.compose(
             fp.filter(notFalse),
             fp.filter(notPasswordField)

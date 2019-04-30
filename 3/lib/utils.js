@@ -80,7 +80,8 @@ utils.fp.map = f => xs => xs.map(f)
 utils.fp.find = f => xs => xs.find(f)
 utils.fp.filter = f => xs => xs.filter(f)
 utils.fp.forEach = f => xs => xs.forEach(f)
-utils.fp.slice = start => end => s => s.slice(start, end)
+utils.fp.slice = a => b => s => s.slice(a, b)
+utils.fp.reduce = f => a => xs => xs.reduce(f, a)
 utils.fp.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)
 
