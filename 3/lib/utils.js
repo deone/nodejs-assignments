@@ -76,12 +76,23 @@ utils.dir.templates = path.join(__dirname, '/../templates/')
 
 /* FP/Point-free utilities */
 utils.fp = {}
+
+// map :: (a -> b) -> [a] -> [b]
 utils.fp.map = f => xs => xs.map(f)
+
+// find :: (a -> Bool) -> [a] -> a
 utils.fp.find = f => xs => xs.find(f)
+
+// filter :: (a -> Bool) -> [a] -> [a]
 utils.fp.filter = f => xs => xs.filter(f)
-utils.fp.forEach = f => xs => xs.forEach(f)
+
+// slice :: a -> a -> String -> String
 utils.fp.slice = a => b => s => s.slice(a, b)
+
+// reduce :: (b -> a -> b) -> b -> [a] -> b
 utils.fp.reduce = f => a => xs => xs.reduce(f, a)
+
+// compose :: [a] -> b -> b
 utils.fp.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)
 
@@ -218,6 +229,8 @@ utils.request.send = payLoad =>
       req.write(payLoad)
       req.end()
     }
+
+utils.getANumber = () => 1
 
 
 module.exports = utils
