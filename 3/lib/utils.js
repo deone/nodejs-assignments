@@ -92,6 +92,8 @@ utils.fp.slice = a => b => s => s.slice(a, b)
 // reduce :: (b -> a -> b) -> b -> [a] -> b
 utils.fp.reduce = f => a => xs => xs.reduce(f, a)
 
+utils.fp.forEach = f => xs => xs.forEach(f)
+
 // compose :: [a] -> b -> b
 utils.fp.compose = (...functions) => data =>
   functions.reduceRight((value, func) => func(value), data)

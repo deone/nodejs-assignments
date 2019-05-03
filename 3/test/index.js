@@ -5,7 +5,7 @@
 
 // Dependencies
 const { fp } = require('./../lib/utils')
-const { reduce } = fp
+const { reduce, forEach } = fp
 
 // Override the NODE_ENV variable
 process.env.NODE_ENV = 'testing'
@@ -68,7 +68,6 @@ _app.runTests = function() {
   }
 };
 
-
 // Product a test outcome report
 _app.produceTestReport = function(limit,successes,errors){
   console.log("")
@@ -83,11 +82,13 @@ _app.produceTestReport = function(limit,successes,errors){
   if (errors.length > 0) {
     console.log("--------BEGIN ERROR DETAILS--------")
     console.log("")
-    errors.forEach(function(testError) {
-      console.log('\x1b[31m%s\x1b[0m', testError.name)
-      console.log(testError.error)
+
+    forEach(e => {
+      console.log('\x1b[31m%s\x1b[0m', e.name)
+      console.log(e.error)
       console.log("")
-    })
+    })(errors)
+
     console.log("")
     console.log("--------END ERROR DETAILS--------")
   }
