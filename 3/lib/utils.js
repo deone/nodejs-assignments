@@ -62,16 +62,15 @@ utils.dir.path = baseDir =>
     fileName =>
       !fileName
         ? path.join(baseDir, dir, '/')
-        : path.join(
-            baseDir, dir, fileName.concat('.', 'json')
-          )
+        : path.join(baseDir, dir, fileName.concat('.', 'json'))
 
 utils.dir.data = utils.dir.path(path.join(__dirname, '/../.data/'))
+utils.dir.templates = utils.dir.path(path.join(__dirname, '/../templates/'))
+
 utils.dir.users = utils.dir.data('users')
 utils.dir.orders = utils.dir.data('orders')
 utils.dir.tokens = utils.dir.data('tokens')
 utils.dir.menuItems = utils.dir.data('menuitems')
-utils.dir.templates = path.join(__dirname, '/../templates/')
 
 
 /* FP/Point-free utilities */
@@ -149,12 +148,7 @@ utils.crypto.createToken = callBack =>
 
 // Create a SHA256 hash
 utils.crypto.hash = str =>
-  typeof str == 'string' && str.length > 0
-    ? crypto.createHmac(
-        'sha256',
-        config.hashingSecret
-      ).update(str).digest('hex')
-    : false
+  crypto.createHmac('sha256',config.hashingSecret).update(str).digest('hex')
 
 
 /* Requests */
@@ -231,8 +225,6 @@ utils.request.send = payLoad =>
       req.write(payLoad)
       req.end()
     }
-
-utils.getANumber = () => 1
 
 
 module.exports = utils
