@@ -16,15 +16,13 @@ const authHandler = {}
 
 authHandler.login = callBack =>
   data => {
-    const dispatch =
-      request.dispatch(callBack)(authHandler._login)
+    const dispatch = request.dispatch(callBack)(authHandler._login)
     dispatch(['post'])(data)
   }
 
 authHandler.logout = callBack =>
   data => {
-    const dispatch =
-      request.dispatch(callBack)(authHandler._logout)
+    const dispatch = request.dispatch(callBack)(authHandler._logout)
     dispatch(['post'])(data)
   }
 

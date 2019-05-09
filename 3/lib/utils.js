@@ -64,8 +64,8 @@ utils.dir.path = baseDir =>
         ? path.join(baseDir, dir, '/')
         : path.join(baseDir, dir, fileName.concat('.', 'json'))
 
+utils.dir.templates = path.join(__dirname, '/../templates/')
 utils.dir.data = utils.dir.path(path.join(__dirname, '/../.data/'))
-utils.dir.templates = utils.dir.path(path.join(__dirname, '/../templates/'))
 
 utils.dir.users = utils.dir.data('users')
 utils.dir.orders = utils.dir.data('orders')
@@ -153,13 +153,6 @@ utils.crypto.hash = str =>
 
 /* Requests */
 utils.request = {}
-utils.request.dispatch = callBack =>
-  handlers =>
-    acceptableMethods =>
-      data =>
-        acceptableMethods.includes(data.method)
-          ? handlers[data.method](callBack)(data)
-          : callBack(405)
 
 utils.request.setOptions = payLoad => {
   let [host, path, auth] = [
@@ -205,6 +198,14 @@ utils.request.createPayLoad = token =>
             'subject': `Order No. ${order.id}`,
             'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
           })
+
+utils.request.dispatch = callBack =>
+  handlers =>
+    acceptableMethods =>
+      data =>
+        acceptableMethods.includes(data.method)
+          ? handlers[data.method](callBack)(data)
+          : callBack(405)
 
 utils.request.send = payLoad =>
   options =>
