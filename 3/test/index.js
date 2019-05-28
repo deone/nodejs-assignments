@@ -3,13 +3,12 @@
  *
  */
 
+// Override the NODE_ENV variable
+process.env.NODE_ENV = 'testing'
+
 // Dependencies
 const { fp } = require('./../lib/utils')
 const { reduce, forEach } = fp
-
-
-// Override the NODE_ENV variable
-process.env.NODE_ENV = 'testing'
 
 // Application logic for the test runner
 const _app = {}

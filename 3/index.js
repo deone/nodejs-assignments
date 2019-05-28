@@ -27,8 +27,7 @@ const getMsgString = (message, contentType) => {
 
   const msgStrings = {
     'json': () => JSON.stringify(
-              typeof message === 'object' ? message : {}
-            ),
+              typeof message === 'object' ? message : {}),
     'html': () => typeof message === 'string' ? message : ''
   }
 
