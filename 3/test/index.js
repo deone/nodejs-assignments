@@ -18,7 +18,7 @@ _app.tests = {}
 
 // Dependencies
 _app.tests.unit = require('./unit')
-// _app.tests.api = require('./api')
+_app.tests.api = require('./api')
 
 const appTests = Object.entries(_app.tests)
 
@@ -44,8 +44,12 @@ _app.runTests = () => {
           console.log('\x1b[32m%s\x1b[0m', name)
           counter = counter + 1
           successes = successes + 1
+          if (counter === numberOfTests) {
+            _app.produceTestReport(numberOfTests, successes, errors)
+          }
         })
-      } catch(e){
+      } catch(e) {
+        console.log('error', e)
         // If it throws, then it failed, so capture
         // the error thrown and log it in red
         errors.push({
@@ -54,9 +58,9 @@ _app.runTests = () => {
         })
         console.log('\x1b[31m%s\x1b[0m', name)
         counter = counter + 1
-      }
-      if (counter === numberOfTests) {
-        _app.produceTestReport(numberOfTests, successes, errors)
+        if (counter === numberOfTests) {
+          _app.produceTestReport(numberOfTests, successes, errors)
+        }
       }
     })(Object.entries(tests))
   })(appTests)

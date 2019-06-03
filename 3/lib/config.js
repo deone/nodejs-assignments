@@ -1,7 +1,7 @@
 const envs = {}
 
 envs.staging = {
-  port: 8080,
+  port: 12230,
   env: 'staging',
   hashingSecret : 'thisIsASecret',
   stripeKey: process.env.STRIPE_KEY,
