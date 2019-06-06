@@ -19,7 +19,7 @@ const user = {
   streetAddress: 'Dansoman'
 }
 
-const makeGETRequest = (path, callBack) => {
+const makeGETRequest = (path, token, callBack) => {
   // Configure options
   const options = {
     'protocol': 'http:',
@@ -28,12 +28,17 @@ const makeGETRequest = (path, callBack) => {
     'method': 'GET',
     'path': path,
     'headers': {
+      'token': token,
       'Content-Type' : 'application/json'
     }
   }
 
   // Send the request
-  const req = http.request(options, res => callBack(res))
+  const req = http.request(options, res => {
+    let body = ''
+    res.on('data', chunk => body += chunk)
+    res.on('end', () => callBack(res.statusCode, JSON.parse(body)))
+  })
 
   req.end()
 }
@@ -69,8 +74,8 @@ const api = {}
 
 // Make a request to a random path
 api['A random path should respond to GET with 404'] = done => {
-  makeGETRequest('/this/path/shouldnt/exist', response => {
-    assert.equal(response.statusCode, 404)
+  makeGETRequest('/this/path/shouldnt/exist', null, (statusCode, data) => {
+    assert.equal(statusCode, 404)
     done()
   })
 }
