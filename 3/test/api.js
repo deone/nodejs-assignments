@@ -44,10 +44,10 @@ const makePOSTRequest = (path, data, token, callBack) => {
     'hostname': 'localhost',
     'port': config.port,
     'method': 'POST',
-    'path': '/api/login',
+    'path': path,
     'headers': {
       'token': token,
-      'Content-Type' : 'application/json',
+      'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(data)
     }
   }
@@ -86,7 +86,30 @@ api['/api/login should return token object'] = done => {
 
   // Log in
   makePOSTRequest('/api/login', data, null, res => {
-    assert.equal(res.email, 'a@a.com')
+    assert.strictEqual(typeof res, 'object')
+    assert.strictEqual(res.email, 'a@a.com')
+    assert.strictEqual(typeof res.id, 'string')
+    assert.strictEqual(typeof res.expires, 'number')
+
+    // Delete user
+    io.delete(dir.users)('a@a.com')
+
+    done()
+  })
+}
+
+api['/api/logout should return success message'] = done => {
+  // Create user
+  io.writeUser(user)
+
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
+
+  // Log in
+  makePOSTRequest('/api/logout', JSON.stringify({}), token.id, res => {
+    assert.strictEqual(typeof res, 'object')
+    assert.strictEqual(res['Success'], 'User logged out.')
 
     // Delete user
     io.delete(dir.users)('a@a.com')

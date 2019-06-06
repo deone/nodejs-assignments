@@ -17,7 +17,7 @@ const _app = {}
 _app.tests = {}
 
 // Dependencies
-_app.tests.unit = require('./unit')
+// _app.tests.unit = require('./unit')
 _app.tests.api = require('./api')
 
 const appTests = Object.entries(_app.tests)
