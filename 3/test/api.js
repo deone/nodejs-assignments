@@ -75,7 +75,7 @@ const api = {}
 // Make a request to a random path
 api['A random path should respond to GET with 404'] = done => {
   makeGETRequest('/this/path/shouldnt/exist', null, (statusCode, data) => {
-    assert.equal(statusCode, 404)
+    assert.strictEqual(statusCode, 404)
     done()
   })
 }
@@ -120,7 +120,23 @@ api['/api/logout should return success message'] = done => {
     assert.strictEqual(res['Success'], 'User logged out.')
 
     // Delete user
-    io.delete(dir.users)('a@a.com')
+    // io.delete(dir.users)('a@a.com')
+
+    done()
+  })
+}
+
+api['/api/menu should return array of menu items'] = done => {
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
+
+  makeGETRequest('/api/menu', token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(Array.isArray(data), true)
+
+    // Delete token
+    io.delete(dir.tokens)(token.id)
 
     done()
   })
