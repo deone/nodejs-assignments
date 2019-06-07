@@ -99,6 +99,9 @@ api['/api/login should return token object'] = done => {
     // Delete user
     io.delete(dir.users)('a@a.com')
 
+    // Delete token
+    io.delete(dir.tokens)(res.id)
+
     done()
   })
 }
