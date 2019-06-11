@@ -44,17 +44,18 @@ api['/api/login should return token object'] = done => {
   })
 
   // Log in
-  helpers.makePOSTRequest('/api/login', data, null, res => {
-    assert.strictEqual(typeof res, 'object')
-    assert.strictEqual(res.email, 'a@a.com')
-    assert.strictEqual(typeof res.id, 'string')
-    assert.strictEqual(typeof res.expires, 'number')
+  helpers.makeRequest('POST', '/api/login', data, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data.email, 'a@a.com')
+    assert.strictEqual(typeof data.id, 'string')
+    assert.strictEqual(typeof data.expires, 'number')
 
     // Delete user
     io.delete(dir.users)('a@a.com')
 
     // Delete token
-    io.delete(dir.tokens)(res.id)
+    io.delete(dir.tokens)(data.id)
 
     done()
   })
@@ -66,10 +67,13 @@ api['/api/logout should return success message'] = done => {
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
 
+  const data = JSON.stringify({})
+
   // Log in
-  helpers.makePOSTRequest('/api/logout', JSON.stringify({}), token.id, res => {
-    assert.strictEqual(typeof res, 'object')
-    assert.strictEqual(res['Success'], 'User logged out.')
+  helpers.makeRequest('POST', '/api/logout', data, token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Success'], 'User logged out.')
 
     done()
   })
@@ -83,7 +87,9 @@ api['GET /api/menu should return array of menu items'] = done => {
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
 
-  helpers.makeGETRequest('/api/menu', token.id, (statusCode, data) => {
+  const data = JSON.stringify({})
+
+  helpers.makeRequest('GET', '/api/menu', data, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(Array.isArray(data), true)
 
@@ -106,11 +112,13 @@ api['POST /api/user should create user and return success message'] = done => {
     password: '123456',
     streetAddress: 'Dansoman'
   }
+
   const data = JSON.stringify(user)
 
-  helpers.makePOSTRequest('/api/user', data, null, res => {
-    assert.strictEqual(typeof res, 'object')
-    assert.strictEqual(res['Success'], 'User created successfully.')
+  helpers.makeRequest('POST', '/api/user', data, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Success'], 'User created successfully.')
 
     // Delete user
     io.delete(dir.users)('b@a.com')
@@ -132,8 +140,9 @@ api['GET /api/user should return user object'] = done => {
 
   io.writeUser(user)
 
-  helpers.makeGETRequest('/api/user?email=c@a.com', null, (statusCode, data) => {
-    // console.log(statusCode, data)
+  const data = JSON.stringify({})
+
+  helpers.makeRequest('GET', '/api/user?email=c@a.com', data, null, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
 
