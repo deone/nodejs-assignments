@@ -6,72 +6,25 @@
 // Dependencies
 const app = require('./../index')
 const assert = require('assert')
-const http = require('http')
-const config = require('./../lib/config')
 
 const { io, dir, crypto } = require('./../lib/utils')
+const helpers = require('./helpers')
+console.log(helpers)
 
-const makeGETRequest = (path, token, callBack) => {
-  // Configure options
-  const options = {
-    'protocol': 'http:',
-    'hostname': 'localhost',
-    'port': config.port,
-    'method': 'GET',
-    'path': path,
-    'headers': {
-      'token': token,
-      'Content-Type' : 'application/json'
-    }
-  }
-
-  // Send the request
-  const req = http.request(options, res => {
-    let body = ''
-    res.on('data', chunk => body += chunk)
-    res.on('end', () => callBack(res.statusCode, JSON.parse(body)))
-  })
-
-  req.end()
-}
-
-const makePOSTRequest = (path, data, token, callBack) => {
-  const options = {
-    'protocol': 'http:',
-    'hostname': 'localhost',
-    'port': config.port,
-    'method': 'POST',
-    'path': path,
-    'headers': {
-      'token': token,
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data)
-    }
-  }
-
-  const req = http.request(options, res => {
-    let body = ''
-    res.on('data', chunk => body += chunk)
-    res.on('end', () => callBack(JSON.parse(body)))
-  })
-
-  req.on('error', error => console.error(error))
-
-  req.write(data)
-  req.end()
-}
 
 // Holder for Tests
 const api = {}
 
-// Make a request to a random path
+// Not Found
 api['A random path should respond to GET with 404'] = done => {
-  makeGETRequest('/this/path/shouldnt/exist', null, (statusCode, data) => {
+  helpers.makeGETRequest('/this/path/shouldnt/exist', null, (statusCode, data) => {
     assert.strictEqual(statusCode, 404)
     done()
   })
 }
 
+// auth.js
+// POST login
 api['/api/login should return token object'] = done => {
   // Create user
   const user = {
@@ -89,7 +42,7 @@ api['/api/login should return token object'] = done => {
   })
 
   // Log in
-  makePOSTRequest('/api/login', data, null, res => {
+  helpers.makePOSTRequest('/api/login', data, null, res => {
     assert.strictEqual(typeof res, 'object')
     assert.strictEqual(res.email, 'a@a.com')
     assert.strictEqual(typeof res.id, 'string')
@@ -105,13 +58,14 @@ api['/api/login should return token object'] = done => {
   })
 }
 
+// POST logout
 api['/api/logout should return success message'] = done => {
   // Create token
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
 
   // Log in
-  makePOSTRequest('/api/logout', JSON.stringify({}), token.id, res => {
+  helpers.makePOSTRequest('/api/logout', JSON.stringify({}), token.id, res => {
     assert.strictEqual(typeof res, 'object')
     assert.strictEqual(res['Success'], 'User logged out.')
 
@@ -119,12 +73,14 @@ api['/api/logout should return success message'] = done => {
   })
 }
 
-api['/api/menu should return array of menu items'] = done => {
+// menu.js
+// GET
+api['GET /api/menu should return array of menu items'] = done => {
   // Create token
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
 
-  makeGETRequest('/api/menu', token.id, (statusCode, data) => {
+  helpers.makeGETRequest('/api/menu', token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(Array.isArray(data), true)
 
@@ -135,10 +91,35 @@ api['/api/menu should return array of menu items'] = done => {
   })
 }
 
+// user.js
+// POST
 api['POST /api/user should create user and return success message'] = done => {
   // User data
   const user = {
-    email: 'b@b.com',
+    email: 'b@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    password: '123456',
+    streetAddress: 'Dansoman'
+  }
+  const data = JSON.stringify(user)
+
+  helpers.makePOSTRequest('/api/user', data, null, res => {
+    assert.strictEqual(typeof res, 'object')
+    assert.strictEqual(res['Success'], 'User created successfully.')
+
+    // Delete user
+    io.delete(dir.users)('b@a.com')
+
+    done()
+  })
+}
+
+// GET
+/* api['GET /api/user should create user and return success message'] = done => {
+  // User data
+  const user = {
+    email: 'b@a.com',
     lastName: 'BBB',
     firstName: 'CCC',
     password: '123456',
@@ -151,11 +132,11 @@ api['POST /api/user should create user and return success message'] = done => {
     assert.strictEqual(res['Success'], 'User created successfully.')
 
     // Delete user
-    io.delete(dir.users)('b@b.com')
+    io.delete(dir.users)('b@a.com')
 
     done()
   })
-}
+} */
 
 
 // Export the tests to the runner
