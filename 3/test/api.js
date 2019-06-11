@@ -9,7 +9,6 @@ const assert = require('assert')
 
 const { io, dir, crypto } = require('./../lib/utils')
 const helpers = require('./helpers')
-console.log(helpers)
 
 
 // Holder for Tests
@@ -116,27 +115,29 @@ api['POST /api/user should create user and return success message'] = done => {
 }
 
 // GET
-/* api['GET /api/user should create user and return success message'] = done => {
+api['GET /api/user should return user object'] = done => {
   // User data
   const user = {
-    email: 'b@a.com',
+    email: 'c@a.com',
     lastName: 'BBB',
     firstName: 'CCC',
     password: '123456',
     streetAddress: 'Dansoman'
   }
-  const data = JSON.stringify(user)
 
-  makePOSTRequest('/api/user', data, null, res => {
-    assert.strictEqual(typeof res, 'object')
-    assert.strictEqual(res['Success'], 'User created successfully.')
+  io.writeUser(user)
+
+  helpers.makeGETRequest('/api/user?email=c@a.com', null, (statusCode, data) => {
+    // console.log(statusCode, data)
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
 
     // Delete user
-    io.delete(dir.users)('b@a.com')
+    io.delete(dir.users)('c@a.com')
 
     done()
   })
-} */
+}
 
 
 // Export the tests to the runner
