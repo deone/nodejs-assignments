@@ -16,11 +16,14 @@ const api = {}
 
 // Not Found
 api['A random path should respond to GET with 404'] = done => {
-  helpers.makeGETRequest('/this/path/shouldnt/exist', null, (statusCode, data) => {
+  const data = JSON.stringify({})
+  helpers.makeRequest(
+    'GET', '/this/path/shouldnt/exist', data, null, (statusCode, data) => {
     assert.strictEqual(statusCode, 404)
     done()
   })
 }
+
 
 // auth.js
 // POST login
@@ -72,6 +75,7 @@ api['/api/logout should return success message'] = done => {
   })
 }
 
+
 // menu.js
 // GET
 api['GET /api/menu should return array of menu items'] = done => {
@@ -89,6 +93,7 @@ api['GET /api/menu should return array of menu items'] = done => {
     done()
   })
 }
+
 
 // user.js
 // POST
@@ -137,6 +142,16 @@ api['GET /api/user should return user object'] = done => {
 
     done()
   })
+}
+
+// PUT
+api['PUT /api/user should update user and return success message'] = done => {
+  done()
+}
+
+// DELETE
+api['DELETE /api/user should delete user and return success message'] = done => {
+  done()
 }
 
 
