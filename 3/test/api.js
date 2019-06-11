@@ -11,14 +11,6 @@ const config = require('./../lib/config')
 
 const { io, dir, crypto } = require('./../lib/utils')
 
-const user = {
-  email: 'a@a.com',
-  lastName: 'BBB',
-  firstName: 'CCC',
-  password: '123456',
-  streetAddress: 'Dansoman'
-}
-
 const makeGETRequest = (path, token, callBack) => {
   // Configure options
   const options = {
@@ -81,10 +73,14 @@ api['A random path should respond to GET with 404'] = done => {
 }
 
 api['/api/login should return token object'] = done => {
-  // Replace password with hashedPassword field
-  // and write
-  user.hashedPassword = crypto.hash("123456")
-  delete user.password
+  // Create user
+  const user = {
+    email: 'a@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman'
+  }
   io.writeUser(user)
 
   const data = JSON.stringify({
@@ -139,19 +135,27 @@ api['/api/menu should return array of menu items'] = done => {
   })
 }
 
-/* api['POST /api/user should create user and return success message'] = done => {
+api['POST /api/user should create user and return success message'] = done => {
   // User data
+  const user = {
+    email: 'b@b.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    password: '123456',
+    streetAddress: 'Dansoman'
+  }
   const data = JSON.stringify(user)
 
   makePOSTRequest('/api/user', data, null, res => {
-    console.log(res)
+    assert.strictEqual(typeof res, 'object')
+    assert.strictEqual(res['Success'], 'User created successfully.')
 
     // Delete user
-    io.delete(dir.users)('a@a.com')
+    io.delete(dir.users)('b@b.com')
 
     done()
   })
-} */
+}
 
 
 // Export the tests to the runner
