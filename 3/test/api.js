@@ -15,7 +15,7 @@ const user = {
   email: 'a@a.com',
   lastName: 'BBB',
   firstName: 'CCC',
-  hashedPassword: crypto.hash("123456"),
+  password: '123456',
   streetAddress: 'Dansoman'
 }
 
@@ -81,7 +81,10 @@ api['A random path should respond to GET with 404'] = done => {
 }
 
 api['/api/login should return token object'] = done => {
-  // Create user
+  // Replace password with hashedPassword field
+  // and write
+  user.hashedPassword = crypto.hash("123456")
+  delete user.password
   io.writeUser(user)
 
   const data = JSON.stringify({
@@ -107,9 +110,6 @@ api['/api/login should return token object'] = done => {
 }
 
 api['/api/logout should return success message'] = done => {
-  // Create user
-  io.writeUser(user)
-
   // Create token
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
@@ -118,9 +118,6 @@ api['/api/logout should return success message'] = done => {
   makePOSTRequest('/api/logout', JSON.stringify({}), token.id, res => {
     assert.strictEqual(typeof res, 'object')
     assert.strictEqual(res['Success'], 'User logged out.')
-
-    // Delete user
-    // io.delete(dir.users)('a@a.com')
 
     done()
   })
@@ -141,6 +138,20 @@ api['/api/menu should return array of menu items'] = done => {
     done()
   })
 }
+
+/* api['POST /api/user should create user and return success message'] = done => {
+  // User data
+  const data = JSON.stringify(user)
+
+  makePOSTRequest('/api/user', data, null, res => {
+    console.log(res)
+
+    // Delete user
+    io.delete(dir.users)('a@a.com')
+
+    done()
+  })
+} */
 
 
 // Export the tests to the runner
