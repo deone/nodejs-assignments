@@ -177,6 +177,7 @@ api['PUT /api/user should update user and return success message'] = done => {
   helpers.makeRequest('PUT', '/api/user', data, null, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Success'], 'User updated successfully.')
 
     // Delete user
     io.delete(dir.users)('d@a.com')
@@ -188,7 +189,26 @@ api['PUT /api/user should update user and return success message'] = done => {
 
 // DELETE
 api['DELETE /api/user should delete user and return success message'] = done => {
-  done()
+  // Create user
+  const user = {
+    email: 'e@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman'
+  }
+
+  io.writeUser(user)
+
+  const data = JSON.stringify({})
+
+  helpers.makeRequest('DELETE', '/api/user?email=e@a.com', data, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Success'], 'User deleted successfully.')
+
+    done()
+  })
 }
 
 
