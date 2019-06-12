@@ -129,12 +129,12 @@ api['POST /api/user should create user and return success message'] = done => {
 
 // GET
 api['GET /api/user should return user object'] = done => {
-  // User data
+  // Create user
   const user = {
     email: 'c@a.com',
     lastName: 'BBB',
     firstName: 'CCC',
-    password: '123456',
+    hashedPassword: crypto.hash('123456'),
     streetAddress: 'Dansoman'
   }
 
@@ -155,7 +155,35 @@ api['GET /api/user should return user object'] = done => {
 
 // PUT
 api['PUT /api/user should update user and return success message'] = done => {
-  done()
+  // Create user
+  const user = {
+    email: 'd@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman'
+  }
+
+  io.writeUser(user)
+
+  const data = JSON.stringify({
+    email: 'd@a.com',
+    firstName: 'DDD',
+    lastName: 'EEE',
+    password: '123478',
+    streetAddress: 'East Legon'
+  })
+
+  helpers.makeRequest('PUT', '/api/user', data, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+
+    // Delete user
+    io.delete(dir.users)('d@a.com')
+
+    done()
+  })
+
 }
 
 // DELETE
