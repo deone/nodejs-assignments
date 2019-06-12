@@ -3,7 +3,7 @@ const config = require('./../lib/config')
 
 const helpers = {}
 
-helpers.makeRequest = (method, path, data, token, callBack) => {
+helpers.makeRequest = (method, path, payLoad, token, callBack) => {
   const options = {
     'protocol': 'http:',
     'hostname': 'localhost',
@@ -13,7 +13,7 @@ helpers.makeRequest = (method, path, data, token, callBack) => {
     'headers': {
       'token': token,
       'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data)
+      'Content-Length': Buffer.byteLength(payLoad)
     }
   }
 
@@ -25,7 +25,7 @@ helpers.makeRequest = (method, path, data, token, callBack) => {
 
   req.on('error', error => console.error(error))
 
-  req.write(data)
+  req.write(payLoad)
   req.end()
 }
 
