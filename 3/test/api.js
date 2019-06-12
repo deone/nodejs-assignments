@@ -320,5 +320,84 @@ api["DELETE /api/cart should delete item and return user's cart"] = done => {
   })
 }
 
+
+// order.js
+// POST
+api['POST /api/order should order items in cart and return an array of orders'] = done => {
+  // Create user
+  const user = {
+    email: 'j@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman',
+    cart: [{"name":"pepperoni","price":13.99}, {"name":"barbeque","price":17.79}]
+  }
+
+  io.writeUser(user)
+
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('j@a.com')(crypto.createRandomString(20))
+
+  const data = JSON.stringify({})
+
+  helpers.makeRequest('POST', '/api/order', data, token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(Array.isArray(data), true)
+    assert.strictEqual(data.length, 1)
+
+    // Delete order
+    io.delete(dir.orders)(data[0]['orderId'])
+
+    // Delete token
+    io.delete(dir.tokens)(token.id)
+
+    // Delete user
+    io.delete(dir.users)('j@a.com')
+
+    done()
+  })
+}
+
+// GET
+api['POST /api/order should order items in cart and return an array of orders'] = done => {
+  // Create user
+  const user = {
+    email: 'j@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman',
+    cart: [{"name":"pepperoni","price":13.99}, {"name":"barbeque","price":17.79}]
+  }
+
+  io.writeUser(user)
+
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('j@a.com')(crypto.createRandomString(20))
+
+  const data = JSON.stringify({})
+
+  helpers.makeRequest('POST', '/api/order', data, token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(Array.isArray(data), true)
+    assert.strictEqual(data.length, 1)
+
+    // Delete order
+    io.delete(dir.orders)(data[0]['orderId'])
+
+    // Delete token
+    io.delete(dir.tokens)(token.id)
+
+    // Delete user
+    io.delete(dir.users)('j@a.com')
+
+    done()
+  })
+}
+
+
 // Export the tests to the runner
 module.exports = api
