@@ -19,6 +19,7 @@ _app.tests = {}
 // Dependencies
 _app.tests.unit = require('./unit')
 _app.tests.auth = require('./auth')
+_app.tests.notFound = require('./notfound')
 _app.tests.api = require('./api')
 
 const appTests = Object.entries(_app.tests)

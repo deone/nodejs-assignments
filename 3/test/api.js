@@ -14,16 +14,6 @@ const helpers = require('./helpers')
 // Holder for Tests
 const api = {}
 
-// Not Found
-api['A random path should respond to GET with 404'] = done => {
-  const payLoad = JSON.stringify({})
-  helpers.makeRequest(
-    'GET', '/this/path/shouldnt/exist', payLoad, null, (statusCode, data) => {
-    assert.strictEqual(statusCode, 404)
-    done()
-  })
-}
-
 
 // POST logout
 api['/api/logout should return success message'] = done => {
