@@ -62,6 +62,43 @@ api['/api/login should return token object'] = done => {
   })
 }
 
+// Missing required fields
+api['/api/login should return error message'] = done => {
+  // Create user
+  const user = {
+    email: 'm@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman'
+  }
+
+  io.writeUser(user)
+
+  const payLoad = JSON.stringify({
+    "password": "123456"
+  })
+
+  // Log in
+  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 400)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Error'], 'Missing required fields.')
+
+    // Delete user
+    io.delete(dir.users)('m@a.com')
+
+    // Delete token
+    io.delete(dir.tokens)(data.id)
+
+    done()
+  })
+}
+
+// Wrong password
+
+// User does not exist
+
 // POST logout
 api['/api/logout should return success message'] = done => {
   // Create token
