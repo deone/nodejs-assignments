@@ -40,7 +40,7 @@ authHandler._login.post = callBack =>
     ])
 
     if (!(email && password)) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELDS})
       return
     }
 

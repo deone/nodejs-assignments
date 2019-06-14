@@ -67,7 +67,7 @@ authTests['POST /api/login with a missing field should return error message'] = 
   helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 400)
     assert.strictEqual(typeof data, 'object')
-    assert.strictEqual(data['Error'], 'Missing required field.')
+    assert.strictEqual(data['Error'], 'Missing required field(s).')
 
     // Delete user
     io.delete(dir.users)('m@a.com')

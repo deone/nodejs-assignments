@@ -13,7 +13,7 @@ const utils = {}
 
 /* Errors */
 utils.errors = {}
-utils.errors.MISSING_REQUIRED_FIELD = 'Missing required field.'
+utils.errors.MISSING_REQUIRED_FIELDS = 'Missing required field(s).'
 utils.errors.TOKEN_EXPIRED = 'Token has expired. Please login again.'
 utils.errors.TOKEN_NOT_PROVIDED = 'Authentication token not provided.'
 

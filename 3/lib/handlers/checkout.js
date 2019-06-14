@@ -37,7 +37,7 @@ checkoutHandler._checkout.post = callBack =>
     }
 
     if (!(orderId && stripeToken)) {
-      callBack(400, {'Error': 'Required fields missing.'})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELDS})
       return
     }
 
