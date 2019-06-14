@@ -108,6 +108,23 @@ authTests['POST /api/login with wrong password should return error message'] = d
 }
 
 // User does not exist
+authTests['POST /api/login with non-existent credentials should return error message'] = done => {
+  // Attempt logging in with credentials that
+  // don't exist
+  const payLoad = JSON.stringify({
+    "email": "o@a.com",
+    "password": "123457"
+  })
+
+  // Log in
+  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 404)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Error'], 'User does not exist.')
+
+    done()
+  })
+}
 
 
 // POST logout
