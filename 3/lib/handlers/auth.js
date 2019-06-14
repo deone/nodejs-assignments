@@ -113,9 +113,7 @@ authHandler._login.post = callBack =>
           .catch(err =>
             callBack(500, {'Error': err.toString()}))
       })
-      .catch(err => {
-        console.log(err)
-        callBack(404, {'Error': 'User does not exist.'})})
+      .catch(err => callBack(404, {'Error': 'User does not exist.'}))
   }
 
 // Logout - post

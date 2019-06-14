@@ -12,7 +12,7 @@ const notFoundTests = {}
 notFoundTests['A random path should respond to GET with 404'] = done => {
   const payLoad = JSON.stringify({})
   helpers.makeRequest(
-    'GET', '/this/path/shouldnt/exist', payLoad, null, (statusCode, data) => {
+    'GET', '/this/path/shouldnt/exist', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 404)
     done()
   })

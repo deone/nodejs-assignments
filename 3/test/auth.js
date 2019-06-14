@@ -29,7 +29,7 @@ authTests['POST /api/login should return token object'] = done => {
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data.email, 'a@a.com')
@@ -64,7 +64,7 @@ authTests['POST /api/login with a missing field should return error message'] = 
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 400)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'Missing required fields.')
@@ -95,7 +95,7 @@ authTests['POST /api/login with wrong password should return error message'] = d
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 400)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], "Password did not match the user's stored password.")
@@ -117,7 +117,7 @@ authTests['POST /api/login with non-existent credentials should return error mes
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 404)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'User does not exist.')
@@ -128,7 +128,7 @@ authTests['POST /api/login with non-existent credentials should return error mes
 
 
 // POST logout
-authTests['/api/logout should return success message'] = done => {
+authTests['POST /api/logout should return success message'] = done => {
   // Create token
   const callBack = () => console.log('hello')
   const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
@@ -140,6 +140,20 @@ authTests['/api/logout should return success message'] = done => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User logged out.')
+
+    done()
+  })
+}
+
+// Token not provided
+authTests['POST /api/logout should return success message'] = done => {
+  const payLoad = JSON.stringify({})
+
+  // Log in
+  helpers.makeRequest('POST', '/api/logout', payLoad, '', (statusCode, data) => {
+    assert.strictEqual(statusCode, 401)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Error'], 'Authentication token not provided.')
 
     done()
   })

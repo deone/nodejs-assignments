@@ -22,7 +22,7 @@ userTests['POST /api/user should create user and return success message'] = done
 
   const payLoad = JSON.stringify(user)
 
-  helpers.makeRequest('POST', '/api/user', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/user', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User created successfully.')
@@ -49,7 +49,7 @@ userTests['GET /api/user should return user object'] = done => {
 
   const payLoad = JSON.stringify({})
 
-  helpers.makeRequest('GET', '/api/user?email=d@a.com', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('GET', '/api/user?email=d@a.com', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
 
@@ -81,7 +81,7 @@ userTests['PUT /api/user should update user and return success message'] = done 
     streetAddress: 'East Legon'
   })
 
-  helpers.makeRequest('PUT', '/api/user', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('PUT', '/api/user', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User updated successfully.')
@@ -108,7 +108,7 @@ userTests['DELETE /api/user should delete user and return success message'] = do
 
   const payLoad = JSON.stringify({})
 
-  helpers.makeRequest('DELETE', '/api/user?email=f@a.com', payLoad, null, (statusCode, data) => {
+  helpers.makeRequest('DELETE', '/api/user?email=f@a.com', payLoad, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User deleted successfully.')
