@@ -72,9 +72,6 @@ authTests['/api/login should return error message'] = done => {
     // Delete user
     io.delete(dir.users)('m@a.com')
 
-    // Delete token
-    io.delete(dir.tokens)(data.id)
-
     done()
   })
 }
