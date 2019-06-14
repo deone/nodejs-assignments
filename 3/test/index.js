@@ -22,8 +22,9 @@ _app.tests.notFound = require('./notfound')
 _app.tests.auth = require('./auth')
 _app.tests.menu = require('./menu')
 _app.tests.user = require('./user')
-
-_app.tests.api = require('./api')
+_app.tests.cart = require('./cart')
+_app.tests.order = require('./order')
+_app.tests.checkout = require('./checkout')
 
 const appTests = Object.entries(_app.tests)
 

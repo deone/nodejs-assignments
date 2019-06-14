@@ -9,8 +9,6 @@ const helpers = require('./helpers')
 // Holder for Tests
 const userTests = {}
 
-
-// user.js
 // POST
 userTests['POST /api/user should create user and return success message'] = done => {
   // User data
