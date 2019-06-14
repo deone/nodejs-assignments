@@ -85,5 +85,23 @@ authTests['/api/login should return error message'] = done => {
 // User does not exist
 
 
+// POST logout
+authTests['/api/logout should return success message'] = done => {
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
+
+  const payLoad = JSON.stringify({})
+
+  // Log in
+  helpers.makeRequest('POST', '/api/logout', payLoad, token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 200)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Success'], 'User logged out.')
+
+    done()
+  })
+}
+
 
 module.exports = authTests
