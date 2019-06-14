@@ -135,7 +135,7 @@ utils.crypto.createToken = callBack =>
   email =>
     id => {
       // Set an expiration date 1 hour in the future.
-      const expires = Date.now() + 1000 * 60 * 60
+      const expires = Date.now() + (1000 * 60 * 60)
       const token = { email, id, expires }
 
       // Store the token

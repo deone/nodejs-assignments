@@ -1,4 +1,4 @@
-/* Auth handlers */
+/* Auth handler */
 
 // Dependencies
 const {
@@ -40,7 +40,7 @@ authHandler._login.post = callBack =>
     ])
 
     if (!(email && password)) {
-      callBack(400, {'Error': 'Missing required fields.'})
+      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 

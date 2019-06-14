@@ -9,7 +9,6 @@ const helpers = require('./helpers')
 // Holder for Tests
 const cartTests = {}
 
-
 // GET
 cartTests["GET /api/cart should return an array of items in user's cart"] = done => {
   // Create user
@@ -39,6 +38,47 @@ cartTests["GET /api/cart should return an array of items in user's cart"] = done
 
     // Delete user
     io.delete(dir.users)('g@a.com')
+
+    done()
+  })
+}
+
+// GET - Token expired
+cartTests['GET /api/cart with expired token should return error message'] = done => {
+  // Create user
+  const user = {
+    email: 'p@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman',
+    cart: [{"name":"pepperoni","price":13.99}]
+  }
+
+  io.writeUser(user)
+
+  // Create token
+  const callBack = () => console.log('hello')
+  const token = crypto.createToken(callBack)('p@a.com')(crypto.createRandomString(20))
+  console.log('before expiry', token.expires)
+
+  // Expire token
+  token.expires = token.expires - (2000 * 60 * 60)
+  // Write to disk
+  io.writeFile(dir.tokens(token.id), JSON.stringify(token))
+
+  const payLoad = JSON.stringify({})
+
+  helpers.makeRequest('GET', '/api/cart', payLoad, token.id, (statusCode, data) => {
+    assert.strictEqual(statusCode, 401)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Error'], 'Token has expired. Please login again.')
+
+    // Delete token
+    io.delete(dir.tokens)(token.id)
+
+    // Delete user
+    io.delete(dir.users)('p@a.com')
 
     done()
   })
