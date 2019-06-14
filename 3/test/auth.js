@@ -1,6 +1,5 @@
 /* Auth Tests */
 
-
 const app = require('./../index')
 const assert = require('assert')
 

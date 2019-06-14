@@ -1,4 +1,4 @@
-/* NotFound test */
+/* NotFound Test */
 
 const app = require('./../index')
 const assert = require('assert')

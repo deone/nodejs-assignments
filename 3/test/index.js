@@ -20,6 +20,7 @@ _app.tests = {}
 _app.tests.unit = require('./unit')
 _app.tests.notFound = require('./notfound')
 _app.tests.auth = require('./auth')
+_app.tests.menu = require('./menu')
 _app.tests.api = require('./api')
 
 const appTests = Object.entries(_app.tests)
