@@ -11,7 +11,7 @@ const authTests = {}
 
 // auth.js
 // POST login
-authTests['/api/login should return token object'] = done => {
+authTests['POST /api/login should return token object'] = done => {
   // Create user
   const user = {
     email: 'a@a.com',
@@ -47,7 +47,7 @@ authTests['/api/login should return token object'] = done => {
 }
 
 // Missing required fields
-authTests['/api/login should return error message'] = done => {
+authTests['POST /api/login with a missing field should return error message'] = done => {
   // Create user
   const user = {
     email: 'm@a.com',
@@ -77,6 +77,35 @@ authTests['/api/login should return error message'] = done => {
 }
 
 // Wrong password
+authTests['POST /api/login with wrong password should return error message'] = done => {
+  // Create user
+  const user = {
+    email: 'n@a.com',
+    lastName: 'BBB',
+    firstName: 'CCC',
+    hashedPassword: crypto.hash('123456'),
+    streetAddress: 'Dansoman'
+  }
+
+  io.writeUser(user)
+
+  const payLoad = JSON.stringify({
+    "email": "n@a.com",
+    "password": "123457"
+  })
+
+  // Log in
+  helpers.makeRequest('POST', '/api/login', payLoad, null, (statusCode, data) => {
+    assert.strictEqual(statusCode, 400)
+    assert.strictEqual(typeof data, 'object')
+    assert.strictEqual(data['Error'], "Password did not match the user's stored password.")
+
+    // Delete user
+    io.delete(dir.users)('n@a.com')
+
+    done()
+  })
+}
 
 // User does not exist
 
