@@ -1,0 +1,7 @@
+btc-checkout branch
+- Add btc checkout.
+- Build front end with React/React Native.
+- Swap file storage for proper database.
+
+master branch
+- Build regular front end.

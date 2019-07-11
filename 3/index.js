@@ -10,6 +10,7 @@ const authHandler = require('./lib/handlers/auth')
 const menuHandler = require('./lib/handlers/menu')
 const userHandler = require('./lib/handlers/user')
 const checkoutHandler = require('./lib/handlers/checkout')
+const BTCCheckoutHandler = require('./lib/handlers/btccheckout')
 
 const cartHandler = require('./lib/handlers/cart/cart')
 const orderHandler = require('./lib/handlers/order/order')
@@ -122,7 +123,9 @@ const router = {
   'api/menu': menuHandler.menu,
   'api/cart': cartHandler.cart,
   'api/order': orderHandler.order,
-  'api/checkout': checkoutHandler.checkout
+  'api/checkout': checkoutHandler.checkout,
+  'api/charge': BTCCheckoutHandler.charge,
+  'api/charges': BTCCheckoutHandler.charges
 }
 
 // Start the server
