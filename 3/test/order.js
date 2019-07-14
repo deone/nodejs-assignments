@@ -24,8 +24,10 @@ orderTests['POST /api/order should order items in cart and return an array of or
   io.writeUser(user)
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('j@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('j@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 
@@ -85,8 +87,10 @@ orderTests['GET /api/order should return order object'] = done => {
   io.writeFile(dir.orders(orderId), JSON.stringify(order))
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('k@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('k@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 

@@ -47,8 +47,10 @@ checkoutTests['POST /api/checkout should send email, payment and return success 
   io.writeFile(dir.orders(orderId), JSON.stringify(order))
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('l@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('l@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({
     'orderId': orderId

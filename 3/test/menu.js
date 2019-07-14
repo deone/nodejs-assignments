@@ -12,8 +12,10 @@ const menuTests = {}
 // GET
 menuTests['GET /api/menu should return array of menu items'] = done => {
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('b@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('b@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 

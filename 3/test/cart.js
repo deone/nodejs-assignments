@@ -24,8 +24,10 @@ cartTests["GET /api/cart should return an array of items in user's cart"] = done
   io.writeUser(user)
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('g@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('g@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 
@@ -58,9 +60,10 @@ cartTests['GET /api/cart with expired token should return error message'] = done
   io.writeUser(user)
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('p@a.com')(crypto.createRandomString(20))
-  console.log('before expiry', token.expires)
+  const token = crypto.createToken('p@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   // Expire token
   token.expires = token.expires - (2000 * 60 * 60)
@@ -99,8 +102,10 @@ cartTests["PUT /api/cart should update and return user's cart"] = done => {
   io.writeUser(user)
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('h@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('h@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({
     "item": "barbeque"
@@ -136,8 +141,10 @@ cartTests["DELETE /api/cart should delete item and return user's cart"] = done =
   io.writeUser(user)
 
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('i@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('i@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 

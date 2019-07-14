@@ -17,7 +17,10 @@ const _app = {}
 _app.tests = {}
 
 // Dependencies
+// Unit tests
 _app.tests.unit = require('./unit')
+
+// API tests
 _app.tests.notFound = require('./notfound')
 _app.tests.auth = require('./auth')
 _app.tests.menu = require('./menu')
