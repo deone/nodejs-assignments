@@ -185,19 +185,21 @@ utils.request.setOptions = payLoad => {
 utils.request.createPayLoad = token =>
   order =>
     _for =>
-      _for == 'stripe'
+      _for === 'stripe'
         ? queryString.stringify({
             amount: Math.round(order.totalPrice * 100),
             currency: 'usd',
             description: `${token.email}_${token.id}_${Date.now()}`,
             source: 'tok_visa'
           })
-        : queryString.stringify({
-            'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
-            'to': 'alwaysdeone@gmail.com',
-            'subject': `Order No. ${order.id}`,
-            'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
-          })
+        : _for === 'mailgun'
+          ? queryString.stringify({
+              'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,
+              'to': 'alwaysdeone@gmail.com',
+              'subject': `Order No. ${order.id}`,
+              'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
+            })
+          : ''
 
 utils.request.dispatch = callBack =>
   handlers =>
