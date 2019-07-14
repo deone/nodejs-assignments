@@ -85,13 +85,11 @@ unit['crypto.createRandomString should return an 8 char long string'] = done => 
 }
 
 unit['crypto.createToken should return object containing 20 char long string'] = done => {
-  const callBack = () => console.log('hello')
-
   // Create token
-  const val = crypto.createToken(callBack)('a@a.com')('l3j6d7qo90zp2k0wyqbx')
+  const token = crypto.createToken('a@a.com')('l3j6d7qo90zp2k0wyqbx')
 
-  assert.strictEqual(typeof val, 'object')
-  assert.strictEqual(val.id.length, 20)
+  assert.strictEqual(typeof token, 'object')
+  assert.strictEqual(token.id.length, 20)
 
   // Delete token
   io.delete(dir.tokens)('l3j6d7qo90zp2k0wyqbx')
@@ -107,5 +105,25 @@ unit['crypto.hash should return a string'] = done => {
   done()
 }
 
+// Request tests
+// request.setOptions
+// request.createPayLoad
+/* unit['request.createPayLoad should return payload object'] = done => {
+  const callBack = () => console.log('hello')
+
+  // Create token
+  const token = crypto.createToken(callBack)('a@a.com')('l3j6d7qo90zp2k0wyqby')
+
+  // Create order
+
+  assert.strictEqual(typeof val, 'object')
+  assert.strictEqual(token.id.length, 20)
+
+  // Delete token
+  io.delete(dir.tokens)('l3j6d7qo90zp2k0wyqbx')
+
+  done()
+} */
+// request.dispatch
 
 module.exports = unit

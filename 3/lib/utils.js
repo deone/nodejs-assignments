@@ -38,6 +38,10 @@ utils.io.getByFileName = dir =>
 utils.io.writeUser = user =>
   utils.io.writeFile(utils.dir.users(user.email), JSON.stringify(user))
 
+// Store the token
+utils.io.writeToken = token =>
+  utils.io.writeFile(utils.dir.tokens(token.id), JSON.stringify(token))
+
 utils.io.getTemplate = (templateName, data, callBack) => {
   templateName = typeof templateName === 'string' && templateName.length > 0
     ? templateName
@@ -131,20 +135,12 @@ const createString = strLength =>
 utils.crypto.createRandomString = strLength =>
   createString(strLength)('abcdefghijklmnopqrstuvwxyz0123456789')
 
-utils.crypto.createToken = callBack =>
-  email =>
-    id => {
-      // Set an expiration date 1 hour in the future.
-      const expires = Date.now() + (1000 * 60 * 60)
-      const token = { email, id, expires }
-
-      // Store the token
-      utils.io.writeFile(utils.dir.tokens(id),
-        JSON.stringify(token))
-        .catch(err => callBack(500, {'Error': err.toString()}))
-
-      return token
-    }
+utils.crypto.createToken = email =>
+  id => {
+    // Set an expiration date 1 hour in the future.
+    const expires = Date.now() + (1000 * 60 * 60)
+    return { email, id, expires }
+  }
 
 // Create a SHA256 hash
 utils.crypto.hash = str =>
@@ -199,7 +195,16 @@ utils.request.createPayLoad = token =>
               'subject': `Order No. ${order.id}`,
               'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
             })
-          : ''
+          : queryString.stringify({
+            	amount: order.totalPrice,
+              description: `${token.email}_${token.id}_${Date.now()}`,
+            	currency: 'USD',
+            	order_id: order.id,
+            	customer_name: 'John Doe',
+            	customer_email: token.email,
+            	callback_url: 'https://site.com/?handler=opennode',
+            	success_url: 'https://site.com/order/abc123'
+            })
 
 utils.request.dispatch = callBack =>
   handlers =>
