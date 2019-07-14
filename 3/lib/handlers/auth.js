@@ -44,8 +44,6 @@ authHandler._login.post = callBack =>
       return
     }
 
-    const createToken = crypto.createToken(callBack)(email)
-
     // Lookup user with email
     io.readFile(dir.users(email), 'utf8')
       .then(u => {
@@ -61,8 +59,12 @@ authHandler._login.post = callBack =>
           .then(xs => {
             if (!xs.length) {
               // First case - no tokens in directory
-              const token = createToken(crypto.createRandomString(20))
-              callBack(200, token)
+              const token = crypto.createToken(email)(crypto.createRandomString(20))
+
+              // Store token
+              io.writeToken(token)
+                .then(callBack(200, token))
+                .catch(err => callBack(500, {'Error': err.toString()}))
               return
             }
 
@@ -84,9 +86,13 @@ authHandler._login.post = callBack =>
 
                   const userHasToken = !emails.includes(email) ? false : true
                   if (!userHasToken) {
-                    // Second case - user does not have token
-                    const token = createToken(crypto.createRandomString(20))
-                    callBack(200, token)
+                    // Second case - there are tokens in directory but user does not have token
+                    const token = crypto.createToken(email)(crypto.createRandomString(20))
+
+                    // Store token
+                    io.writeToken(token)
+                      .then(callBack(200, token))
+                      .catch(err => callBack(500, {'Error': err.toString()}))
                     return
                   }
 
@@ -98,8 +104,12 @@ authHandler._login.post = callBack =>
                     // if token is expired, delete and create another
                     ? io.delete(dir.tokens)(token.id)
                         .then(() => {
-                          const token = createToken(crypto.createRandomString(20))
-                          callBack(200, token)
+                          const token = crypto.createToken(email, crypto.createRandomString(20))
+
+                          // Store token
+                          io.writeToken(token)
+                            .then(callBack(200, token))
+                            .catch(err => callBack(500, {'Error': err.toString()}))
                         })
                         .catch(err =>
                           callBack(500, {'Error': err.toString()}))

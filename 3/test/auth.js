@@ -130,8 +130,10 @@ authTests['POST /api/login with non-existent credentials should return error mes
 // POST logout
 authTests['POST /api/logout should return success message'] = done => {
   // Create token
-  const callBack = () => console.log('hello')
-  const token = crypto.createToken(callBack)('a@a.com')(crypto.createRandomString(20))
+  const token = crypto.createToken('a@a.com')(crypto.createRandomString(20))
+
+  // Write token
+  io.writeToken(token)
 
   const payLoad = JSON.stringify({})
 
@@ -146,7 +148,7 @@ authTests['POST /api/logout should return success message'] = done => {
 }
 
 // Token not provided
-authTests['POST /api/logout should return success message'] = done => {
+authTests['POST /api/logout without token should return error message'] = done => {
   const payLoad = JSON.stringify({})
 
   // Log in
