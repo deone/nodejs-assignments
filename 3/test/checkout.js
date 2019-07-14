@@ -51,7 +51,6 @@ checkoutTests['POST /api/checkout should send email, payment and return success 
   const token = crypto.createToken(callBack)('l@a.com')(crypto.createRandomString(20))
 
   const payLoad = JSON.stringify({
-    'stripeToken': 'tok_visa',
     'orderId': orderId
   })
 

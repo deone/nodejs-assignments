@@ -184,13 +184,13 @@ utils.request.setOptions = payLoad => {
 
 utils.request.createPayLoad = token =>
   order =>
-    (source = null) =>
-      source
+    _for =>
+      _for == 'stripe'
         ? queryString.stringify({
             amount: Math.round(order.totalPrice * 100),
             currency: 'usd',
             description: `${token.email}_${token.id}_${Date.now()}`,
-            source: source
+            source: 'tok_visa'
           })
         : queryString.stringify({
             'from': `Dayo Osikoya<info@${config.mailgunDomain}>`,

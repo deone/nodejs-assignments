@@ -22,13 +22,12 @@ checkoutHandler.checkout = callBack =>
 checkoutHandler._checkout = {}
 
 // Checkout - post
-// Required data - token ID. Stripe token and order ID in payload
+// Required data - token ID in header. order ID in payload
 checkoutHandler._checkout.post = callBack =>
   data => {
-    const [tokenId, orderId, stripeToken] = validate([
+    const [tokenId, orderId] = validate([
       data.headers.token,
-      data.payload.orderId,
-      data.payload.stripeToken
+      data.payload.orderId
     ])
 
     if (!tokenId) {
@@ -36,7 +35,7 @@ checkoutHandler._checkout.post = callBack =>
       return
     }
 
-    if (!(orderId && stripeToken)) {
+    if (!orderId) {
       callBack(400, {'Error': errors.MISSING_REQUIRED_FIELDS})
       return
     }
@@ -55,8 +54,8 @@ checkoutHandler._checkout.post = callBack =>
           .then(o => {
             const order = json.toObject(o)
             const payLoad = request.createPayLoad(token)(order)
-
-            const stripePayLoad = payLoad(stripeToken)
+            
+            const stripePayLoad = payLoad('stripe')
             const stripeOptions = request.setOptions(stripePayLoad)
 
             // Make payment
@@ -70,7 +69,7 @@ checkoutHandler._checkout.post = callBack =>
 
             order.paid = true
 
-            const mailgunPayLoad = payLoad()
+            const mailgunPayLoad = payLoad('mailgun')
             const mailgunOptions = request.setOptions(mailgunPayLoad)
 
             // Send email
@@ -95,6 +94,8 @@ checkoutHandler._checkout.post = callBack =>
               .catch(err =>
                 callBack(500, {'Error': err.toString()}))
           })
+          .catch(err =>
+            callBack(500, {'Error': err.toString()}))
       })
       .catch(err =>
         callBack(500, {'Error': err.toString()}))
