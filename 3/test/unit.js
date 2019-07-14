@@ -11,7 +11,8 @@ const {
   dir,
   validate,
   json,
-  crypto
+  crypto,
+  request
 } = require('./../lib/utils')
 
 // These first 2 test cases need not exist
@@ -91,9 +92,6 @@ unit['crypto.createToken should return object containing 20 char long string'] =
   assert.strictEqual(typeof token, 'object')
   assert.strictEqual(token.id.length, 20)
 
-  // Delete token
-  io.delete(dir.tokens)('l3j6d7qo90zp2k0wyqbx')
-
   done()
 }
 
@@ -105,25 +103,27 @@ unit['crypto.hash should return a string'] = done => {
   done()
 }
 
-// Request tests
+// request tests
 // request.setOptions
 // request.createPayLoad
-/* unit['request.createPayLoad should return payload object'] = done => {
-  const callBack = () => console.log('hello')
-
+unit['request.createPayLoad should return payload object'] = done => {
   // Create token
-  const token = crypto.createToken(callBack)('a@a.com')('l3j6d7qo90zp2k0wyqby')
+  const token = crypto.createToken('a@a.com')('l3j6d7qo90zp2k0wyqby')
 
   // Create order
+  const order = {
+    id: '4qdf2sxbsy9ky89c3rs2',
+    totalPrice: 17.99,
+    items: [ { name: 'marinara', price: 17.99 } ],
+    email: 'a@a.com'
+  }
 
-  assert.strictEqual(typeof val, 'object')
-  assert.strictEqual(token.id.length, 20)
-
-  // Delete token
-  io.delete(dir.tokens)('l3j6d7qo90zp2k0wyqbx')
+  const val = request.createPayLoad(token)(order)('stripe')
+  assert.strictEqual(typeof val, 'string')
 
   done()
-} */
+}
 // request.dispatch
+
 
 module.exports = unit
