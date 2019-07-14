@@ -5,6 +5,7 @@ envs.staging = {
   env: 'staging',
   hashingSecret : 'thisIsASecret',
   stripeKey: process.env.STRIPE_KEY,
+  opennodeKey: process.env.OPENNODE_DEV_KEY,
   mailgunDomain: 'sandboxcdc8e4d68fec495cb2e45f0ba0fc2293.mailgun.org',
   mailgunKey: process.env.MAILGUN_KEY
 }
@@ -14,6 +15,7 @@ envs.production = {
   env: 'production',
   hashingSecret : 'thisIsASecret',
   stripeKey: process.env.STRIPE_KEY,
+  opennodeKey: process.env.OPENNODE_DEV_KEY,
   mailgunDomain: 'sandboxcdc8e4d68fec495cb2e45f0ba0fc2293.mailgun.org',
   mailgunKey: process.env.MAILGUN_KEY
 }
@@ -23,6 +25,7 @@ envs.testing = {
   env: 'testing',
   hashingSecret : 'thisIsASecret',
   stripeKey: process.env.STRIPE_KEY,
+  opennodeKey: process.env.OPENNODE_DEV_KEY,
   mailgunDomain: 'sandboxcdc8e4d68fec495cb2e45f0ba0fc2293.mailgun.org',
   mailgunKey: process.env.MAILGUN_KEY
 }

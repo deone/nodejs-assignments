@@ -105,8 +105,7 @@ unit['crypto.hash should return a string'] = done => {
 
 // request tests
 // request.setOptions
-// request.createPayLoad
-unit['request.createPayLoad should return payload object'] = done => {
+unit['request.setOptions should return object'] = done => {
   // Create token
   const token = crypto.createToken('a@a.com')('l3j6d7qo90zp2k0wyqby')
 
@@ -118,8 +117,29 @@ unit['request.createPayLoad should return payload object'] = done => {
     email: 'a@a.com'
   }
 
-  const val = request.createPayLoad(token)(order)('stripe')
-  assert.strictEqual(typeof val, 'string')
+  const payload = request.createPayload(token)(order)('opennode')
+  const options = request.setOptions(payload)
+
+  assert.strictEqual(typeof options, 'object')
+
+  done()
+}
+
+// request.createPayload
+unit['request.createPayload should return string'] = done => {
+  // Create token
+  const token = crypto.createToken('a@a.com')('l3j6d7qo90zp2k0wyqby')
+
+  // Create order
+  const order = {
+    id: '4qdf2sxbsy9ky89c3rs2',
+    totalPrice: 17.99,
+    items: [ { name: 'marinara', price: 17.99 } ],
+    email: 'a@a.com'
+  }
+
+  const payload = request.createPayload(token)(order)('stripe')
+  assert.strictEqual(typeof payload, 'string')
 
   done()
 }

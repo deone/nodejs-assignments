@@ -150,18 +150,26 @@ utils.crypto.hash = str =>
 /* Requests */
 utils.request = {}
 
-utils.request.setOptions = payLoad => {
+utils.request.setOptions = payload => {
   let [host, path, auth] = [
-    'api.stripe.com',
+    'dev-api.opennode.co',
     '/v1/charges',
-    `Bearer ${config.stripeKey}`
+    config.opennodeKey
   ]
 
-  if (payLoad.includes('mailgun')) {
+  if (payload.includes('mailgun')) {
     [host, path, auth] = [
       'api.mailgun.net',
       `/v3/${config.mailgunDomain}/messages`,
       'Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')
+    ]
+  }
+
+  if (payload.includes('source')) {
+    [host, path, auth] = [
+      'api.stripe.com',
+      '/v1/charges',
+      `Bearer ${config.stripeKey}`
     ]
   }
 
@@ -173,12 +181,12 @@ utils.request.setOptions = payLoad => {
     headers: {
       'Authorization': auth,
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(payLoad)
+      'Content-Length': Buffer.byteLength(payload)
     }
   }
 }
 
-utils.request.createPayLoad = token =>
+utils.request.createPayload = token =>
   order =>
     _for =>
       _for === 'stripe'
@@ -198,12 +206,12 @@ utils.request.createPayLoad = token =>
           : queryString.stringify({
             	amount: order.totalPrice,
               description: `${token.email}_${token.id}_${Date.now()}`,
-            	currency: 'USD',
-            	order_id: order.id,
-            	customer_name: 'John Doe',
-            	customer_email: token.email,
-            	callback_url: 'https://site.com/?handler=opennode',
-            	success_url: 'https://site.com/order/abc123'
+              currency: 'USD',
+              order_id: order.id,
+              customer_name: 'John Doe',
+              customer_email: token.email,
+              callback_url: 'https://site.com/?handler=opennode',
+              success_url: 'https://site.com/order/abc123'
             })
 
 utils.request.dispatch = callBack =>
@@ -214,7 +222,7 @@ utils.request.dispatch = callBack =>
           ? handlers[data.method](callBack)(data)
           : callBack(405)
 
-utils.request.send = payLoad =>
+utils.request.send = payload =>
   options =>
     callBack => {
       const req = https.request(options, res => {
@@ -230,7 +238,7 @@ utils.request.send = payLoad =>
       
       req.on('error', error => console.error(error))
       
-      req.write(payLoad)
+      req.write(payload)
       req.end()
     }
 

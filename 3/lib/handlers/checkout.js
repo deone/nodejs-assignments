@@ -53,13 +53,13 @@ checkoutHandler._checkout.post = callBack =>
         io.get(dir.orders)(orderId)
           .then(o => {
             const order = json.toObject(o)
-            const payLoad = request.createPayLoad(token)(order)
+            const payload = request.createPayload(token)(order)
             
-            const stripePayLoad = payLoad('stripe')
-            const stripeOptions = request.setOptions(stripePayLoad)
+            const stripePayload = payload('stripe')
+            const stripeOptions = request.setOptions(stripePayload)
 
             // Make payment
-            request.send(stripePayLoad)(stripeOptions)
+            request.send(stripePayload)(stripeOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Unable to process payment.'})
@@ -69,11 +69,11 @@ checkoutHandler._checkout.post = callBack =>
 
             order.paid = true
 
-            const mailgunPayLoad = payLoad('mailgun')
-            const mailgunOptions = request.setOptions(mailgunPayLoad)
+            const mailgunPayload = payload('mailgun')
+            const mailgunOptions = request.setOptions(mailgunPayload)
 
             // Send email
-            request.send(mailgunPayLoad)(mailgunOptions)
+            request.send(mailgunPayload)(mailgunOptions)
               ((err, data) => {
                 if (err) {
                   callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
