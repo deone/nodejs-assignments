@@ -52,12 +52,12 @@ checkoutTests['POST /api/checkout should send email, payment and return success 
   // Write token
   io.writeToken(token)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     'orderId': orderId
   })
 
   helpers.makeRequest(
-    'POST', '/api/checkout', payLoad, token.id, (statusCode, data) => {
+    'POST', '/api/checkout', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'Payment processed and user notified successfully.')

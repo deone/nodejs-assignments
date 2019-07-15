@@ -29,9 +29,9 @@ cartTests["GET /api/cart should return an array of items in user's cart"] = done
   // Write token
   io.writeToken(token)
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
-  helpers.makeRequest('GET', '/api/cart', payLoad, token.id, (statusCode, data) => {
+  helpers.makeRequest('GET', '/api/cart', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(Array.isArray(data), true)
 
@@ -70,9 +70,9 @@ cartTests['GET /api/cart with expired token should return error message'] = done
   // Write to disk
   io.writeFile(dir.tokens(token.id), JSON.stringify(token))
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
-  helpers.makeRequest('GET', '/api/cart', payLoad, token.id, (statusCode, data) => {
+  helpers.makeRequest('GET', '/api/cart', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 401)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'Token has expired. Please login again.')
@@ -107,11 +107,11 @@ cartTests["PUT /api/cart should update and return user's cart"] = done => {
   // Write token
   io.writeToken(token)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     "item": "barbeque"
   })
 
-  helpers.makeRequest('PUT', '/api/cart', payLoad, token.id, (statusCode, data) => {
+  helpers.makeRequest('PUT', '/api/cart', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(Array.isArray(data), true)
     assert.strictEqual(data.length, 2)
@@ -146,9 +146,9 @@ cartTests["DELETE /api/cart should delete item and return user's cart"] = done =
   // Write token
   io.writeToken(token)
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
-  helpers.makeRequest('DELETE', '/api/cart?item=barbeque', payLoad, token.id, (statusCode, data) => {
+  helpers.makeRequest('DELETE', '/api/cart?item=barbeque', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(Array.isArray(data), true)
     assert.strictEqual(data.length, 1)

@@ -20,10 +20,10 @@ userTests['POST /api/user should create user and return success message'] = done
     streetAddress: 'Dansoman'
   }
 
-  const payLoad = JSON.stringify(user)
+  const payload = JSON.stringify(user)
 
-  helpers.makeRequest('POST', '/api/user', payLoad, '', (statusCode, data) => {
-    assert.strictEqual(statusCode, 200)
+  helpers.makeRequest('POST', '/api/user', payload, '', (statusCode, data) => {
+    assert.strictEqual(statusCode, 201)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User created successfully.')
 
@@ -47,9 +47,9 @@ userTests['GET /api/user should return user object'] = done => {
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
-  helpers.makeRequest('GET', '/api/user?email=d@a.com', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('GET', '/api/user?email=d@a.com', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
 
@@ -73,7 +73,7 @@ userTests['PUT /api/user should update user and return success message'] = done 
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     email: 'e@a.com',
     firstName: 'DDD',
     lastName: 'EEE',
@@ -81,7 +81,7 @@ userTests['PUT /api/user should update user and return success message'] = done 
     streetAddress: 'East Legon'
   })
 
-  helpers.makeRequest('PUT', '/api/user', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('PUT', '/api/user', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User updated successfully.')
@@ -106,9 +106,9 @@ userTests['DELETE /api/user should delete user and return success message'] = do
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
-  helpers.makeRequest('DELETE', '/api/user?email=f@a.com', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('DELETE', '/api/user?email=f@a.com', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User deleted successfully.')

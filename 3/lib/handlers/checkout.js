@@ -12,10 +12,10 @@ const {
 
 const checkoutHandler = {}
 
-checkoutHandler.checkout = callBack =>
+checkoutHandler.checkout = callback =>
   data => {
     const dispatch =
-      request.dispatch(callBack)(checkoutHandler._checkout)
+      request.dispatch(callback)(checkoutHandler._checkout)
     dispatch(['post'])(data)
   }
 
@@ -23,7 +23,7 @@ checkoutHandler._checkout = {}
 
 // Checkout - post
 // Required data - token ID in header. order ID in payload
-checkoutHandler._checkout.post = callBack =>
+checkoutHandler._checkout.post = callback =>
   data => {
     const [tokenId, orderId] = validate([
       data.headers.token,
@@ -31,12 +31,12 @@ checkoutHandler._checkout.post = callBack =>
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
+      callback(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!orderId) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELDS})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELDS})
       return
     }
 
@@ -46,7 +46,7 @@ checkoutHandler._checkout.post = callBack =>
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': errors.TOKEN_EXPIRED})
+          callback(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
@@ -54,7 +54,7 @@ checkoutHandler._checkout.post = callBack =>
           .then(o => {
             const order = json.toObject(o)
             const payload = request.createPayload(token)(order)
-            
+
             const stripePayload = payload('stripe')
             const stripeOptions = request.setOptions(stripePayload)
 
@@ -62,12 +62,12 @@ checkoutHandler._checkout.post = callBack =>
             request.send(stripePayload)(stripeOptions)
               ((err, data) => {
                 if (err) {
-                  callBack(500, {'Error': 'Unable to process payment.'})
+                  callback(500, {'Error': 'Unable to process payment.'})
                   return
                 }
               })
 
-            order.paid = true
+            order.paymentStatus = 'paid'
 
             const mailgunPayload = payload('mailgun')
             const mailgunOptions = request.setOptions(mailgunPayload)
@@ -76,7 +76,7 @@ checkoutHandler._checkout.post = callBack =>
             request.send(mailgunPayload)(mailgunOptions)
               ((err, data) => {
                 if (err) {
-                  callBack(500, {'Error': 'Payment successful, but unable to notify user.'})
+                  callback(500, {'Error': 'Payment successful, but unable to notify user.'})
                   return
                 }
               })
@@ -87,18 +87,18 @@ checkoutHandler._checkout.post = callBack =>
             io.writeFile(dir.orders(order.id),
               JSON.stringify(order))
               .then(
-                callBack(200, {
+                callback(200, {
                   'Success': 'Payment processed and user notified successfully.'
                 })
               )
               .catch(err =>
-                callBack(500, {'Error': err.toString()}))
+                callback(500, {'Error': err.toString()}))
           })
           .catch(err =>
-            callBack(500, {'Error': err.toString()}))
+            callback(500, {'Error': err.toString()}))
       })
       .catch(err =>
-        callBack(500, {'Error': err.toString()}))
+        callback(500, {'Error': err.toString()}))
   }
 
 

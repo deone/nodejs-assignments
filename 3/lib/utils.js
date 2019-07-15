@@ -42,7 +42,7 @@ utils.io.writeUser = user =>
 utils.io.writeToken = token =>
   utils.io.writeFile(utils.dir.tokens(token.id), JSON.stringify(token))
 
-utils.io.getTemplate = (templateName, data, callBack) => {
+utils.io.getTemplate = (templateName, data, callback) => {
   templateName = typeof templateName === 'string' && templateName.length > 0
     ? templateName
     : false
@@ -55,7 +55,7 @@ utils.io.getTemplate = (templateName, data, callBack) => {
     ? utils.io.readFile(path.join(
         utils.dir.templates, `${templateName}.html`
       ), 'utf8')
-    : callBack('A valid template name was not specified.');
+    : callback('A valid template name was not specified.');
 }
 
 
@@ -151,25 +151,28 @@ utils.crypto.hash = str =>
 utils.request = {}
 
 utils.request.setOptions = payload => {
-  let [host, path, auth] = [
+  let [host, path, auth, contentType] = [
     'dev-api.opennode.co',
     '/v1/charges',
-    config.opennodeKey
+    config.opennodeKey,
+    'application/json'
   ]
 
   if (payload.includes('mailgun')) {
-    [host, path, auth] = [
+    [host, path, auth, contentType] = [
       'api.mailgun.net',
       `/v3/${config.mailgunDomain}/messages`,
-      'Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64')
+      'Basic ' + Buffer.from((`api:${config.mailgunKey}`)).toString('base64'),
+      'application/x-www-form-urlencoded'
     ]
   }
 
   if (payload.includes('source')) {
-    [host, path, auth] = [
+    [host, path, auth, contentType] = [
       'api.stripe.com',
       '/v1/charges',
-      `Bearer ${config.stripeKey}`
+      `Bearer ${config.stripeKey}`,
+      'application/x-www-form-urlencoded'
     ]
   }
 
@@ -180,7 +183,7 @@ utils.request.setOptions = payload => {
     method: 'POST',
     headers: {
       'Authorization': auth,
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': contentType,
       'Content-Length': Buffer.byteLength(payload)
     }
   }
@@ -203,36 +206,37 @@ utils.request.createPayload = token =>
               'subject': `Order No. ${order.id}`,
               'text': `Dear ${token.email}, an order with a total amount of ${order.totalPrice} was made by you.`
             })
-          : queryString.stringify({
+          : JSON.stringify({
             	amount: order.totalPrice,
-              description: `${token.email}_${token.id}_${Date.now()}`,
-              currency: 'USD',
-              order_id: order.id,
+            	currency: 'USD',
+            	order_id: order.id,
               customer_name: 'John Doe',
               customer_email: token.email,
-              callback_url: 'https://site.com/?handler=opennode',
-              success_url: 'https://site.com/order/abc123'
+              auto_settle: false,
+            	callback_url: 'https://site.com/?handler=opennode',
+            	success_url: "https://site.com/order/abc123",
+            	description: `Test Invoice for $${order.totalPrice}`
             })
 
-utils.request.dispatch = callBack =>
+utils.request.dispatch = callback =>
   handlers =>
     acceptableMethods =>
       data =>
         acceptableMethods.includes(data.method)
-          ? handlers[data.method](callBack)(data)
-          : callBack(405)
+          ? handlers[data.method](callback)(data)
+          : callback(405)
 
 utils.request.send = payload =>
   options =>
-    callBack => {
+    callback => {
       const req = https.request(options, res => {
         console.log(`Status code: ${res.statusCode}`)
       
         res.on('data', d => {
           console.log(`${d}`)
-          res.statusCode === 200
-            ? callBack(false)
-            : callBack(true)
+          res.statusCode === 200 || res.statusCode === 201
+            ? callback(false)
+            : callback(true)
         })
       })
       

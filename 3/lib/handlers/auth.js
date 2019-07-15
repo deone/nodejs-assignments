@@ -63,7 +63,7 @@ authHandler._login.post = callBack =>
 
               // Store token
               io.writeToken(token)
-                .then(callBack(200, token))
+                .then(callBack(201, token))
                 .catch(err => callBack(500, {'Error': err.toString()}))
               return
             }
@@ -91,7 +91,7 @@ authHandler._login.post = callBack =>
 
                     // Store token
                     io.writeToken(token)
-                      .then(callBack(200, token))
+                      .then(callBack(201, token))
                       .catch(err => callBack(500, {'Error': err.toString()}))
                     return
                   }
@@ -104,11 +104,11 @@ authHandler._login.post = callBack =>
                     // if token is expired, delete and create another
                     ? io.delete(dir.tokens)(token.id)
                         .then(() => {
-                          const token = crypto.createToken(email, crypto.createRandomString(20))
+                          const token = crypto.createToken(email)(crypto.createRandomString(20))
 
                           // Store token
                           io.writeToken(token)
-                            .then(callBack(200, token))
+                            .then(callBack(201, token))
                             .catch(err => callBack(500, {'Error': err.toString()}))
                         })
                         .catch(err =>

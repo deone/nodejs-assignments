@@ -14,10 +14,10 @@ const {
 
 const userHandler = {}
 
-userHandler.user = callBack =>
+userHandler.user = callback =>
   data => {
     const dispatch =
-      request.dispatch(callBack)(userHandler._user)
+      request.dispatch(callback)(userHandler._user)
     dispatch(['post', 'get', 'put', 'delete'])(data)
   }
 
@@ -28,7 +28,7 @@ userHandler._user = {}
 // Required data: firstName, lastName,
 // email, streetAddress, password
 // Optional data: none
-userHandler._user.post = callBack =>
+userHandler._user.post = callback =>
   data => {
     // Check that all required fields are filled out
     const [
@@ -46,7 +46,7 @@ userHandler._user.post = callBack =>
     ])
 
     if (!(firstName && lastName &&  email &&  streetAddress &&  password)) {
-      callBack(400, {'Error': 'Missing required fields.'})
+      callback(400, {'Error': 'Missing required fields.'})
       return
     }
 
@@ -54,7 +54,7 @@ userHandler._user.post = callBack =>
       dir.users(email),
       'utf8'
     )
-      .then(u => callBack(400, {
+      .then(u => callback(400, {
         'Error': 'User already exists.'
       }))
       .catch(err => {
@@ -73,8 +73,8 @@ userHandler._user.post = callBack =>
 
           // Store the user
           io.writeUser(user)
-            .then(callBack(200, {'Success': 'User created successfully.'}))
-            .catch(err => callBack(500, {'Error': err.toString()}))
+            .then(callback(201, {'Success': 'User created successfully.'}))
+            .catch(err => callback(500, {'Error': err.toString()}))
         }
       })
   }
@@ -84,13 +84,13 @@ userHandler._user.post = callBack =>
 // Optional data: none
 // @TODO Only let an authenticated user access
 // their object. Dont let them access anyone elses.
-userHandler._user.get = callBack =>
+userHandler._user.get = callback =>
   data => {
     // Validate email - do this properly, maybe with regex
     const [email] = validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -102,15 +102,15 @@ userHandler._user.get = callBack =>
       .then(u => {
         const user = json.toObject(u)
         delete user.hashedPassword
-        callBack(200, user)
+        callback(200, user)
       })
       .catch(err => {
         const errorString = err.toString()
         errorString.includes('no such file or directory')
-          ? callBack(404, {
+          ? callback(404, {
               'Error': 'User does not exist.'
             })
-          : callBack(500, {
+          : callback(500, {
               'Error': err.toString()
             })
       })
@@ -122,7 +122,7 @@ userHandler._user.get = callBack =>
 // password (at least one must be specified)
 // @TODO Only let an authenticated user up their object.
 // Dont let them access update elses.
-userHandler._user.put = callBack =>
+userHandler._user.put = callback =>
   data => {
     // Validate required field
     const [email] = validate([data.payload.email])
@@ -141,12 +141,12 @@ userHandler._user.put = callBack =>
     ])
 
     if (!email) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     if (!(firstName || lastName || streetAddress || password)) {
-      callBack(400, {'Error': 'Missing fields to update.'})
+      callback(400, {'Error': 'Missing fields to update.'})
       return
     }
 
@@ -185,12 +185,12 @@ userHandler._user.put = callBack =>
 
         // Store updates
         io.writeUser(user)
-          .then(callBack(200, {'Success': 'User updated successfully.'}))
-          .catch(err => callBack(500, {'Error': err.toString()}))
+          .then(callback(200, {'Success': 'User updated successfully.'}))
+          .catch(err => callback(500, {'Error': err.toString()}))
       })
       .catch(err => {
         console.log(err)
-        callBack(404, {'Error': 'User does not exist.'})
+        callback(404, {'Error': 'User does not exist.'})
       })
   }
 
@@ -200,27 +200,27 @@ userHandler._user.put = callBack =>
 // @TODO Only let an authenticated user delete their object.
 // Don't let them delete or update someone elses.
 // @TODO Cleanup (delete) any other data files associated with the user
-userHandler._user.delete = callBack =>
+userHandler._user.delete = callback =>
   data => {
     // Validate email
     const [email] = validate([data.queryStringObject.email])
 
     if (!email) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
     io.delete(dir.users)(email)
-      .then(() => callBack(200, {
+      .then(() => callback(200, {
         'Success': 'User deleted successfully.'
       }))
       .catch(err => {
         const errorString = err.toString()
         errorString.includes('no such file or directory')
-          ? callBack(404, {
+          ? callback(404, {
               'Error': 'User does not exist.'
             })
-          : callBack(500, {
+          : callback(500, {
               'Error': err.toString()
             })
       })

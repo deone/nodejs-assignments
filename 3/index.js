@@ -15,8 +15,8 @@ const BTCCheckoutHandler = require('./lib/handlers/btccheckout')
 const cartHandler = require('./lib/handlers/cart/cart')
 const orderHandler = require('./lib/handlers/order/order')
 
-const notFoundHandler = callBack =>
-  data => callBack(404, 'Not Found')
+const notFoundHandler = callback =>
+  data => callback(404, 'Not Found')
 
 // HTML handler
 const frontEnd = require('./lib/handlers/frontend')
@@ -59,7 +59,7 @@ const server = http.createServer((req, res) => {
   const headers = req.headers
 
   // -- Callback
-  const callBack = (statusCode, message, contentType) => {
+  const callback = (statusCode, message, contentType) => {
     // Determine the type of response (fallback to JSON)
     contentType = typeof contentType === 'string' ? contentType : 'json'
 
@@ -111,7 +111,7 @@ const server = http.createServer((req, res) => {
     }
 
     // handle request
-    chosenHandler(callBack)(data)
+    chosenHandler(callback)(data)
   })
 })
 

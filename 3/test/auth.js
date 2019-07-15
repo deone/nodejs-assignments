@@ -23,14 +23,14 @@ authTests['POST /api/login should return token object'] = done => {
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     "email": "a@a.com",
     "password": "123456"
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
-    assert.strictEqual(statusCode, 200)
+  helpers.makeRequest('POST', '/api/login', payload, '', (statusCode, data) => {
+    assert.strictEqual(statusCode, 201)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data.email, 'a@a.com')
     assert.strictEqual(typeof data.id, 'string')
@@ -59,12 +59,12 @@ authTests['POST /api/login with a missing field should return error message'] = 
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     "password": "123456"
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 400)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'Missing required field(s).')
@@ -89,13 +89,13 @@ authTests['POST /api/login with wrong password should return error message'] = d
 
   io.writeUser(user)
 
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     "email": "n@a.com",
     "password": "123457"
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 400)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], "Password did not match the user's stored password.")
@@ -111,13 +111,13 @@ authTests['POST /api/login with wrong password should return error message'] = d
 authTests['POST /api/login with non-existent credentials should return error message'] = done => {
   // Attempt logging in with credentials that
   // don't exist
-  const payLoad = JSON.stringify({
+  const payload = JSON.stringify({
     "email": "o@a.com",
     "password": "123457"
   })
 
   // Log in
-  helpers.makeRequest('POST', '/api/login', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/login', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 404)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'User does not exist.')
@@ -135,10 +135,10 @@ authTests['POST /api/logout should return success message'] = done => {
   // Write token
   io.writeToken(token)
 
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
   // Log in
-  helpers.makeRequest('POST', '/api/logout', payLoad, token.id, (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/logout', payload, token.id, (statusCode, data) => {
     assert.strictEqual(statusCode, 200)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Success'], 'User logged out.')
@@ -149,10 +149,10 @@ authTests['POST /api/logout should return success message'] = done => {
 
 // Token not provided
 authTests['POST /api/logout without token should return error message'] = done => {
-  const payLoad = JSON.stringify({})
+  const payload = JSON.stringify({})
 
   // Log in
-  helpers.makeRequest('POST', '/api/logout', payLoad, '', (statusCode, data) => {
+  helpers.makeRequest('POST', '/api/logout', payload, '', (statusCode, data) => {
     assert.strictEqual(statusCode, 401)
     assert.strictEqual(typeof data, 'object')
     assert.strictEqual(data['Error'], 'Authentication token not provided.')

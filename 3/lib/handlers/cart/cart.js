@@ -15,10 +15,10 @@ const {
 
 const cartHandler = {}
 
-cartHandler.cart = callBack =>
+cartHandler.cart = callback =>
   data => {
     const dispatch =
-      request.dispatch(callBack)(cartHandler._cart)
+      request.dispatch(callback)(cartHandler._cart)
     dispatch(['get', 'put', 'delete'])(data)
   }
 
@@ -27,13 +27,13 @@ cartHandler._cart = {}
 // Cart - get
 // Required data - tokenID
 // Optional data - none
-cartHandler._cart.get = callBack =>
+cartHandler._cart.get = callback =>
   data => {
     // Get tokenId from header
     const [tokenId] = validate([data.headers.token])
 
     if (!tokenId) {
-      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
+      callback(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
@@ -44,28 +44,28 @@ cartHandler._cart.get = callBack =>
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': errors.TOKEN_EXPIRED})
+          callback(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
         io.get(dir.users)(token.email)
           .then(user => {
-              const cart = helpers.getOrCreateCart(callBack)(
+              const cart = helpers.getOrCreateCart(callback)(
                 json.toObject(user))
-              callBack(200, cart)
+              callback(200, cart)
             }
           )
           .catch(err =>
-            callBack(500, {'Error': err.toString()}))
+            callback(500, {'Error': err.toString()}))
       })
       .catch(err =>
-        callBack(500, {'Error': err.toString()}))
+        callback(500, {'Error': err.toString()}))
   }
 
 // Cart - put
 // Required data - token ID, menu item
 // Optional data - none
-cartHandler._cart.put = callBack =>
+cartHandler._cart.put = callback =>
   data => {
     // Get tokenID from header
     const [tokenId, item] = validate([
@@ -74,12 +74,12 @@ cartHandler._cart.put = callBack =>
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
+      callback(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!item) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -90,7 +90,7 @@ cartHandler._cart.put = callBack =>
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': errors.TOKEN_EXPIRED})
+          callback(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
@@ -100,7 +100,7 @@ cartHandler._cart.put = callBack =>
             const menu = fp.map(fp.slice(0)(-5))(xs)
             if (!menu.includes(item)) {
               // Requested item is not on menu
-              callBack(400, {'Error': 'Item requested is not on menu.'})
+              callback(400, {'Error': 'Item requested is not on menu.'})
               return
             }
 
@@ -113,7 +113,7 @@ cartHandler._cart.put = callBack =>
                   .then(m => {
                     const menuItem = json.toObject(m)
                     // Get cart
-                    const cart = helpers.getOrCreateCart(callBack)(user)
+                    const cart = helpers.getOrCreateCart(callback)(user)
                     // Remove menu item ID and
                     // update cart with menu item
                     delete menuItem.id
@@ -121,26 +121,26 @@ cartHandler._cart.put = callBack =>
 
                     // Write user and return cart
                     io.writeUser(user)
-                      .then(callBack(200, user.cart))
-                      .catch(err => callBack(500, {'Error': err.toString()}))
+                      .then(callback(200, user.cart))
+                      .catch(err => callback(500, {'Error': err.toString()}))
                   })
                   .catch(err =>
-                    callBack(500, {'Error': err.toString()}))
+                    callback(500, {'Error': err.toString()}))
               })
               .catch(err =>
-                callBack(500, {'Error': err.toString()}))
+                callback(500, {'Error': err.toString()}))
           })
           .catch(err =>
-            callBack(500, {'Error': err.toString()}))
+            callback(500, {'Error': err.toString()}))
       })
       .catch(err =>
-        callBack(500, {'Error': err.toString()}))
+        callback(500, {'Error': err.toString()}))
   }
 
 // Cart - delete
 // Required data - token ID, menu item
 // Optional data - none
-cartHandler._cart.delete = callBack =>
+cartHandler._cart.delete = callback =>
   data => {
     // Get tokenID from header  
     const [tokenId, item] = validate([
@@ -149,12 +149,12 @@ cartHandler._cart.delete = callBack =>
     ])
 
     if (!tokenId) {
-      callBack(401, {'Error': errors.TOKEN_NOT_PROVIDED})
+      callback(401, {'Error': errors.TOKEN_NOT_PROVIDED})
       return
     }
 
     if (!item) {
-      callBack(400, {'Error': errors.MISSING_REQUIRED_FIELD})
+      callback(400, {'Error': errors.MISSING_REQUIRED_FIELD})
       return
     }
 
@@ -165,7 +165,7 @@ cartHandler._cart.delete = callBack =>
 
         // Check whether token is expired
         if (Date.now() > token.expires) {
-          callBack(401, {'Error': errors.TOKEN_EXPIRED})
+          callback(401, {'Error': errors.TOKEN_EXPIRED})
           return
         }
 
@@ -179,16 +179,16 @@ cartHandler._cart.delete = callBack =>
 
             // Write user and return cart
             io.writeUser(user)
-              .then(callBack(200, user.cart))
+              .then(callback(200, user.cart))
               .catch(err =>
-                callBack(500, {'Error': err.toString()}))
+                callback(500, {'Error': err.toString()}))
           })
           .catch(err =>
-            callBack(500, {'Error': err.toString()})
+            callback(500, {'Error': err.toString()})
           )
       })
       .catch(err =>
-        callBack(500, {'Error': err.toString()}))
+        callback(500, {'Error': err.toString()}))
   }
 
 
